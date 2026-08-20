@@ -1,5 +1,6 @@
 /*!
  * js/data.js — Estado y persistencia
+ * v2 — Favicons con triple fallback de alta calidad
  */
 (function (root) {
   'use strict';
@@ -97,12 +98,14 @@
     var emojiClass = cssClass === 'fav-icon' ? 'fav-emoji' : 'link-emoji';
     
     if (domain) {
-      var googleFavicon = 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=' + (s * 2);
-      var yandexFavicon = 'https://favicon.yandex.net/favicon/v2/' + domain + '?size=64';
+      // Triple fallback de alta calidad
+      var googleFavicon = 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=256';
+      var duckduckgoFavicon = 'https://icons.duckduckgo.com/ip3/' + domain + '.ico';
+      var iconHorseFavicon = 'https://icon.horse/icon/' + domain;
       var emojiFallback = emoji || '🔗';
       
       return '<img class="' + (cssClass || '') + '" src="' + googleFavicon + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
-             'onerror="if(!this.dataset.fallback1){this.dataset.fallback1=1;this.src=\'' + yandexFavicon + '\';}else{this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';}">' +
+             'onerror="if(!this.dataset.fallback1){this.dataset.fallback1=1;this.src=\'' + duckduckgoFavicon + '\';}else if(!this.dataset.fallback2){this.dataset.fallback2=1;this.src=\'' + iconHorseFavicon + '\';}else{this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';}">' +
              '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + emojiFallback + '</span>';
     }
     
