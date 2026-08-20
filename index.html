@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐈‍⬛ La Guarida — Página de inicio del Gato Negro</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      background:#0e0e10; color:#e9e9ee;
+      font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+      line-height:1.5; padding:40px 20px;
+      min-height:100vh;
+    }
+
+    .container {
+      max-width:1000px; margin:0 auto;
+      display:flex; flex-direction:column; gap:24px;
+    }
+
+    /* ====== Header ====== */
+    .header {
+      text-align:center; padding:30px 20px;
+      background:#141418; border-radius:24px;
+      border:1px solid #1d1d20;
+      box-shadow:0 8px 24px rgba(0,0,0,0.3);
+    }
+    .header h1 {
+      font-size:1.8rem; color:#ffffff;
+      display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;
+    }
+    .header h1 .gold { color:#ffd966; }
+    .toolbar {
+      display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:16px;
+    }
+    .btn {
+      padding:8px 16px; border-radius:20px;
+      border:1px solid #2a2c35; background:#1a1c24;
+      color:#e0e4ed; font-size:0.8rem; font-weight:600;
+      cursor:pointer; transition:all 0.2s ease;
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    .btn:hover { background:#252830; border-color:#3a3e4a; }
+    .btn--gold { border-color:#ffd966; color:#ffd966; }
+    .btn--gold:hover { background:#ffd96620; border-color:#ffd966; }
+    .btn--danger { border-color:#ff9d9d; color:#ff9d9d; }
+    .btn--danger:hover { background:#ff9d9d20; }
+
+    /* ====== Favoritos ====== */
+    .section-title {
+      font-size:1.1rem; color:#e0e4ed; margin:0;
+      display:flex; align-items:center; gap:8px;
+    }
+    .favorites-grid {
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr));
+      gap:12px;
+    }
+    .fav-card {
+      background:#0f1116; border:1px solid #26262b; border-radius:12px;
+      padding:16px 8px; text-align:center; text-decoration:none;
+      display:flex; flex-direction:column; align-items:center; gap:8px;
+      transition:all 0.2s ease; position:relative;
+    }
+    .fav-card:hover {
+      transform:translateY(-3px);
+      box-shadow:0 10px 28px rgba(0,0,0,0.45), 0 0 16px rgba(90,110,154,0.20);
+    }
+    .fav-card img, .fav-card .emoji-fallback {
+      width:40px; height:40px; border-radius:8px; object-fit:contain;
+    }
+    .fav-card .fav-name {
+      font-size:0.7rem; color:#cfd2d8; font-weight:600;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+    }
+
+    /* Modo edición */
+    .edit-mode .fav-card { cursor:pointer; }
+    .edit-actions {
+      display:none; position:absolute; top:4px; right:4px; gap:4px;
+    }
+    .edit-mode .edit-actions { display:flex; }
+    .edit-actions button {
+      width:20px; height:20px; border-radius:50%;
+      border:none; font-size:0.6rem; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .edit-actions .edit-btn { background:#1a1c24; color:#ffd966; }
+    .edit-actions .del-btn { background:#1a1c24; color:#ff9d9d; }
+
+    /* ====== Categorías ====== */
+    .categories-grid {
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+      gap:16px;
+    }
+    .category-card {
+      background:#0f1116; border:1px solid #26262b; border-radius:12px;
+      padding:16px; position:relative;
+    }
+    .category-header {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .category-title {
+      font-size:0.9rem; font-weight:700; color:#e0e4ed;
+      display:flex; align-items:center; gap:8px;
+    }
+    .category-links {
+      display:flex; flex-direction:column; gap:6px;
+    }
+    .category-link {
+      display:flex; align-items:center; gap:10px;
+      padding:8px 10px; background:#0a0c10;
+      border:1px solid #1e2028; border-radius:8px;
+      text-decoration:none; transition:all 0.15s ease;
+    }
+    .category-link:hover { background:#11131c; border-color:#2e3342; }
+    .category-link img, .category-link .emoji-fallback {
+      width:20px; height:20px; border-radius:4px; object-fit:contain;
+    }
+    .category-link .link-name {
+      font-size:0.8rem; color:#cfd2d8; font-weight:500;
+      flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+
+    /* ====== Modal ====== */
+    .modal {
+      position:fixed; inset:0; background:rgba(0,0,0,0.7);
+      display:flex; align-items:center; justify-content:center;
+      z-index:1000;
+    }
+    .modal[hidden] { display:none; }
+    .modal-card {
+      background:#141418; border:1px solid #2a2c35; border-radius:16px;
+      padding:24px; width:90%; max-width:420px;
+    }
+    .modal-card h3 { color:#e0e4ed; margin-bottom:16px; font-size:1.1rem; }
+    .field { margin-bottom:12px; }
+    .field label {
+      display:block; font-size:0.75rem; color:#9aa2b8; margin-bottom:4px;
+      text-transform:uppercase; letter-spacing:0.5px;
+    }
+    .field input {
+      width:100%; padding:8px 12px; border-radius:8px;
+      border:1px solid #2a2c35; background:#0f1116;
+      color:#e0e4ed; font-size:0.85rem;
+    }
+    .field input:focus { outline:none; border-color:#5a6e9a; }
+    .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:16px; }
+
+    .add-btn {
+      display:flex; align-items:center; gap:6px;
+      padding:8px 16px; border-radius:20px;
+      border:1px dashed #2a2c35; background:transparent;
+      color:#6a7080; font-size:0.75rem; cursor:pointer;
+      transition:all 0.2s ease; width:100%; justify-content:center;
+    }
+    .add-btn:hover { border-color:#5a6e9a; color:#9aa2b8; }
+
+    @media (max-width:600px) {
+      .container { padding:16px; gap:16px; }
+      .favorites-grid { grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); }
+      .categories-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header">
+    <h1>
+      🐈‍⬛ <span class="gold">Bóveda del Gato Negro</span>
+    </h1>
+    <p style="color:#a0a0a6; font-size:0.85rem; margin-top:4px;">Página de inicio personal</p>
+    
+    <div class="toolbar">
+      <button id="editModeBtn" class="btn">✏️ Modo edición</button>
+      <button id="addFavoriteBtn" class="btn btn--gold">⭐ Agregar favorito</button>
+      <button id="addCategoryBtn" class="btn">📁 Agregar categoría</button>
+      <button id="exportBtn" class="btn">💾 Exportar</button>
+      <button id="importBtn" class="btn">📂 Importar</button>
+      <input type="file" id="importFile" accept=".json" style="display:none;">
+    </div>
+  </header>
+
+  <!-- FAVORITOS -->
+  <section>
+    <h2 class="section-title">⭐ Favoritos</h2>
+    <div class="favorites-grid" id="favoritesGrid"></div>
+  </section>
+
+  <!-- CATEGORÍAS -->
+  <section>
+    <h2 class="section-title">📁 Categorías</h2>
+    <div class="categories-grid" id="categoriesGrid"></div>
+  </section>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal" hidden>
+  <div class="modal-card">
+    <h3 id="modalTitle">Editar</h3>
+    <div class="field">
+      <label>Nombre</label>
+      <input type="text" id="modalName" placeholder="Ej: GitHub">
+    </div>
+    <div class="field">
+      <label>URL</label>
+      <input type="url" id="modalUrl" placeholder="https://...">
+    </div>
+    <div class="field" id="modalEmojiField">
+      <label>Emoji (opcional, override del favicon)</label>
+      <input type="text" id="modalEmoji" placeholder="🔗">
+    </div>
+    <div class="modal-actions">
+      <button id="modalCancel" class="btn">Cancelar</button>
+      <button id="modalSave" class="btn btn--gold">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var LOG = '[Homepage]';
+
+  // ====== ESTADO ======
+  var STORAGE_KEY = 'homepage_data_v1';
+  var state = {
+    favorites: [],
+    categories: []
+  };
+
+  // ====== DEFAULT INICIAL ======
+  var DEFAULT_STATE = {
+    favorites: [
+      { id: 1, name: 'Bóveda', url: 'https://pablosnchz.github.io/gw2-wallet-ligero/', emoji: '' },
+      { id: 2, name: 'Métricas', url: 'https://pablosnchz.github.io/gw2-metrics-dashboard/', emoji: '' },
+      { id: 3, name: 'Link Bio', url: 'https://pablosnchz.github.io/bio/', emoji: '' },
+      { id: 4, name: 'Traffic Stats', url: 'https://pablosnchz.github.io/github-repo-traffic-stats/', emoji: '' }
+    ],
+    categories: [
+      {
+        id: 1,
+        name: 'GW2',
+        emoji: '🎮',
+        links: [
+          { id: 1, name: 'Wiki ES', url: 'https://wiki-es.guildwars2.com/', emoji: '' },
+          { id: 2, name: 'GW2 Efficiency', url: 'https://gw2efficiency.com/', emoji: '' },
+          { id: 3, name: 'Metabattle', url: 'https://metabattle.com/', emoji: '' }
+        ]
+      },
+      {
+        id: 2,
+        name: 'Desarrollo',
+        emoji: '💻',
+        links: [
+          { id: 1, name: 'GitHub', url: 'https://github.com/', emoji: '' },
+          { id: 2, name: 'Vercel', url: 'https://vercel.com/', emoji: '' }
+        ]
+      }
+    ]
+  };
+
+  // ====== UTILIDADES ======
+  function $(sel) { return document.querySelector(sel); }
+  function esc(s) { return String(s || '').replace(/[&<>]/g, function(m) { return ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]); }); }
+  function genId() { return Date.now() + Math.floor(Math.random() * 1000); }
+
+  function getDomain(url) {
+    try { return new URL(url).hostname; } catch(e) { return ''; }
+  }
+
+  function getFaviconHTML(url, emoji, size) {
+    var domain = getDomain(url);
+    var s = size || 32;
+    var faviconUrl = domain ? 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=' + (s * 2) : '';
+    
+    if (faviconUrl) {
+      return '<img src="' + faviconUrl + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'inline-block\';' + (emoji ? ' this.nextElementSibling.textContent=\'' + esc(emoji) + '\';' : '') + '">' +
+             '<span class="emoji-fallback" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
+    }
+    return '<span class="emoji-fallback" style="width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
+  }
+
+  // ====== PERSISTENCIA ======
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        state = JSON.parse(raw);
+        return;
+      }
+    } catch(e) { console.warn(LOG, 'Error cargando datos:', e); }
+    state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    save();
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch(e) {
+      console.error(LOG, 'Error guardando:', e);
+      alert('⚠️ No se pudo guardar. El navegador puede tener cuota llena. Usá Exportar para respaldar.');
+    }
+  }
+
+  function exportJSON() {
+    var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'homepage-data.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importJSON(file) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var data = JSON.parse(e.target.result);
+        if (data && data.favorites && data.categories) {
+          state = data;
+          save();
+          render();
+          alert('✅ Datos importados correctamente');
+        } else {
+          alert('❌ El archivo no tiene el formato correcto');
+        }
+      } catch(err) {
+        alert('❌ Error al leer el JSON: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // ====== RENDER ======
+  function render() {
+    renderFavorites();
+    renderCategories();
+  }
+
+  function renderFavorites() {
+    var grid = $('#favoritesGrid');
+    if (!grid) return;
+
+    grid.innerHTML = state.favorites.map(function(fav) {
+      return '<a class="fav-card" href="' + esc(fav.url) + '" target="_blank" rel="noopener" data-id="' + fav.id + '">' +
+        getFaviconHTML(fav.url, fav.emoji, 40) +
+        '<span class="fav-name">' + esc(fav.name) + '</span>' +
+        '<div class="edit-actions">' +
+          '<button class="edit-btn" data-action="edit" data-id="' + fav.id + '" title="Editar">✏️</button>' +
+          '<button class="del-btn" data-action="delete" data-id="' + fav.id + '" title="Eliminar">🗑</button>' +
+        '</div>' +
+        '</a>';
+    }).join('') + '<button class="add-btn" id="addFavInline">+ Favorito</button>';
+
+    // Wire inline add
+    var addFavBtn = $('#addFavInline');
+    if (addFavBtn) {
+      addFavBtn.addEventListener('click', function() { openModal('favorite'); });
+    }
+
+    // Wire edit/delete
+    grid.querySelectorAll('.edit-actions button').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var action = this.getAttribute('data-action');
+        var id = parseInt(this.getAttribute('data-id'));
+        if (action === 'edit') openModal('favorite', id);
+        if (action === 'delete') deleteFavorite(id);
+      });
+    });
+
+    // En modo edición, click en la card no navega
+    grid.querySelectorAll('.fav-card').forEach(function(card) {
+      card.addEventListener('click', function(e) {
+        if (editMode) {
+          e.preventDefault();
+          var id = parseInt(this.getAttribute('data-id'));
+          openModal('favorite', id);
+        }
+      });
+    });
+  }
+
+  function renderCategories() {
+    var grid = $('#categoriesGrid');
+    if (!grid) return;
+
+    grid.innerHTML = state.categories.map(function(cat) {
+      var linksHTML = cat.links.map(function(link) {
+        return '<a class="category-link" href="' + esc(link.url) + '" target="_blank" rel="noopener" data-cat-id="' + cat.id + '" data-link-id="' + link.id + '">' +
+          getFaviconHTML(link.url, link.emoji, 20) +
+          '<span class="link-name">' + esc(link.name) + '</span>' +
+          '<div class="edit-actions">' +
+            '<button class="edit-btn" data-action="edit-link" data-cat-id="' + cat.id + '" data-link-id="' + link.id + '">✏️</button>' +
+            '<button class="del-btn" data-action="delete-link" data-cat-id="' + cat.id + '" data-link-id="' + link.id + '">🗑</button>' +
+          '</div>' +
+          '</a>';
+      }).join('');
+
+      return '<div class="category-card" data-id="' + cat.id + '">' +
+        '<div class="category-header">' +
+          '<span class="category-title">' + esc(cat.emoji || '📁') + ' ' + esc(cat.name) + '</span>' +
+          '<div class="edit-actions">' +
+            '<button class="edit-btn" data-action="edit-cat" data-id="' + cat.id + '">✏️</button>' +
+            '<button class="del-btn" data-action="delete-cat" data-id="' + cat.id + '">🗑</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="category-links">' + linksHTML + '</div>' +
+        '<button class="add-btn" style="margin-top:8px;" data-action="add-link" data-cat-id="' + cat.id + '">+ Link</button>' +
+        '</div>';
+    }).join('') + '<button class="add-btn" id="addCatInline">+ Categoría</button>';
+
+    // Wire add category inline
+    var addCatBtn = $('#addCatInline');
+    if (addCatBtn) addCatBtn.addEventListener('click', function() { openModal('category'); });
+
+    // Wire edit/delete categorías
+    grid.querySelectorAll('[data-action="edit-cat"]').forEach(function(btn) {
+      btn.addEventListener('click', function() { var id = parseInt(this.getAttribute('data-id')); openModal('category', id); });
+    });
+    grid.querySelectorAll('[data-action="delete-cat"]').forEach(function(btn) {
+      btn.addEventListener('click', function() { deleteCategory(parseInt(this.getAttribute('data-id'))); });
+    });
+
+    // Wire add link en categoría
+    grid.querySelectorAll('[data-action="add-link"]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var catId = parseInt(this.getAttribute('data-cat-id'));
+        openModal('link', null, catId);
+      });
+    });
+
+    // Wire edit/delete links
+    grid.querySelectorAll('[data-action="edit-link"]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var catId = parseInt(this.getAttribute('data-cat-id'));
+        var linkId = parseInt(this.getAttribute('data-link-id'));
+        openModal('link', linkId, catId);
+      });
+    });
+    grid.querySelectorAll('[data-action="delete-link"]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        deleteLink(parseInt(this.getAttribute('data-cat-id')), parseInt(this.getAttribute('data-link-id')));
+      });
+    });
+
+    // En modo edición, click no navega
+    grid.querySelectorAll('.category-link').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        if (editMode) {
+          e.preventDefault();
+          var catId = parseInt(this.getAttribute('data-cat-id'));
+          var linkId = parseInt(this.getAttribute('data-link-id'));
+          openModal('link', linkId, catId);
+        }
+      });
+    });
+  }
+
+  // ====== ACCIONES ======
+  function deleteFavorite(id) {
+    if (!confirm('¿Eliminar este favorito?')) return;
+    state.favorites = state.favorites.filter(function(f) { return f.id !== id; });
+    save(); render();
+  }
+
+  function deleteCategory(id) {
+    if (!confirm('¿Eliminar esta categoría y todos sus links?')) return;
+    state.categories = state.categories.filter(function(c) { return c.id !== id; });
+    save(); render();
+  }
+
+  function deleteLink(catId, linkId) {
+    if (!confirm('¿Eliminar este link?')) return;
+    var cat = state.categories.find(function(c) { return c.id === catId; });
+    if (cat) {
+      cat.links = cat.links.filter(function(l) { return l.id !== linkId; });
+      save(); render();
+    }
+  }
+
+  // ====== MODAL ======
+  var editMode = false;
+  var modalContext = null; // { type, id, catId }
+
+  function openModal(type, id, catId) {
+    modalContext = { type: type, id: id, catId: catId };
+    var modal = $('#modal');
+    var title = $('#modalTitle');
+    var nameInput = $('#modalName');
+    var urlInput = $('#modalUrl');
+    var emojiInput = $('#modalEmoji');
+
+    if (type === 'favorite') {
+      title.textContent = id ? '✏️ Editar favorito' : '⭐ Agregar favorito';
+      var fav = id ? state.favorites.find(function(f) { return f.id === id; }) : null;
+      nameInput.value = fav ? fav.name : '';
+      urlInput.value = fav ? fav.url : '';
+      emojiInput.value = fav ? (fav.emoji || '') : '';
+    } else if (type === 'category') {
+      title.textContent = id ? '✏️ Editar categoría' : '📁 Agregar categoría';
+      var cat = id ? state.categories.find(function(c) { return c.id === id; }) : null;
+      nameInput.value = cat ? cat.name : '';
+      urlInput.value = '';
+      urlInput.style.display = 'none';
+      document.querySelector('label[for="modalUrl"]').style.display = 'none';
+      emojiInput.value = cat ? (cat.emoji || '') : '';
+    } else if (type === 'link') {
+      title.textContent = id ? '✏️ Editar link' : '🔗 Agregar link';
+      var cat2 = state.categories.find(function(c) { return c.id === catId; });
+      var link = id && cat2 ? cat2.links.find(function(l) { return l.id === id; }) : null;
+      nameInput.value = link ? link.name : '';
+      urlInput.value = link ? link.url : '';
+      emojiInput.value = link ? (link.emoji || '') : '';
+    }
+
+    modal.hidden = false;
+  }
+
+  function closeModal() {
+    $('#modal').hidden = true;
+    $('#modalUrl').style.display = '';
+    document.querySelector('label[for="modalUrl"]').style.display = '';
+  }
+
+  function saveModal() {
+    var name = $('#modalName').value.trim();
+    var url = $('#modalUrl').value.trim();
+    var emoji = $('#modalEmoji').value.trim();
+
+    if (!name) { alert('El nombre es obligatorio'); return; }
+
+    var ctx = modalContext;
+    if (ctx.type === 'favorite') {
+      if (!url) { alert('La URL es obligatoria'); return; }
+      if (ctx.id) {
+        var fav = state.favorites.find(function(f) { return f.id === ctx.id; });
+        if (fav) { fav.name = name; fav.url = url; fav.emoji = emoji; }
+      } else {
+        state.favorites.push({ id: genId(), name: name, url: url, emoji: emoji });
+      }
+    } else if (ctx.type === 'category') {
+      if (ctx.id) {
+        var cat = state.categories.find(function(c) { return c.id === ctx.id; });
+        if (cat) { cat.name = name; cat.emoji = emoji; }
+      } else {
+        state.categories.push({ id: genId(), name: name, emoji: emoji, links: [] });
+      }
+    } else if (ctx.type === 'link') {
+      if (!url) { alert('La URL es obligatoria'); return; }
+      var cat2 = state.categories.find(function(c) { return c.id === ctx.catId; });
+      if (cat2) {
+        if (ctx.id) {
+          var link = cat2.links.find(function(l) { return l.id === ctx.id; });
+          if (link) { link.name = name; link.url = url; link.emoji = emoji; }
+        } else {
+          cat2.links.push({ id: genId(), name: name, url: url, emoji: emoji });
+        }
+      }
+    }
+
+    save(); render(); closeModal();
+  }
+
+  // ====== WIRE GLOBAL ======
+  function wireEvents() {
+    $('#editModeBtn').addEventListener('click', function() {
+      editMode = !editMode;
+      this.textContent = editMode ? '✅ Modo edición: ON' : '✏️ Modo edición';
+      document.body.classList.toggle('edit-mode', editMode);
+    });
+
+    $('#addFavoriteBtn').addEventListener('click', function() { openModal('favorite'); });
+    $('#addCategoryBtn').addEventListener('click', function() { openModal('category'); });
+
+    $('#exportBtn').addEventListener('click', exportJSON);
+
+    $('#importBtn').addEventListener('click', function() { $('#importFile').click(); });
+    $('#importFile').addEventListener('change', function(e) {
+      if (this.files && this.files[0]) importJSON(this.files[0]);
+      this.value = '';
+    });
+
+    $('#modalCancel').addEventListener('click', closeModal);
+    $('#modalSave').addEventListener('click', saveModal);
+
+    $('#modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+  }
+
+  // ====== INIT ======
+  function init() {
+    console.log(LOG, 'Iniciando...');
+    load();
+    wireEvents();
+    render();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>
