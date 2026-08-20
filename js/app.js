@@ -141,4 +141,50 @@
     if (!confirm('¿Eliminar este link?')) return;
     var cat = root.Data.state.categories.find(function(c) { return c.id === catId; });
     if (cat) {
-      cat.links = cat.links.filter(function(l) { return
+      cat.links = cat.links.filter(function(l) { return l.id !== linkId; });
+      root.Data.save(); render();
+    }
+  }
+
+  // ====== WIRE ======
+  function wireEvents() {
+    $('#editModeBtn').addEventListener('click', function() {
+      editMode = !editMode;
+      this.textContent = editMode ? '✅ Modo edición: ON' : '✏️ Modo edición';
+      document.body.classList.toggle('edit-mode', editMode);
+      root.DragDrop.setEditMode(editMode);
+      render();
+    });
+
+    $('#addFavoriteBtn').addEventListener('click', function() { root.Modal.open('favorite'); });
+    $('#addCategoryBtn').addEventListener('click', function() { root.Modal.open('category'); });
+    $('#exportBtn').addEventListener('click', root.Data.exportJSON);
+    $('#importBtn').addEventListener('click', function() { $('#importFile').click(); });
+    $('#importFile').addEventListener('change', function(e) {
+      if (this.files && this.files[0]) root.Data.importJSON(this.files[0]);
+      this.value = '';
+    });
+
+    root.Modal.wire();
+  }
+
+  // ====== INIT ======
+  function init() {
+    console.log(LOG, 'Iniciando...');
+    root.Data.load();
+    wireEvents();
+    render();
+  }
+
+  root.App = {
+    render: render,
+    init: init
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})(typeof window !== 'undefined' ? window : this);
