@@ -1,5 +1,6 @@
 /*!
  * js/modal.js — Modal de edición
+ * Incluye openWithURL para drag externo de Firefox
  */
 (function (root) {
   'use strict';
@@ -43,6 +44,45 @@
     }
 
     modal.hidden = false;
+  }
+
+  // ====== NUEVO: Abrir con URL pre-cargada (drag externo) ======
+  function openWithURL(type, url, catId) {
+    var name = extractNameFromURL(url);
+    
+    modalContext = { type: type, id: null, catId: catId };
+    var modal = $('#modal');
+    var title = $('#modalTitle');
+    var nameInput = $('#modalName');
+    var urlInput = $('#modalUrl');
+    var emojiInput = $('#modalEmoji');
+    var urlField = $('#modalUrlField');
+    
+    urlField.style.display = '';
+    
+    if (type === 'favorite') {
+      title.textContent = '⭐ Agregar favorito desde Firefox';
+    } else {
+      title.textContent = '🔗 Agregar link desde Firefox';
+    }
+    
+    nameInput.value = name;
+    urlInput.value = url;
+    emojiInput.value = '';
+    
+    modal.hidden = false;
+  }
+
+  function extractNameFromURL(url) {
+    try {
+      var u = new URL(url);
+      var hostname = u.hostname.replace(/^www\./, '');
+      var parts = hostname.split('.');
+      var name = parts[0];
+      return name.charAt(0).toUpperCase() + name.slice(1);
+    } catch(e) {
+      return 'Nuevo link';
+    }
   }
 
   function closeModal() {
@@ -101,6 +141,7 @@
 
   root.Modal = {
     open: openModal,
+    openWithURL: openWithURL,
     close: closeModal,
     wire: wireModal
   };
