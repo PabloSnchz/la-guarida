@@ -115,33 +115,33 @@
   function esc(s) { return String(s || '').replace(/[&<>]/g, function(m) { return ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]); }); }
   function getDomain(url) { try { return new URL(url).hostname; } catch(e) { return ''; } }
 
-    function getFaviconHTML(item, size, cssClass) {
+      function getFaviconHTML(item, size, cssClass) {
     var s = size || 32;
     var emojiClass = cssClass === 'fav-icon' ? 'fav-emoji' : 'link-emoji';
     var url = item.url || '';
     var emoji = item.emoji || '';
     var icon_url = item.icon_url || '';
     
-    // 1er intento: icon_url personalizado
+    // 1er intento: favicon automático (Google S2)
+    var domain = getDomain(url);
+    if (domain) {
+      var googleFavicon = 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=256';
+      var htmlFavicon = 'https://icon.horse/icon/' + domain;
+      var duckduckgoFavicon = 'https://icons.duckduckgo.com/ip3/' + domain + '.ico';
+      
+      return '<img class="' + (cssClass || '') + '" src="' + googleFavicon + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
+             'onerror="if(!this.dataset.fallback1){this.dataset.fallback1=1;this.src=\'' + htmlFavicon + '\';}else if(!this.dataset.fallback2){this.dataset.fallback2=1;this.src=\'' + duckduckgoFavicon + '\';}else{this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';}">' +
+             '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
+    }
+    
+    // 3er intento: URL custom (si no hay dominio)
     if (icon_url && icon_url.trim()) {
       return '<img class="' + (cssClass || '') + '" src="' + esc(icon_url) + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
              'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';">' +
              '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
     }
     
-    // 2do intento: favicon automático del dominio
-    var domain = getDomain(url);
-    if (domain) {
-      var googleFavicon = 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=256';
-      var duckduckgoFavicon = 'https://icons.duckduckgo.com/ip3/' + domain + '.ico';
-      var iconHorseFavicon = 'https://icon.horse/icon/' + domain;
-      
-      return '<img class="' + (cssClass || '') + '" src="' + googleFavicon + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
-             'onerror="if(!this.dataset.fallback1){this.dataset.fallback1=1;this.src=\'' + duckduckgoFavicon + '\';}else if(!this.dataset.fallback2){this.dataset.fallback2=1;this.src=\'' + iconHorseFavicon + '\';}else{this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';}">' +
-             '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
-    }
-    
-    // Fallback final: emoji
+    // 4to: emoji
     return '<span class="' + emojiClass + '" style="width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
   }
 
