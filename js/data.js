@@ -131,17 +131,6 @@
     var icon_url = item.icon_url || '';
     var icon_data = item.icon_data || '';
     
-    // 1er prioridad: icon_url manual
-    if (icon_url && icon_url.trim()) {
-      return '<img class="' + (cssClass || '') + '" src="' + esc(icon_url) + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
-             'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';">' +
-             '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
-    }
-    
-    // 2da prioridad: icon_data base64
-    if (icon_data) {
-      return '<img class="' + (cssClass || '') + '" src="' + icon_data + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;">';
-    }
     
     // 1er PRIORIDAD: icon_url manual
     if (icon_url && icon_url.trim()) {
