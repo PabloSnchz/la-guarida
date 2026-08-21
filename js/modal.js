@@ -111,7 +111,8 @@
         var fav = state.favorites.find(function(f) { return f.id === ctx.id; });
         if (fav) { fav.name = name; fav.url = url; fav.emoji = emoji; fav.icon_url = iconUrl; }
       } else {
-        state.favorites.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: iconUrl });
+        var autoIcon = iconUrl || (root.Data.getDomain(url) ? 'https://icon.horse/icon/' + root.Data.getDomain(url) : '');
+        state.favorites.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: autoIcon });
       }
     } else if (ctx.type === 'category') {
       if (ctx.id) {
@@ -128,7 +129,8 @@
           var link = cat2.links.find(function(l) { return l.id === ctx.id; });
           if (link) { link.name = name; link.url = url; link.emoji = emoji; link.icon_url = iconUrl; }
         } else {
-          cat2.links.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: iconUrl });
+          var autoIcon = iconUrl || (root.Data.getDomain(url) ? 'https://icon.horse/icon/' + root.Data.getDomain(url) : '');
+          cat2.links.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: autoIcon });
         }
       }
     }
