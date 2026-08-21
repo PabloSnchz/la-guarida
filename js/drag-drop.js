@@ -1,12 +1,13 @@
 /*!
  * js/drag-drop.js — Lógica de drag & drop
- * Incluye drag interno (reordenar) + externo (desde Firefox)
+ * v2 — Reordenamiento interno + externo
  */
 (function (root) {
   'use strict';
   var LOG = '[LaGuarida:DragDrop]';
 
   var editMode = false;
+  var draggedItem = null;
 
   function setEditMode(on) { editMode = on; }
 
@@ -20,6 +21,9 @@
         if (data.type === 'link') {
           moveLinkToFavorites(state, data.catId, data.id);
         }
+        if (data.type === 'favorite' && draggedItem && draggedItem.targetId) {
+          reorderFavorites(state, data.id, draggedItem.targetId);
+        }
       }
       
       if (targetZone === 'category' && targetCatId) {
@@ -27,22 +31,56 @@
           moveFavoriteToCategory(state, data.id, targetCatId);
         }
         if (data.type === 'link') {
-          moveLinkBetweenCategories(state, data.catId, data.id, targetCatId);
+          if (draggedItem && draggedItem.targetId && data.catId === targetCatId) {
+            reorderLinks(state, targetCatId, data.id, draggedItem.targetId);
+          } else {
+            moveLinkBetweenCategories(state, data.catId, data.id, targetCatId);
+          }
         }
       }
     } catch(err) {
-      // Si el JSON falla, es un drop externo (Firefox)
       handleExternalDrop(e);
     }
   }
 
+  // ====== REORDENAMIENTO ======
+  function reorderFavorites(state, sourceId, targetId) {
+    if (sourceId === targetId) return;
+    var sourceIdx = state.favorites.findIndex(function(f) { return f.id === sourceId; });
+    var targetIdx = state.favorites.findIndex(function(f) { return f.id === targetId; });
+    if (sourceIdx === -1 || targetIdx === -1) return;
+    
+    var item = state.favorites.splice(sourceIdx, 1)[0];
+    state.favorites.splice(targetIdx, 0, item);
+    
+    root.Data.save();
+    if (root.App && typeof root.App.render === 'function') root.App.render();
+  }
+
+  function reorderLinks(state, catId, sourceId, targetId) {
+    if (sourceId === targetId) return;
+    var cat = state.categories.find(function(c) { return c.id === catId; });
+    if (!cat) return;
+    
+    var sourceIdx = cat.links.findIndex(function(l) { return l.id === sourceId; });
+    var targetIdx = cat.links.findIndex(function(l) { return l.id === targetId; });
+    if (sourceIdx === -1 || targetIdx === -1) return;
+    
+    var item = cat.links.splice(sourceIdx, 1)[0];
+    cat.links.splice(targetIdx, 0, item);
+    
+    root.Data.save();
+    if (root.App && typeof root.App.render === 'function') root.App.render();
+  }
+
+  // ====== MOVIMIENTOS ======
   function moveLinkToFavorites(state, fromCatId, linkId) {
     var cat = state.categories.find(function(c) { return c.id === fromCatId; });
     if (!cat) return;
     var link = cat.links.find(function(l) { return l.id === linkId; });
     if (!link) return;
     
-    state.favorites.push({ id: root.Data.genId(), name: link.name, url: link.url, emoji: link.emoji || '' });
+    state.favorites.push({ id: root.Data.genId(), name: link.name, url: link.url, emoji: link.emoji || '', icon_url: link.icon_url || '' });
     cat.links = cat.links.filter(function(l) { return l.id !== linkId; });
     root.Data.save();
     if (root.App && typeof root.App.render === 'function') root.App.render();
@@ -54,7 +92,7 @@
     var cat = state.categories.find(function(c) { return c.id === targetCatId; });
     if (!cat) return;
     
-    cat.links.push({ id: root.Data.genId(), name: fav.name, url: fav.url, emoji: fav.emoji || '' });
+    cat.links.push({ id: root.Data.genId(), name: fav.name, url: fav.url, emoji: fav.emoji || '', icon_url: fav.icon_url || '' });
     state.favorites = state.favorites.filter(function(f) { return f.id !== favId; });
     root.Data.save();
     if (root.App && typeof root.App.render === 'function') root.App.render();
@@ -68,34 +106,28 @@
     var link = fromCat.links.find(function(l) { return l.id === linkId; });
     if (!link) return;
     
-    toCat.links.push({ id: root.Data.genId(), name: link.name, url: link.url, emoji: link.emoji || '' });
+    toCat.links.push({ id: root.Data.genId(), name: link.name, url: link.url, emoji: link.emoji || '', icon_url: link.icon_url || '' });
     fromCat.links = fromCat.links.filter(function(l) { return l.id !== linkId; });
     root.Data.save();
     if (root.App && typeof root.App.render === 'function') root.App.render();
   }
 
-  // ====== DRAG EXTERNO (Firefox) ======
+  // ====== DRAG EXTERNO ======
   function getExternalURL(dataTransfer) {
-    // Firefox arrastra el favicon → entrega text/uri-list
     var uriList = dataTransfer.getData('text/uri-list');
     if (uriList) {
       var lines = uriList.split('\n').filter(function(l) { return l && l.indexOf('#') !== 0; });
       if (lines.length) return lines[0];
     }
-    
-    // Firefox entrega text/x-moz-url para arrastres de pestañas
     var mozUrl = dataTransfer.getData('text/x-moz-url');
     if (mozUrl) {
       var firstLine = mozUrl.split('\n')[0];
       if (firstLine) return firstLine;
     }
-    
-    // Texto plano que sea URL
     var text = dataTransfer.getData('text/plain');
     if (text && (text.indexOf('http://') === 0 || text.indexOf('https://') === 0)) {
       return text;
     }
-    
     return null;
   }
 
@@ -103,33 +135,28 @@
     var url = getExternalURL(e.dataTransfer);
     if (!url) return;
     
-    // Determinar en qué zona cayó
     var targetZone = null;
     var targetCatId = null;
     
-    var element = e.target;
-    while (element && element !== document.body) {
-      if (element.id === 'favoritesGrid') {
-        targetZone = 'favorites';
-        break;
-      }
-      if (element.classList && element.classList.contains('category-card')) {
-        targetZone = 'category';
-        targetCatId = parseInt(element.getAttribute('data-id'));
-        break;
-      }
-      element = element.parentElement;
+    var catCard = e.target.closest ? e.target.closest('.category-card') : null;
+    if (catCard) {
+      targetZone = 'category';
+      targetCatId = parseInt(catCard.getAttribute('data-id'));
+    } else {
+      var favGrid = e.target.closest ? e.target.closest('#favoritesGrid') : null;
+      if (favGrid) targetZone = 'favorites';
     }
     
     if (!targetZone) targetZone = 'favorites';
     
-    // Abrir modal pre-cargado con la URL
     root.Modal.openWithURL(targetZone === 'favorites' ? 'favorite' : 'link', url, targetCatId);
   }
 
   function initDragDrop() {
     var favGrid = document.getElementById('favoritesGrid');
     if (!favGrid) return;
+
+    draggedItem = null;
 
     // ====== Zonas de drop interno ======
     favGrid.addEventListener('dragover', function(e) { e.preventDefault(); favGrid.classList.add('drag-over'); });
@@ -138,13 +165,13 @@
       e.preventDefault();
       favGrid.classList.remove('drag-over');
       
-      // Verificar si es drag interno o externo
       var internalData = e.dataTransfer.getData('text/plain');
       if (internalData && internalData.indexOf('{') === 0) {
         handleDrop(e, 'favorites');
       } else {
         handleExternalDrop(e);
       }
+      draggedItem = null;
     });
 
     document.querySelectorAll('.category-card').forEach(function(catCard) {
@@ -161,25 +188,63 @@
         } else {
           handleExternalDrop(e);
         }
+        draggedItem = null;
       });
     });
 
-    // ====== Elementos arrastrables internos ======
+    // ====== Elementos arrastrables ======
     document.querySelectorAll('.fav-card, .category-link').forEach(function(el) {
       el.setAttribute('draggable', editMode ? 'true' : 'false');
+      
       el.addEventListener('dragstart', function(e) {
         if (!editMode) { e.preventDefault(); return; }
         el.classList.add('dragging');
         var isFav = el.classList.contains('fav-card');
-        e.dataTransfer.setData('text/plain', JSON.stringify({
+        draggedItem = {
           type: isFav ? 'favorite' : 'link',
           id: parseInt(el.getAttribute('data-id')),
           catId: isFav ? null : parseInt(el.getAttribute('data-cat-id'))
-        }));
+        };
+        e.dataTransfer.setData('text/plain', JSON.stringify(draggedItem));
         e.dataTransfer.effectAllowed = 'move';
       });
+      
       el.addEventListener('dragend', function() {
         el.classList.remove('dragging');
+        draggedItem = null;
+      });
+      
+      // Drop sobre OTRO elemento = reordenar
+      el.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!editMode) return;
+        if (draggedItem && draggedItem.id !== parseInt(el.getAttribute('data-id'))) {
+          el.classList.add('drag-over');
+        }
+      });
+      
+      el.addEventListener('dragleave', function() {
+        el.classList.remove('drag-over');
+      });
+      
+      el.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        el.classList.remove('drag-over');
+        
+        if (!editMode || !draggedItem) return;
+        
+        var isFav = el.classList.contains('fav-card');
+        var targetId = parseInt(el.getAttribute('data-id'));
+        var targetCatId = isFav ? null : parseInt(el.getAttribute('data-cat-id'));
+        
+        if (draggedItem.type === 'favorite' && isFav) {
+          reorderFavorites(root.Data.state, draggedItem.id, targetId);
+        } else if (draggedItem.type === 'link' && !isFav && draggedItem.catId === targetCatId) {
+          reorderLinks(root.Data.state, targetCatId, draggedItem.id, targetId);
+        }
+        draggedItem = null;
       });
     });
 
@@ -197,12 +262,10 @@
       e.preventDefault();
       document.body.classList.remove('drop-external-active');
       
-      // Si el drop no fue manejado por las zonas internas
       var internalData = e.dataTransfer.getData('text/plain');
       if (!internalData || internalData.indexOf('{') !== 0) {
         var url = getExternalURL(e.dataTransfer);
         if (url) {
-          // Drop en cualquier lugar → agregar a favoritos
           root.Modal.openWithURL('favorite', url, null);
         }
       }
