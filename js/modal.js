@@ -130,7 +130,7 @@
       if (cat2) {
         if (ctx.id) {
           var link = cat2.links.find(function(l) { return l.id === ctx.id; });
-          if (link) { link.name = name; link.url = url; link.emoji = emoji; link.icon_url = iconUrl; link.icon_data = downloadedIconData || link.icon_data || ''; }
+          if (link) { link.name = name; link.url = url; link.emoji = emoji; link.icon_url = iconUrl; link.icon_data = downloadedIconData || (iconUrl ? '' : (link.icon_data || '')); }
         } else {
           var autoIcon = iconUrl || (root.Data.getDomain(url) ? 'https://icon.horse/icon/' + root.Data.getDomain(url) : '');
           cat2.links.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: autoIcon, icon_data: downloadedIconData || '' });
