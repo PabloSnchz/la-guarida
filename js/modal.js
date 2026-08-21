@@ -7,11 +7,13 @@
   var LOG = '[LaGuarida:Modal]';
 
   var modalContext = null;
+  var downloadedIconData = null;
 
   function $(sel) { return document.querySelector(sel); }
 
   function openModal(type, id, catId) {
     modalContext = { type: type, id: id, catId: catId };
+    downloadedIconData = null;
     var modal = $('#modal');
     var title = $('#modalTitle');
     var nameInput = $('#modalName');
@@ -54,6 +56,7 @@
     var name = extractNameFromURL(url);
     
     modalContext = { type: type, id: null, catId: catId };
+    downloadedIconData = null;
     var modal = $('#modal');
     var title = $('#modalTitle');
     var nameInput = $('#modalName');
@@ -109,10 +112,10 @@
       if (!url) { alert('La URL es obligatoria'); return; }
       if (ctx.id) {
         var fav = state.favorites.find(function(f) { return f.id === ctx.id; });
-        if (fav) { fav.name = name; fav.url = url; fav.emoji = emoji; fav.icon_url = iconUrl; }
+        if (fav) { fav.name = name; fav.url = url; fav.emoji = emoji; fav.icon_url = iconUrl; fav.icon_data = downloadedIconData || fav.icon_data || ''; }
       } else {
         var autoIcon = iconUrl || (root.Data.getDomain(url) ? 'https://icon.horse/icon/' + root.Data.getDomain(url) : '');
-        state.favorites.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: autoIcon });
+        state.favorites.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: autoIcon, icon_data: downloadedIconData || '' });
       }
     } else if (ctx.type === 'category') {
       if (ctx.id) {
@@ -127,10 +130,10 @@
       if (cat2) {
         if (ctx.id) {
           var link = cat2.links.find(function(l) { return l.id === ctx.id; });
-          if (link) { link.name = name; link.url = url; link.emoji = emoji; link.icon_url = iconUrl; }
+          if (link) { link.name = name; link.url = url; link.emoji = emoji; link.icon_url = iconUrl; link.icon_data = downloadedIconData || link.icon_data || ''; }
         } else {
           var autoIcon = iconUrl || (root.Data.getDomain(url) ? 'https://icon.horse/icon/' + root.Data.getDomain(url) : '');
-          cat2.links.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: autoIcon });
+          cat2.links.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: autoIcon, icon_data: downloadedIconData || '' });
         }
       }
     }
@@ -143,8 +146,49 @@
   function wireModal() {
     $('#modalCancel').addEventListener('click', closeModal);
     $('#modalSave').addEventListener('click', saveModal);
+    var downloadBtn = $('#modalDownloadFaviconBtn');
+    if (downloadBtn) downloadBtn.addEventListener('click', downloadFavicon);
     $('#modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
     document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+  }
+
+  async function downloadFavicon() {
+    var url = $('#modalUrl').value.trim();
+    if (!url) { alert('Primero ingresá la URL'); return; }
+    
+    var btn = $('#modalDownloadFaviconBtn');
+    if (btn) { btn.textContent = '⏳ Buscando...'; btn.disabled = true; }
+    
+    var domain = root.Data.getDomain(url);
+    var candidates = [];
+    
+    if (domain) {
+      candidates.push('https://icon.horse/icon/' + domain);
+      candidates.push('https://www.google.com/s2/favicons?domain=' + domain + '&sz=256');
+      candidates.push('https://' + domain + '/favicon.ico');
+      candidates.push('https://' + domain + '/favicon.png');
+    }
+    
+    for (var i = 0; i < candidates.length; i++) {
+      try {
+        var res = await fetch(candidates[i], { mode: 'cors' });
+        if (res.ok) {
+          var blob = await res.blob();
+          var reader = new FileReader();
+          reader.readAsDataURL(blob);
+          var result = await new Promise(function(resolve) {
+            reader.onload = function() { resolve(reader.result); };
+          });
+          
+          downloadedIconData = result;
+          if (btn) { btn.textContent = '✅ Favicon descargado'; btn.disabled = false; }
+          return;
+        }
+      } catch(e) {}
+    }
+    
+    downloadedIconData = null;
+    if (btn) { btn.textContent = '❌ No se pudo descargar'; btn.disabled = false; }
   }
 
   root.Modal = {
