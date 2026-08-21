@@ -62,9 +62,9 @@
       }
     } catch(e) { console.warn(LOG, 'Error cargando:', e); }
     
-    state.favorites = JSON.parse(JSON.stringify(DEFAULT_STATE.favorites));
-    state.categories = JSON.parse(JSON.stringify(DEFAULT_STATE.categories));
-    save();
+    state.favorites = [];
+    state.categories = [];
+    // No guardar — solo si hay datos reales
   }
 
   function save() {
