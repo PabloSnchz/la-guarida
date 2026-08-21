@@ -1,6 +1,6 @@
 /*!
  * js/modal.js — Modal de edición
- * Incluye openWithURL para drag externo de Firefox
+ * v2 — Campo icon_url personalizado
  */
 (function (root) {
   'use strict';
@@ -17,6 +17,7 @@
     var nameInput = $('#modalName');
     var urlInput = $('#modalUrl');
     var emojiInput = $('#modalEmoji');
+    var iconUrlInput = $('#modalIconUrl');
     var urlField = $('#modalUrlField');
 
     urlField.style.display = '';
@@ -27,6 +28,7 @@
       nameInput.value = fav ? fav.name : '';
       urlInput.value = fav ? fav.url : '';
       emojiInput.value = fav ? (fav.emoji || '') : '';
+      iconUrlInput.value = fav ? (fav.icon_url || '') : '';
     } else if (type === 'category') {
       title.textContent = id ? '✏️ Editar categoría' : '📁 Agregar categoría';
       var cat = id ? root.Data.state.categories.find(function(c) { return c.id === id; }) : null;
@@ -34,6 +36,7 @@
       urlInput.value = '';
       urlField.style.display = 'none';
       emojiInput.value = cat ? (cat.emoji || '') : '';
+      iconUrlInput.value = '';
     } else if (type === 'link') {
       title.textContent = id ? '✏️ Editar link' : '🔗 Agregar link';
       var cat2 = root.Data.state.categories.find(function(c) { return c.id === catId; });
@@ -41,12 +44,12 @@
       nameInput.value = link ? link.name : '';
       urlInput.value = link ? link.url : '';
       emojiInput.value = link ? (link.emoji || '') : '';
+      iconUrlInput.value = link ? (link.icon_url || '') : '';
     }
 
     modal.hidden = false;
   }
 
-  // ====== NUEVO: Abrir con URL pre-cargada (drag externo) ======
   function openWithURL(type, url, catId) {
     var name = extractNameFromURL(url);
     
@@ -56,6 +59,7 @@
     var nameInput = $('#modalName');
     var urlInput = $('#modalUrl');
     var emojiInput = $('#modalEmoji');
+    var iconUrlInput = $('#modalIconUrl');
     var urlField = $('#modalUrlField');
     
     urlField.style.display = '';
@@ -69,6 +73,7 @@
     nameInput.value = name;
     urlInput.value = url;
     emojiInput.value = '';
+    iconUrlInput.value = '';
     
     modal.hidden = false;
   }
@@ -93,6 +98,7 @@
     var name = $('#modalName').value.trim();
     var url = $('#modalUrl').value.trim();
     var emoji = $('#modalEmoji').value.trim();
+    var iconUrl = $('#modalIconUrl').value.trim();
 
     if (!name) { alert('El nombre es obligatorio'); return; }
 
@@ -103,9 +109,9 @@
       if (!url) { alert('La URL es obligatoria'); return; }
       if (ctx.id) {
         var fav = state.favorites.find(function(f) { return f.id === ctx.id; });
-        if (fav) { fav.name = name; fav.url = url; fav.emoji = emoji; }
+        if (fav) { fav.name = name; fav.url = url; fav.emoji = emoji; fav.icon_url = iconUrl; }
       } else {
-        state.favorites.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji });
+        state.favorites.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: iconUrl });
       }
     } else if (ctx.type === 'category') {
       if (ctx.id) {
@@ -120,9 +126,9 @@
       if (cat2) {
         if (ctx.id) {
           var link = cat2.links.find(function(l) { return l.id === ctx.id; });
-          if (link) { link.name = name; link.url = url; link.emoji = emoji; }
+          if (link) { link.name = name; link.url = url; link.emoji = emoji; link.icon_url = iconUrl; }
         } else {
-          cat2.links.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji });
+          cat2.links.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: iconUrl });
         }
       }
     }
