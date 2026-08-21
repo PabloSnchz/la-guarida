@@ -1,6 +1,6 @@
 /*!
  * js/data.js — Estado y persistencia
- * v2 — Favicons con triple fallback de alta calidad
+ * v3 — Fix: mutar objeto state correctamente
  */
 (function (root) {
   'use strict';
@@ -43,9 +43,18 @@
   function load() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) { state = JSON.parse(raw); return; }
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        // Mutar el objeto existente — NO reemplazarlo
+        state.favorites = parsed.favorites || [];
+        state.categories = parsed.categories || [];
+        return;
+      }
     } catch(e) { console.warn(LOG, 'Error cargando:', e); }
-    state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    
+    // Cargar defaults
+    state.favorites = JSON.parse(JSON.stringify(DEFAULT_STATE.favorites));
+    state.categories = JSON.parse(JSON.stringify(DEFAULT_STATE.categories));
     save();
   }
 
@@ -74,7 +83,9 @@
       try {
         var data = JSON.parse(e.target.result);
         if (data && data.favorites && data.categories) {
-          state = data;
+          // Mutar el objeto existente
+          state.favorites = data.favorites || [];
+          state.categories = data.categories || [];
           save();
           if (root.App && typeof root.App.render === 'function') root.App.render();
           alert('✅ Datos importados correctamente');
@@ -98,7 +109,6 @@
     var emojiClass = cssClass === 'fav-icon' ? 'fav-emoji' : 'link-emoji';
     
     if (domain) {
-      // Triple fallback de alta calidad
       var googleFavicon = 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=256';
       var duckduckgoFavicon = 'https://icons.duckduckgo.com/ip3/' + domain + '.ico';
       var iconHorseFavicon = 'https://icon.horse/icon/' + domain;
