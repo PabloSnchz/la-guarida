@@ -143,6 +143,19 @@
       return '<img class="' + (cssClass || '') + '" src="' + icon_data + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;">';
     }
     
+    // 1er PRIORIDAD: icon_url manual
+    if (icon_url && icon_url.trim()) {
+      return '<img class="' + (cssClass || '') + '" src="' + esc(icon_url) + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
+             'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';">' +
+             '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
+    }
+    
+    // 2da PRIORIDAD: icon_data base64
+    if (icon_data) {
+      return '<img class="' + (cssClass || '') + '" src="' + icon_data + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;">';
+    }
+    
+    // 3ra PRIORIDAD: automático
     var domain = getDomain(url);
     if (domain) {
       var iconHorseFavicon = 'https://icon.horse/icon/' + domain;
@@ -151,12 +164,6 @@
       
       return '<img class="' + (cssClass || '') + '" src="' + iconHorseFavicon + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
              'onerror="if(!this.dataset.fallback1){this.dataset.fallback1=1;this.src=\'' + googleFavicon + '\';}else if(!this.dataset.fallback2){this.dataset.fallback2=1;this.src=\'' + duckduckgoFavicon + '\';}else{this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';}">' +
-             '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
-    }
-    
-    if (icon_url && icon_url.trim()) {
-      return '<img class="' + (cssClass || '') + '" src="' + esc(icon_url) + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
-             'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';">' +
              '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
     }
     
