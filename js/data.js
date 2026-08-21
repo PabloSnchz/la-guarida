@@ -50,11 +50,13 @@
         // Asegurar que todos tienen icon_url y emoji
         state.favorites.forEach(function(f) {
           if (f.icon_url === undefined) f.icon_url = '';
+          if (f.icon_data === undefined) f.icon_data = '';
           if (f.emoji === undefined) f.emoji = '';
         });
         state.categories.forEach(function(c) {
           (c.links || []).forEach(function(l) {
             if (l.icon_url === undefined) l.icon_url = '';
+            if (l.icon_data === undefined) l.icon_data = '';
             if (l.emoji === undefined) l.emoji = '';
           });
         });
@@ -94,9 +96,15 @@
         if (data && data.favorites && data.categories) {
           state.favorites = data.favorites || [];
           state.categories = data.categories || [];
-          state.favorites.forEach(function(f) { if (!f.icon_url) f.icon_url = ''; });
+          state.favorites.forEach(function(f) {
+            if (!f.icon_url) f.icon_url = '';
+            if (!f.icon_data) f.icon_data = '';
+          });
           state.categories.forEach(function(c) {
-            (c.links || []).forEach(function(l) { if (!l.icon_url) l.icon_url = ''; });
+            (c.links || []).forEach(function(l) {
+              if (!l.icon_url) l.icon_url = '';
+              if (!l.icon_data) l.icon_data = '';
+            });
           });
           save();
           if (root.App && typeof root.App.render === 'function') root.App.render();
@@ -121,6 +129,19 @@
     var url = item.url || '';
     var emoji = item.emoji || '';
     var icon_url = item.icon_url || '';
+    var icon_data = item.icon_data || '';
+    
+    // 1er prioridad: icon_url manual
+    if (icon_url && icon_url.trim()) {
+      return '<img class="' + (cssClass || '') + '" src="' + esc(icon_url) + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
+             'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';">' +
+             '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
+    }
+    
+    // 2da prioridad: icon_data base64
+    if (icon_data) {
+      return '<img class="' + (cssClass || '') + '" src="' + icon_data + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;">';
+    }
     
     var domain = getDomain(url);
     if (domain) {
