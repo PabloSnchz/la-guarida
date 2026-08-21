@@ -63,7 +63,7 @@
     grid.innerHTML = state.categories.map(function(cat) {
       var linksHTML = cat.links.map(function(link) {
         return '<a class="category-link" href="' + root.Data.esc(link.url) + '" target="_blank" rel="noopener" data-cat-id="' + cat.id + '" data-link-id="' + link.id + '" data-id="' + link.id + '">' +
-        root.Data.getFaviconHTML(link.url, link.emoji, 20, 'link-icon') +
+        root.Data.getFaviconHTML(link, 20, 'link-icon') +
           '<span class="link-name">' + root.Data.esc(link.name) + '</span>' +
           '<div class="edit-actions">' +
             '<button class="edit-btn" data-action="edit-link" data-cat-id="' + cat.id + '" data-link-id="' + link.id + '">✏️</button>' +
