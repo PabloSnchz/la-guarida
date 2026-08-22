@@ -132,19 +132,24 @@
     var icon_data = item.icon_data || '';
     
     
-    // 1er PRIORIDAD: icon_url manual
+    // 1er prioridad: icon_url manual
     if (icon_url && icon_url.trim()) {
       return '<img class="' + (cssClass || '') + '" src="' + esc(icon_url) + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
              'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';">' +
              '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
     }
     
-    // 2da PRIORIDAD: icon_data base64
+    // 2da prioridad: icon_data base64
     if (icon_data) {
       return '<img class="' + (cssClass || '') + '" src="' + icon_data + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;">';
     }
     
-    // 3ra PRIORIDAD: automático
+    // 3ra prioridad: emoji manual
+    if (emoji && emoji.trim()) {
+      return '<span class="' + emojiClass + '" style="width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + emoji + '</span>';
+    }
+    
+    // 4ta PRIORIDAD: automático
     var domain = getDomain(url);
     if (domain) {
       var iconHorseFavicon = 'https://icon.horse/icon/' + domain;
