@@ -479,13 +479,26 @@
     if (!widget) return;
     
     var config = widget.config || {};
+    
+    // Preguntar título
     var title = prompt('Título del evento:', config.title || 'Cuenta regresiva');
     if (title === null) return;
-    var dateStr = prompt('Fecha (YYYY-MM-DD):', config.date || '');
+    
+    // Preguntar fecha con formato claro
+    var dateStr = prompt('Fecha objetivo (YYYY-MM-DD):\nEjemplo: 2026-12-25', config.date || '');
     if (dateStr === null) return;
     
+    // Validar formato
+    if (dateStr && !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      alert('Formato inválido. Usá YYYY-MM-DD (ej: 2026-12-25)');
+      return;
+    }
+    
+    // Guardar
     widget.config = { title: title, date: dateStr };
     root.Data.save();
+    
+    // Re-renderizar todo
     renderAll();
   }
 
