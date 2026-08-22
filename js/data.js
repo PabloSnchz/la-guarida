@@ -11,10 +11,14 @@
   var DEFAULT_STATE = {
     widgets_left: [
       { type: 'clock', position: 0, config: { format: '24h', showDate: true } },
-      { type: 'greeting', position: 1, config: { name: '' } }
+      { type: 'daily_reset', position: 1, config: {} },
+      { type: 'weekly_reset', position: 2, config: {} },
+      { type: 'season_reset', position: 3, config: {} }
     ],
     widgets_right: [
-      { type: 'notes', position: 0, config: { text: '' } }
+      { type: 'notes', position: 0, config: { text: '' } },
+      { type: 'counter', position: 1, config: { title: 'Cuenta regresiva', date: '' } },
+      { type: 'gw2_news', position: 2, config: {} }
     ],
     favorites: [
       { id: 1, name: 'Bóveda', url: 'https://pablosnchz.github.io/gw2-wallet-ligero/', emoji: '', icon_url: 'https://pablosnchz.github.io/gw2-wallet-ligero/assets/favicon.png' },

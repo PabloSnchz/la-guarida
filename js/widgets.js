@@ -1,6 +1,6 @@
 /*!
  * js/widgets.js — Widgets editables para paneles laterales
- * v2 — Corrección de renderizado en ambos paneles
+ * v3 — Reset timers GW2 + noticias RSS + contador editable
  */
 (function (root) {
   'use strict';
@@ -13,7 +13,10 @@
     greeting: { label: 'Saludo', icon: '👋' },
     notes: { label: 'Notas', icon: '📝' },
     counter: { label: 'Contador', icon: '🔢' },
-    quote: { label: 'Frase', icon: '💬' }
+    daily_reset: { label: 'Daily Reset GW2', icon: '⏳' },
+    weekly_reset: { label: 'Weekly Reset GW2', icon: '📅' },
+    season_reset: { label: 'Season Reset GW2', icon: '🔮' },
+    gw2_news: { label: 'Noticias GW2', icon: '📰' }
   };
 
   function getWidgets() {
@@ -23,6 +26,49 @@
     return { left: state.widgets_left, right: state.widgets_right };
   }
 
+  // ====== HELPERS DE TIEMPO ======
+  function formatCountdown(ms) {
+    if (!isFinite(ms) || ms <= 0) return '—';
+    var seconds = Math.floor(ms / 1000);
+    var days = Math.floor(seconds / 86400);
+    seconds %= 86400;
+    var hours = Math.floor(seconds / 3600);
+    seconds %= 3600;
+    var minutes = Math.floor(seconds / 60);
+    seconds %= 60;
+    
+    if (days > 0) return days + 'd ' + hours + 'h ' + minutes + 'm';
+    if (hours > 0) return hours + 'h ' + minutes + 'm';
+    if (minutes > 0) return minutes + 'm';
+    return seconds + 's';
+  }
+
+  function nextDailyResetUTC() {
+    var now = new Date();
+    var next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 24, 0, 0, 0));
+    if (next.getTime() <= now.getTime()) {
+      next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0, 0));
+    }
+    return next;
+  }
+
+  function nextWeeklyResetUTC() {
+    var now = new Date();
+    var day = now.getUTCDay();
+    var daysUntilMonday = (1 - day + 7) % 7;
+    var base = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 7, 30, 0, 0));
+    var next = new Date(base.getTime() + daysUntilMonday * 24 * 60 * 60 * 1000);
+    if (next.getTime() <= now.getTime()) next = new Date(next.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return next;
+  }
+
+  function getSeasonEnd() {
+    // Usar fecha hardcoded por ahora — después conectar a API GW2
+    var seasonEnd = new Date('2026-09-15T16:00:00Z');
+    return seasonEnd;
+  }
+
+  // ====== RENDER ======
   function renderClock(config) {
     var format = (config && config.format) || '24h';
     var showDate = config && config.showDate !== false;
@@ -57,6 +103,43 @@
       '</div>';
   }
 
+  function renderDailyReset() {
+    var next = nextDailyResetUTC();
+    var ms = Math.max(0, next.getTime() - Date.now());
+    var countdown = formatCountdown(ms);
+    
+    return '<div class="widget widget--reset">' +
+      '<div class="widget-title">⏳ Daily Reset</div>' +
+      '<div class="widget-reset-countdown">' + countdown + '</div>' +
+      '<div class="widget-reset-label">00:00 UTC</div>' +
+      '</div>';
+  }
+
+  function renderWeeklyReset() {
+    var next = nextWeeklyResetUTC();
+    var ms = Math.max(0, next.getTime() - Date.now());
+    var countdown = formatCountdown(ms);
+    
+    return '<div class="widget widget--reset">' +
+      '<div class="widget-title">📅 Weekly Reset</div>' +
+      '<div class="widget-reset-countdown">' + countdown + '</div>' +
+      '<div class="widget-reset-label">Lunes 07:30 UTC</div>' +
+      '</div>';
+  }
+
+  function renderSeasonReset() {
+    var end = getSeasonEnd();
+    var ms = Math.max(0, end.getTime() - Date.now());
+    var countdown = formatCountdown(ms);
+    var dateStr = end.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
+    
+    return '<div class="widget widget--reset">' +
+      '<div class="widget-title">🔮 Season Reset</div>' +
+      '<div class="widget-reset-countdown">' + countdown + '</div>' +
+      '<div class="widget-reset-label">' + dateStr + '</div>' +
+      '</div>';
+  }
+
   function renderNotes(config) {
     var text = (config && config.text) || '';
     return '<div class="widget widget--notes">' +
@@ -69,30 +152,75 @@
     var title = (config && config.title) || 'Cuenta regresiva';
     var targetDate = (config && config.date) || '';
     
+    var content;
     if (!targetDate) {
-      return '<div class="widget widget--counter">' +
-        '<div class="widget-title">🔢 ' + root.Data.esc(title) + '</div>' +
-        '<div class="widget-counter-empty">Sin fecha configurada</div>' +
-        '</div>';
+      content = '<div class="widget-counter-empty">Click para configurar</div>';
+    } else {
+      var target = new Date(targetDate);
+      var now = new Date();
+      var diff = target - now;
+      var days = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+      content = '<div class="widget-counter-days">' + days + '</div>' +
+                '<div class="widget-counter-label">días restantes</div>' +
+                '<div class="widget-counter-date">' + target.toLocaleDateString('es-AR') + '</div>';
     }
     
-    var target = new Date(targetDate);
-    var now = new Date();
-    var diff = target - now;
-    var days = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-    
-    return '<div class="widget widget--counter">' +
+    return '<div class="widget widget--counter" data-widget-type="counter" style="cursor:pointer;" title="Click para editar">' +
       '<div class="widget-title">🔢 ' + root.Data.esc(title) + '</div>' +
-      '<div class="widget-counter-days">' + days + '</div>' +
-      '<div class="widget-counter-label">días restantes</div>' +
+      content +
       '</div>';
   }
 
-  function renderQuote(config) {
-    var text = (config && config.text) || 'La vida es lo que pasa mientras estás ocupado haciendo otros planes.';
-    return '<div class="widget widget--quote">' +
-      '<div class="widget-title">💬 Frase</div>' +
-      '<div class="widget-quote-text">"' + root.Data.esc(text) + '"</div>' +
+  var newsCache = null;
+  var newsLastFetch = 0;
+  var NEWS_TTL = 10 * 60 * 1000; // 10 min
+
+  async function fetchGW2News() {
+    var now = Date.now();
+    if (newsCache && (now - newsLastFetch) < NEWS_TTL) return newsCache;
+    
+    try {
+      var res = await fetch('https://www.guildwars2.com/es/feed/', { mode: 'cors' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var text = await res.text();
+      
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(text, 'text/xml');
+      var items = doc.querySelectorAll('item');
+      
+      newsCache = [];
+      items.forEach(function(item, index) {
+        if (index >= 4) return;
+        var title = item.querySelector('title') ? item.querySelector('title').textContent : '';
+        var link = item.querySelector('link') ? item.querySelector('link').textContent : '';
+        newsCache.push({ title: title, link: link });
+      });
+      
+      newsLastFetch = now;
+      return newsCache;
+    } catch(e) {
+      console.warn(LOG, 'Error fetching GW2 news:', e);
+      return [];
+    }
+  }
+
+  async function renderGW2News() {
+    var news = await fetchGW2News();
+    
+    var content;
+    if (!news.length) {
+      content = '<div class="widget-news-empty">No se pudieron cargar noticias</div>';
+    } else {
+      content = news.map(function(item) {
+        return '<a class="widget-news-item" href="' + root.Data.esc(item.link) + '" target="_blank" rel="noopener">' +
+          root.Data.esc(item.title) +
+          '</a>';
+      }).join('');
+    }
+    
+    return '<div class="widget widget--news">' +
+      '<div class="widget-title">📰 Noticias GW2</div>' +
+      '<div class="widget-news-list">' + content + '</div>' +
       '</div>';
   }
 
@@ -102,7 +230,10 @@
       case 'greeting': return renderGreeting(widget.config);
       case 'notes': return renderNotes(widget.config);
       case 'counter': return renderCounter(widget.config);
-      case 'quote': return renderQuote(widget.config);
+      case 'daily_reset': return renderDailyReset();
+      case 'weekly_reset': return renderWeeklyReset();
+      case 'season_reset': return renderSeasonReset();
+      case 'gw2_news': return '<div class="widget-news-placeholder">Cargando noticias...</div>';
       default: return '';
     }
   }
@@ -118,6 +249,25 @@
     html += '<button class="add-widget-btn" data-side="' + containerId + '">＋ Widget</button>';
     
     container.innerHTML = html;
+    
+    // Cargar noticias async
+    if (html.indexOf('widget-news-placeholder') !== -1) {
+      container.querySelectorAll('.widget-news-placeholder').forEach(function(placeholder) {
+        fetchGW2News().then(function(news) {
+          var parent = placeholder.closest('.widget--news') || placeholder;
+          var newsHTML = news.length ? news.map(function(item) {
+            return '<a class="widget-news-item" href="' + root.Data.esc(item.link) + '" target="_blank" rel="noopener">' +
+              root.Data.esc(item.title) + '</a>';
+          }).join('') : '<div class="widget-news-empty">No se pudieron cargar</div>';
+          
+          var listDiv = parent.querySelector('.widget-news-list');
+          if (listDiv) {
+            listDiv.innerHTML = newsHTML;
+          }
+          placeholder.remove();
+        });
+      });
+    }
   }
 
   function renderAll() {
@@ -145,6 +295,13 @@
       });
     });
     
+    // Wire contador editable
+    document.querySelectorAll('[data-widget-type="counter"]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        editCounterWidget(this);
+      });
+    });
+    
     // Wire botones + Widget
     document.querySelectorAll('.add-widget-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -153,12 +310,38 @@
       });
     });
     
-    // Actualizar reloj cada segundo
-    setTimeout(function() { 
-      if (document.querySelector('.widget--clock')) {
+    // Actualizar cada segundo
+    setTimeout(function() {
+      if (document.querySelector('.widget--clock, .widget--reset')) {
         renderAll();
       }
     }, 1000);
+  }
+
+  function editCounterWidget(element) {
+    var state = root.Data.state;
+    var sideId = element.closest('.side-panel').id;
+    var widgetList = sideId === 'widgetsLeft' ? state.widgets_left : state.widgets_right;
+    
+    var widget = null;
+    widgetList.forEach(function(w) {
+      if (w.type === 'counter') widget = w;
+    });
+    
+    if (!widget) return;
+    
+    var config = widget.config || {};
+    
+    var title = prompt('Título del evento:', config.title || 'Cuenta regresiva');
+    if (title === null) return;
+    
+    var dateStr = prompt('Fecha (YYYY-MM-DD):', config.date || '');
+    if (dateStr === null) return;
+    
+    widget.config = { title: title, date: dateStr };
+    
+    root.Data.save();
+    renderAll();
   }
 
   function showWidgetPicker(side) {
@@ -186,13 +369,11 @@
       widgetList = state.widgets_right;
     }
     
-    // Config default según tipo
     var config = {};
-    if (selectedType === 'greeting') config = { name: '' };
     if (selectedType === 'counter') config = { title: 'Cuenta regresiva', date: '' };
     if (selectedType === 'notes') config = { text: '' };
-    if (selectedType === 'quote') config = { text: '' };
     if (selectedType === 'clock') config = { format: '24h', showDate: true };
+    if (selectedType === 'greeting') config = { name: '' };
     
     widgetList.push({ type: selectedType, position: widgetList.length, config: config });
     
