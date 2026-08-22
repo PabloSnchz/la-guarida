@@ -1,5 +1,5 @@
 /* ====== La Guarida — Estilos (v2 — Look & Feel Bóveda) ====== */
-* { margin:0; padding:0; box-sizing:border-box; }
+{ margin:0; padding:0; box-sizing:border-box; }
 
 body {
   background:#0e0e10; color:#e9e9ee;
