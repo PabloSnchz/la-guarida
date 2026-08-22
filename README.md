@@ -9,6 +9,7 @@ Página de inicio personal del Gato Negro — organizá tus enlaces frecuentes, 
 - 📁 Categorías personalizables (3 por fila)
 - 🔀 Drag & drop para reordenar y mover entre secciones
 - 🦊 Arrastrar desde Firefox para crear links automáticamente
+- 🌐 Abrir links en Chrome obligatoriamente (protocol handler)
 
 ### Favicons inteligentes
 - 🔗 Auto-detección al pegar URL
@@ -49,6 +50,7 @@ Página de inicio personal del Gato Negro — organizá tus enlaces frecuentes, 
 | `js/drag-drop.js` | Drag & drop interno + externo |
 | `js/modal.js` | Modal de edición + auto-detección |
 | `js/app.js` | Init, render y eventos |
+| `docs/chrome-open.bat` | Script para abrir links en Chrome (backup) |
 
 ## 🔧 Cómo usar
 
@@ -88,6 +90,22 @@ Página de inicio personal del Gato Negro — organizá tus enlaces frecuentes, 
 | 3 | Emoji manual |
 | 4 | Auto-detección (Icon Horse → Google → DuckDuckGo) |
 | 5 | 🔗 genérico |
+
+## 🌐 Abrir en Chrome obligatoriamente
+
+Permite marcar links para que se abran SIEMPRE en Google Chrome, sin importar el navegador que estés usando.
+
+### Cómo funciona
+1. En el modal de edición, marcá "Abrir en Chrome obligatoriamente"
+2. El link muestra un badge 🌐
+3. Al clickear, Windows ejecuta el protocol handler `chrome-launch:`
+4. El script `chrome-open.bat` limpia la URL y la abre en Chrome
+
+### Configuración (una sola vez)
+1. Copiá `docs/chrome-open.bat` a `C:\Users\TU_USUARIO\chrome-open.bat`
+2. Ejecutá el `.reg` para registrar el protocol handler:
+   - `HKEY_CLASSES_ROOT\chrome-launch\shell\open\command` → `C:\Users\TU_USUARIO\chrome-open.bat %1`
+3. Listo — los links marcados se abren en Chrome
 
 ## 🔌 APIs integradas
 
