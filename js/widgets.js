@@ -331,11 +331,31 @@
       });
     });
     
-    // Actualizar cada segundo
-    setTimeout(function() {
-      if (document.querySelector('.widget--clock, .widget--resets')) {
-        renderAll();
-      }
+    // Actualizar solo reloj y resets cada segundo
+    setTimeout(function tick() {
+      // Reloj
+      document.querySelectorAll('.widget--clock').forEach(function(clockEl) {
+        var now = new Date();
+        var timeStr = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+        var timeEl = clockEl.querySelector('.widget-clock-time');
+        if (timeEl) timeEl.textContent = timeStr;
+      });
+      
+      // Resets
+      document.querySelectorAll('.widget--resets').forEach(function(resetEl) {
+        var dailyMs = Math.max(0, nextDailyResetUTC().getTime() - Date.now());
+        var weeklyMs = Math.max(0, nextWeeklyResetUTC().getTime() - Date.now());
+        var seasonMs = Math.max(0, getSeasonEnd().getTime() - Date.now());
+        
+        var values = resetEl.querySelectorAll('.reset-value');
+        if (values.length >= 3) {
+          values[0].textContent = formatCountdown(dailyMs);
+          values[1].textContent = formatCountdown(weeklyMs);
+          values[2].textContent = formatCountdown(seasonMs);
+        }
+      });
+      
+      setTimeout(tick, 1000);
     }, 1000);
   }
 
