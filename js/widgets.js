@@ -1,5 +1,6 @@
 /*!
  * js/widgets.js — Widgets editables para paneles laterales
+ * v2 — Corrección de renderizado en ambos paneles
  */
 (function (root) {
   'use strict';
@@ -8,10 +9,11 @@
   function $(sel) { return document.querySelector(sel); }
 
   var WIDGET_TYPES = {
-    clock: { label: '🕐 Reloj', icon: '🕐' },
-    greeting: { label: '👋 Saludo', icon: '👋' },
-    notes: { label: '📝 Notas', icon: '📝' },
-    counter: { label: '🔢 Contador', icon: '🔢' }
+    clock: { label: 'Reloj', icon: '🕐' },
+    greeting: { label: 'Saludo', icon: '👋' },
+    notes: { label: 'Notas', icon: '📝' },
+    counter: { label: 'Contador', icon: '🔢' },
+    quote: { label: 'Frase', icon: '💬' }
   };
 
   function getWidgets() {
@@ -24,7 +26,6 @@
   function renderClock(config) {
     var format = (config && config.format) || '24h';
     var showDate = config && config.showDate !== false;
-    
     var now = new Date();
     var timeStr;
     if (format === '12h') {
@@ -32,11 +33,10 @@
     } else {
       timeStr = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
     }
-    
     var dateStr = showDate ? now.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }) : '';
     
     return '<div class="widget widget--clock">' +
-      '<div class="widget-title">🕐</div>' +
+      '<div class="widget-title">🕐 Reloj</div>' +
       '<div class="widget-clock-time">' + timeStr + '</div>' +
       (dateStr ? '<div class="widget-clock-date">' + dateStr + '</div>' : '') +
       '</div>';
@@ -52,6 +52,7 @@
     else saludo = 'Buenas noches';
     
     return '<div class="widget widget--greeting">' +
+      '<div class="widget-title">👋 Saludo</div>' +
       '<div class="widget-greeting-text">' + saludo + (name ? ', <strong>' + root.Data.esc(name) + '</strong>' : '') + '</div>' +
       '</div>';
   }
@@ -60,7 +61,7 @@
     var text = (config && config.text) || '';
     return '<div class="widget widget--notes">' +
       '<div class="widget-title">📝 Notas</div>' +
-      '<textarea class="widget-notes-input" placeholder="Escribí tus notas..." data-widget="notes">' + root.Data.esc(text) + '</textarea>' +
+      '<textarea class="widget-notes-input" placeholder="Escribí tus notas...">' + root.Data.esc(text) + '</textarea>' +
       '</div>';
   }
 
@@ -71,20 +72,27 @@
     if (!targetDate) {
       return '<div class="widget widget--counter">' +
         '<div class="widget-title">🔢 ' + root.Data.esc(title) + '</div>' +
-        '<div class="widget-counter-empty">Sin fecha</div>' +
+        '<div class="widget-counter-empty">Sin fecha configurada</div>' +
         '</div>';
     }
     
     var target = new Date(targetDate);
     var now = new Date();
     var diff = target - now;
-    
-    var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    var days = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
     
     return '<div class="widget widget--counter">' +
       '<div class="widget-title">🔢 ' + root.Data.esc(title) + '</div>' +
       '<div class="widget-counter-days">' + days + '</div>' +
       '<div class="widget-counter-label">días restantes</div>' +
+      '</div>';
+  }
+
+  function renderQuote(config) {
+    var text = (config && config.text) || 'La vida es lo que pasa mientras estás ocupado haciendo otros planes.';
+    return '<div class="widget widget--quote">' +
+      '<div class="widget-title">💬 Frase</div>' +
+      '<div class="widget-quote-text">"' + root.Data.esc(text) + '"</div>' +
       '</div>';
   }
 
@@ -94,6 +102,7 @@
       case 'greeting': return renderGreeting(widget.config);
       case 'notes': return renderNotes(widget.config);
       case 'counter': return renderCounter(widget.config);
+      case 'quote': return renderQuote(widget.config);
       default: return '';
     }
   }
@@ -102,29 +111,31 @@
     var container = document.getElementById(containerId);
     if (!container) return;
     
-    container.innerHTML = widgets.map(function(widget) {
+    var html = widgets.map(function(widget) {
       return renderWidget(widget);
-    }).join('') + '<button class="add-widget-btn" data-side="' + containerId + '">＋ Widget</button>';
+    }).join('');
+    
+    html += '<button class="add-widget-btn" data-side="' + containerId + '">＋ Widget</button>';
+    
+    container.innerHTML = html;
   }
 
   function renderAll() {
     var widgets = getWidgets();
+    
     renderSidePanel('widgetsLeft', widgets.left);
     renderSidePanel('widgetsRight', widgets.right);
     
-    // Wire textarea de notas
+    // Wire textareas de notas
     document.querySelectorAll('.widget-notes-input').forEach(function(textarea) {
       textarea.addEventListener('input', function() {
         var text = this.value;
         var state = root.Data.state;
-        // Buscar el widget de notas y actualizar
-        state.widgets_left.forEach(function(w) {
-          if (w.type === 'notes') {
-            if (!w.config) w.config = {};
-            w.config.text = text;
-          }
-        });
-        state.widgets_right.forEach(function(w) {
+        var side = this.closest('.side-panel');
+        var sideId = side ? side.id : '';
+        
+        var widgetList = sideId === 'widgetsLeft' ? state.widgets_left : state.widgets_right;
+        widgetList.forEach(function(w) {
           if (w.type === 'notes') {
             if (!w.config) w.config = {};
             w.config.text = text;
@@ -134,7 +145,7 @@
       });
     });
     
-    // Wire add widget buttons
+    // Wire botones + Widget
     document.querySelectorAll('.add-widget-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var side = this.getAttribute('data-side');
@@ -142,39 +153,48 @@
       });
     });
     
-    // Update clock each second
-    if (document.querySelector('.widget--clock')) {
-      setTimeout(function() { renderAll(); }, 1000);
-    }
+    // Actualizar reloj cada segundo
+    setTimeout(function() { 
+      if (document.querySelector('.widget--clock')) {
+        renderAll();
+      }
+    }, 1000);
   }
 
   function showWidgetPicker(side) {
     var types = Object.keys(WIDGET_TYPES);
-    var options = types.map(function(type) {
-      return WIDGET_TYPES[type].icon + ' ' + WIDGET_TYPES[type].label;
+    var options = types.map(function(type, index) {
+      return (index + 1) + '. ' + WIDGET_TYPES[type].icon + ' ' + WIDGET_TYPES[type].label;
     }).join('\n');
     
-    var choice = prompt('Elegí un widget:\n' + options);
+    var choice = prompt('Elegí un widget (número):\n\n' + options);
     if (!choice) return;
     
-    // Encontrar el tipo
-    var selectedType = null;
-    types.forEach(function(type) {
-      if (choice.indexOf(WIDGET_TYPES[type].icon) !== -1 || choice.indexOf(WIDGET_TYPES[type].label) !== -1) {
-        selectedType = type;
-      }
-    });
+    var index = parseInt(choice, 10) - 1;
+    if (isNaN(index) || index < 0 || index >= types.length) return;
     
-    if (!selectedType) return;
+    var selectedType = types[index];
     
     var state = root.Data.state;
+    var widgetList;
+    
     if (side === 'widgetsLeft') {
       if (!state.widgets_left) state.widgets_left = [];
-      state.widgets_left.push({ type: selectedType, position: state.widgets_left.length, config: {} });
+      widgetList = state.widgets_left;
     } else {
       if (!state.widgets_right) state.widgets_right = [];
-      state.widgets_right.push({ type: selectedType, position: state.widgets_right.length, config: {} });
+      widgetList = state.widgets_right;
     }
+    
+    // Config default según tipo
+    var config = {};
+    if (selectedType === 'greeting') config = { name: '' };
+    if (selectedType === 'counter') config = { title: 'Cuenta regresiva', date: '' };
+    if (selectedType === 'notes') config = { text: '' };
+    if (selectedType === 'quote') config = { text: '' };
+    if (selectedType === 'clock') config = { format: '24h', showDate: true };
+    
+    widgetList.push({ type: selectedType, position: widgetList.length, config: config });
     
     root.Data.save();
     renderAll();
@@ -182,7 +202,8 @@
 
   root.Widgets = {
     renderAll: renderAll,
-    WIDGET_TYPES: WIDGET_TYPES
+    WIDGET_TYPES: WIDGET_TYPES,
+    showWidgetPicker: showWidgetPicker
   };
 
 })(typeof window !== 'undefined' ? window : this);
