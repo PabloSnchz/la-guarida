@@ -413,7 +413,7 @@
     var widgets = getWidgets();
     
     renderSidePanel('widgetsLeft', widgets.left);
-    renderSidePanel('widgetsRight', widgets.right);
+    renderSidePanel('widgetsLeft', widgets.right);  // TODO: integrar en 2 columnas
     
     // Wire textareas
     document.querySelectorAll('.widget-notes-input').forEach(function(textarea) {
