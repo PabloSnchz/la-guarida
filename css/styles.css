@@ -769,3 +769,31 @@ body.drop-external-active .container {
   .favorites-grid { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
   .categories-grid { grid-template-columns: 1fr; }
 }
+
+.launcher-sections {
+  padding: 10px;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.launcher-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffd966;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.launcher-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.side-panel--right {
+  width: 420px;
+  min-width: 420px;
+  max-width: 420px;
+}

@@ -94,12 +94,15 @@
         <div class="launcher-header">
           <span class="launcher-title">🚀 Lanzador</span>
         </div>
-        <div class="launcher-tabs">
-          <button id="launcherTabApps" class="launcher-tab active">Apps</button>
-          <button id="launcherTabGames" class="launcher-tab">Juegos</button>
-        </div>
-        <div class="launcher-content" id="launcherContent">
-          <!-- Se renderiza con app.js -->
+        <div class="launcher-sections">
+          <div class="launcher-section">
+            <h3 class="launcher-section-title">🎮 Juegos</h3>
+            <div class="launcher-grid" id="launcherGamesGrid"></div>
+          </div>
+          <div class="launcher-section">
+            <h3 class="launcher-section-title">💻 Apps</h3>
+            <div class="launcher-grid" id="launcherAppsGrid"></div>
+          </div>
         </div>
       </div>
     </aside>
