@@ -1,6 +1,6 @@
 /*!
  * js/data.js — Estado y persistencia
- * v5 — Soporte apps y games para el lanzador
+ * v6 — Juegos y apps cargados
  */
 (function (root) {
   'use strict';
@@ -20,40 +20,30 @@
       { type: 'twitch', position: 2, config: {} },
       { type: 'youtube', position: 3, config: {} }
     ],
-    favorites: [
-      { id: 1, name: 'Bóveda', url: 'https://pablosnchz.github.io/gw2-wallet-ligero/', emoji: '', icon_url: 'https://pablosnchz.github.io/gw2-wallet-ligero/assets/favicon.png', open_chrome: false },
-      { id: 2, name: 'Métricas', url: 'https://pablosnchz.github.io/gw2-metrics-dashboard/', emoji: '', icon_url: '', open_chrome: false },
-      { id: 3, name: 'Link Bio', url: 'https://pablosnchz.github.io/bio/', emoji: '', icon_url: '', open_chrome: false },
-      { id: 4, name: 'Traffic Stats', url: 'https://pablosnchz.github.io/github-repo-traffic-stats/', emoji: '', icon_url: '', open_chrome: false }
-    ],
-    categories: [
-      {
-        id: 1,
-        name: 'GW2',
-        emoji: '🎮',
-        links: [
-          { id: 1, name: 'Wiki ES', url: 'https://wiki-es.guildwars2.com/', emoji: '', icon_url: '', open_chrome: false },
-          { id: 2, name: 'GW2 Efficiency', url: 'https://gw2efficiency.com/', emoji: '', icon_url: '', open_chrome: false },
-          { id: 3, name: 'Metabattle', url: 'https://metabattle.com/', emoji: '', icon_url: '', open_chrome: false }
-        ]
-      },
-      {
-        id: 2,
-        name: 'Desarrollo',
-        emoji: '💻',
-        links: [
-          { id: 1, name: 'GitHub', url: 'https://github.com/', emoji: '', icon_url: '', open_chrome: false },
-          { id: 2, name: 'Vercel', url: 'https://vercel.com/', emoji: '', icon_url: '', open_chrome: false }
-        ]
-      }
-    ],
+    favorites: [],
+    categories: [],
     apps: [
-      { id: 1, name: 'Chrome', command: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', emoji: '🌐' },
-      { id: 2, name: 'VS Code', command: 'code', emoji: '💻' },
-      { id: 3, name: 'Discord', command: 'discord', emoji: '🎮' }
+      { id: 101, name: 'Discord', command: 'C:\\Users\\psanc\\AppData\\Local\\Discord\\app-1.0.9253\\Discord.exe', emoji: '💬' },
+      { id: 102, name: 'OBS Studio', command: 'C:\\Program Files\\obs-studio\\bin\\64bit\\obs64.exe', emoji: '🎥' },
+      { id: 103, name: 'Filmora', command: 'C:\\Users\\psanc\\AppData\\Local\\Wondershare\\Wondershare Filmora\\Wondershare Filmora Launcher.exe', emoji: '🎬' },
+      { id: 104, name: 'Iriun Webcam', command: 'C:\\Program Files (x86)\\Iriun Webcam\\IriunWebcam.exe', emoji: '📷' },
+      { id: 105, name: 'CPU-Z', command: 'C:\\Program Files\\CPUID\\CPU-Z\\cpuz.exe', emoji: '🔧' },
+      { id: 106, name: 'iCUE', command: 'C:\\Program Files\\Corsair\\Corsair iCUE5 Software\\iCUE.exe', emoji: '🎨' },
+      { id: 107, name: 'NVIDIA Broadcast', command: 'C:\\Program Files\\NVIDIA Corporation\\NVIDIA Broadcast\\NVIDIA Broadcast.exe', emoji: '🎙️' },
+      { id: 108, name: 'Explorador', command: 'explorer.exe', emoji: '📁' },
+      { id: 109, name: 'Configuración', command: 'ms-settings:', emoji: '⚙️' },
+      { id: 110, name: 'Panel NVIDIA', command: 'C:\\Program Files\\NVIDIA Corporation\\Control Panel Client\\nvcplui.exe', emoji: '🖥️' },
+      { id: 111, name: 'Admin. Tareas', command: 'taskmgr.exe', emoji: '📊' }
     ],
     games: [
-      { id: 1, name: 'GW2', command: 'C:\\Games\\Guild Wars 2\\gw2-64.exe', emoji: '⚔️' }
+      { id: 201, name: 'Guild Wars 2', command: 'C:\\Guild Wars 2\\Gw2-64.exe', emoji: '⚔️' },
+      { id: 202, name: 'GW2 Launcher', command: 'C:\\Gw2launcher\\Gw2Launcher.exe', emoji: '🚀' },
+      { id: 203, name: 'Blish HUD', command: 'C:\\Blish.HUD.1.1.1\\Blish HUD.exe', emoji: '🗺️' },
+      { id: 204, name: 'Riot Client', command: 'C:\\Riot Games\\Riot Client\\RiotClientServices.exe', emoji: '🎮' },
+      { id: 205, name: 'Overwolf', command: 'C:\\Program Files (x86)\\Overwolf\\OverwolfLauncher.exe', emoji: '🐺' },
+      { id: 206, name: 'Steam', command: 'C:\\Program Files (x86)\\Steam\\steam.exe', emoji: '🚂' },
+      { id: 207, name: 'Epic Games', command: 'C:\\Program Files (x86)\\Epic Games\\Launcher\\Portal\\Binaries\\Win32\\EpicGamesLauncher.exe', emoji: '🏰' },
+      { id: 208, name: 'GOG Galaxy', command: 'C:\\Program Files (x86)\\GOG Galaxy\\GalaxyClient.exe', emoji: '🌟' }
     ]
   };
 
@@ -121,7 +111,7 @@
     reader.onload = function(e) {
       try {
         var data = JSON.parse(e.target.result);
-        if (data && data.favorites && data.categories) {
+        if (data && data.favorites !== undefined) {
           state.favorites = data.favorites || [];
           state.categories = data.categories || [];
           state.apps = data.apps || [];
