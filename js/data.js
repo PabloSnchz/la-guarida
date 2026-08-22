@@ -16,7 +16,8 @@
     ],
     widgets_right: [
       { type: 'notes', position: 0, config: { text: '' } },
-      { type: 'counter', position: 1, config: { title: 'Cuenta regresiva', date: '' } }
+      { type: 'counter', position: 1, config: { title: 'Cuenta regresiva', date: '' } },
+      { type: 'twitch', position: 2, config: {} }
     ],
     favorites: [
       { id: 1, name: 'Bóveda', url: 'https://pablosnchz.github.io/gw2-wallet-ligero/', emoji: '', icon_url: 'https://pablosnchz.github.io/gw2-wallet-ligero/assets/favicon.png' },

@@ -394,3 +394,38 @@ body.drop-external-active .categories-grid {
   text-align: center;
   padding: 8px;
 }
+
+/* ====== Widget Twitch ====== */
+.widget-twitch-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #e0e4ed;
+}
+
+.widget-twitch-followers {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #9146FF;
+  margin-top: 4px;
+}
+
+.widget-twitch-live {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ff4d4d;
+  margin-top: 6px;
+}
+
+.widget-twitch-offline {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6a7080;
+  margin-top: 6px;
+}
+
+.widget-twitch-placeholder {
+  font-size: 0.75rem;
+  color: #6a7080;
+  text-align: center;
+  padding: 8px;
+}

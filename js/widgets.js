@@ -1,6 +1,6 @@
 /*!
  * js/widgets.js — Widgets editables para paneles laterales
- * v3 — Reset timers GW2 + noticias RSS + contador editable
+ * v4 — Twitch integrado + resets unificados + noticias GW2
  */
 (function (root) {
   'use strict';
@@ -14,7 +14,8 @@
     notes: { label: 'Notas', icon: '📝' },
     counter: { label: 'Contador', icon: '🔢' },
     all_resets: { label: 'Resets GW2', icon: '⏳' },
-    gw2_news: { label: 'Noticias GW2', icon: '📰' }
+    gw2_news: { label: 'Noticias GW2', icon: '📰' },
+    twitch: { label: 'Twitch', icon: '📺' }
   };
 
   function getWidgets() {
@@ -61,7 +62,6 @@
   }
 
   function getSeasonEnd() {
-    // Usar fecha hardcoded por ahora — después conectar a API GW2
     var seasonEnd = new Date('2026-09-15T16:00:00Z');
     return seasonEnd;
   }
@@ -152,9 +152,10 @@
       '</div>';
   }
 
+  // ====== NOTICIAS GW2 ======
   var newsCache = null;
   var newsLastFetch = 0;
-  var NEWS_TTL = 10 * 60 * 1000; // 10 min
+  var NEWS_TTL = 10 * 60 * 1000;
 
   async function fetchGW2News() {
     var now = Date.now();
@@ -185,23 +186,60 @@
     }
   }
 
-  async function renderGW2News() {
-    var news = await fetchGW2News();
-    
-    var content;
-    if (!news.length) {
-      content = '<div class="widget-news-empty">No se pudieron cargar noticias</div>';
-    } else {
-      content = news.map(function(item) {
-        return '<a class="widget-news-item" href="' + root.Data.esc(item.link) + '" target="_blank" rel="noopener">' +
-          root.Data.esc(item.title) +
-          '</a>';
-      }).join('');
+  // ====== TWITCH ======
+  var twitchConfig = {
+    clientId: 'jtirnfb54v6fz1i823rsidesn2ojo4',
+    accessToken: 'msph7jsh5wthpeaf3me3cuwbc2sxh3',
+    userId: '401539231',
+    login: 'pblsnchz'
+  };
+
+  async function fetchTwitchFollowers() {
+    try {
+      var res = await fetch('https://api.twitch.tv/helix/channels/followers?broadcaster_id=' + twitchConfig.userId, {
+        headers: {
+          'Client-ID': twitchConfig.clientId,
+          'Authorization': 'Bearer ' + twitchConfig.accessToken
+        }
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      return data.total || 0;
+    } catch(e) {
+      console.warn(LOG, 'Error Twitch followers:', e);
+      return null;
     }
+  }
+
+  async function fetchTwitchStream() {
+    try {
+      var res = await fetch('https://api.twitch.tv/helix/streams?user_id=' + twitchConfig.userId, {
+        headers: {
+          'Client-ID': twitchConfig.clientId,
+          'Authorization': 'Bearer ' + twitchConfig.accessToken
+        }
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      return data.data && data.data.length > 0;
+    } catch(e) {
+      return false;
+    }
+  }
+
+  async function renderTwitch() {
+    var followers = await fetchTwitchFollowers();
+    var isLive = await fetchTwitchStream();
     
-    return '<div class="widget widget--news">' +
-      '<div class="widget-title">📰 Noticias GW2</div>' +
-      '<div class="widget-news-list">' + content + '</div>' +
+    var followersStr = followers !== null ? followers.toLocaleString('es-AR') : '—';
+    var statusClass = isLive ? 'widget-twitch-live' : 'widget-twitch-offline';
+    var statusText = isLive ? '🔴 En vivo' : '⚫ Offline';
+    
+    return '<div class="widget widget--twitch">' +
+      '<div class="widget-title">📺 Twitch</div>' +
+      '<div class="widget-twitch-name">' + twitchConfig.login + '</div>' +
+      '<div class="widget-twitch-followers">' + followersStr + ' seguidores</div>' +
+      '<div class="' + statusClass + '">' + statusText + '</div>' +
       '</div>';
   }
 
@@ -213,6 +251,7 @@
       case 'counter': return renderCounter(widget.config);
       case 'all_resets': return renderAllResets();
       case 'gw2_news': return '<div class="widget widget--news"><div class="widget-title">📰 Noticias GW2</div><div class="widget-news-list"><div class="widget-news-placeholder">Cargando...</div></div></div>';
+      case 'twitch': return '<div class="widget widget--twitch"><div class="widget-title">📺 Twitch</div><div class="widget-twitch-placeholder">Cargando...</div></div>';
       default: return '';
     }
   }
@@ -241,6 +280,13 @@
         if (listDiv) {
           listDiv.innerHTML = newsHTML;
         }
+      });
+    });
+    
+    // Cargar Twitch async
+    container.querySelectorAll('.widget-twitch-placeholder').forEach(function(placeholder) {
+      renderTwitch().then(function(html) {
+        placeholder.outerHTML = html;
       });
     });
   }
@@ -287,7 +333,7 @@
     
     // Actualizar cada segundo
     setTimeout(function() {
-      if (document.querySelector('.widget--clock, .widget--reset')) {
+      if (document.querySelector('.widget--clock, .widget--resets')) {
         renderAll();
       }
     }, 1000);
