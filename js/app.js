@@ -221,7 +221,7 @@
     if (!item) return;
     
     // Usar protocol handler launch: con la ruta completa
-    var launchUrl = 'launch:' + item.command;
+    var launchUrl = 'launch:' + item.command.replace(/\\/g, '/');
     window.location.href = launchUrl;
     
     console.log(LOG, 'Lanzando:', item.name, '→', item.command);
