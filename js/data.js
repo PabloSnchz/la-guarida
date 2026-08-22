@@ -9,6 +9,13 @@
   var STORAGE_KEY = 'la_guarida_data_v1';
 
   var DEFAULT_STATE = {
+    widgets_left: [
+      { type: 'clock', position: 0, config: { format: '24h', showDate: true } },
+      { type: 'greeting', position: 1, config: { name: '' } }
+    ],
+    widgets_right: [
+      { type: 'notes', position: 0, config: { text: '' } }
+    ],
     favorites: [
       { id: 1, name: 'Bóveda', url: 'https://pablosnchz.github.io/gw2-wallet-ligero/', emoji: '', icon_url: 'https://pablosnchz.github.io/gw2-wallet-ligero/assets/favicon.png' },
       { id: 2, name: 'Métricas', url: 'https://pablosnchz.github.io/gw2-metrics-dashboard/', emoji: '', icon_url: '' },
@@ -47,6 +54,8 @@
         var parsed = JSON.parse(raw);
         state.favorites = parsed.favorites || [];
         state.categories = parsed.categories || [];
+        state.widgets_left = parsed.widgets_left || [];
+        state.widgets_right = parsed.widgets_right || [];
         // Asegurar que todos tienen icon_url y emoji
         state.favorites.forEach(function(f) {
           if (f.icon_url === undefined) f.icon_url = '';
@@ -66,6 +75,8 @@
     
     state.favorites = [];
     state.categories = [];
+    state.widgets_left = [];
+    state.widgets_right = [];
     // No guardar — solo si hay datos reales
   }
 
@@ -96,6 +107,8 @@
         if (data && data.favorites && data.categories) {
           state.favorites = data.favorites || [];
           state.categories = data.categories || [];
+          state.widgets_left = data.widgets_left || [];
+          state.widgets_right = data.widgets_right || [];
           state.favorites.forEach(function(f) {
             if (!f.icon_url) f.icon_url = '';
             if (!f.icon_data) f.icon_data = '';

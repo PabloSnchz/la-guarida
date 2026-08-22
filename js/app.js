@@ -13,6 +13,7 @@
   function render() {
     renderFavorites();
     renderCategories();
+    root.Widgets.renderAll();
     root.DragDrop.init();
   }
 
