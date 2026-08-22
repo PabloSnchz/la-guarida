@@ -558,16 +558,28 @@ body.drop-external-active .categories-grid {
 /* ====== Badge Chrome ====== */
 .chrome-badge {
   position: absolute;
-  top: 4px;
-  left: 4px;
+  top: 8px;
+  left: 8px;
   font-size: 0.6rem;
   background: #1a1c24;
   border: 1px solid #2a2c35;
   border-radius: 50%;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.fav-card.chrome-forced .fav-icon,
+.fav-card.chrome-forced .fav-emoji {
+  margin-top: 8px;
+}
+
+.category-link.chrome-forced .link-icon,
+.category-link.chrome-forced .link-emoji {
+  margin-left: 12px;
 }

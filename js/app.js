@@ -63,6 +63,10 @@
         if (editMode) {
           e.preventDefault();
           root.Modal.open('favorite', parseInt(this.getAttribute('data-id')));
+        } else if (card.classList.contains('chrome-forced')) {
+          e.preventDefault();
+          var href = card.getAttribute('href');
+          window.location.href = href;
         }
       });
     });
@@ -136,6 +140,10 @@
         if (editMode) {
           e.preventDefault();
           root.Modal.open('link', parseInt(this.getAttribute('data-link-id')), parseInt(this.getAttribute('data-cat-id')));
+        } else if (link.classList.contains('chrome-forced')) {
+          e.preventDefault();
+          var href = link.getAttribute('href');
+          window.location.href = href;
         }
       });
     });
