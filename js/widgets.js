@@ -235,12 +235,9 @@
     var statusClass = isLive ? 'widget-twitch-live' : 'widget-twitch-offline';
     var statusText = isLive ? '🔴 En vivo' : '⚫ Offline';
     
-    return '<div class="widget widget--twitch">' +
-      '<div class="widget-title">📺 Twitch</div>' +
-      '<div class="widget-twitch-name">' + twitchConfig.login + '</div>' +
+    return '<div class="widget-twitch-name">' + twitchConfig.login + '</div>' +
       '<div class="widget-twitch-followers">' + followersStr + ' seguidores</div>' +
-      '<div class="' + statusClass + '">' + statusText + '</div>' +
-      '</div>';
+      '<div class="' + statusClass + '">' + statusText + '</div>';
   }
 
   function renderWidget(widget) {
@@ -286,7 +283,10 @@
     // Cargar Twitch async
     container.querySelectorAll('.widget-twitch-placeholder').forEach(function(placeholder) {
       renderTwitch().then(function(html) {
-        placeholder.outerHTML = html;
+        var widgetCard = placeholder.closest('.widget--twitch');
+        if (widgetCard) {
+          widgetCard.innerHTML = '<div class="widget-title">📺 Twitch</div>' + html;
+        }
       });
     });
   }
