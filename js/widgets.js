@@ -1,6 +1,6 @@
 /*!
  * js/widgets.js — Widgets editables para paneles laterales
- * v4 — Twitch integrado + resets unificados + noticias GW2
+ * v5 — Twitch + YouTube integrados
  */
 (function (root) {
   'use strict';
@@ -15,7 +15,8 @@
     counter: { label: 'Contador', icon: '🔢' },
     all_resets: { label: 'Resets GW2', icon: '⏳' },
     gw2_news: { label: 'Noticias GW2', icon: '📰' },
-    twitch: { label: 'Twitch', icon: '📺' }
+    twitch: { label: 'Twitch', icon: '📺' },
+    youtube: { label: 'YouTube', icon: '📊' }
   };
 
   function getWidgets() {
@@ -240,6 +241,62 @@
       '<div class="' + statusClass + '">' + statusText + '</div>';
   }
 
+  // ====== YOUTUBE ======
+  var youtubeConfig = {
+    apiKey: 'AIzaSyC_IRdWIwyzor5qeSao5mEqlI-S8OHKcso',
+    channelId: 'UC4JTh35sJq644V0t7LfO76g'
+  };
+
+  async function fetchYouTubeChannel() {
+    try {
+      var res = await fetch('https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=' + youtubeConfig.channelId + '&key=' + youtubeConfig.apiKey);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (data.items && data.items.length) {
+        return {
+          title: data.items[0].snippet.title,
+          subscribers: data.items[0].statistics.subscriberCount,
+          videoCount: data.items[0].statistics.videoCount
+        };
+      }
+      return null;
+    } catch(e) {
+      console.warn(LOG, 'Error YouTube:', e);
+      return null;
+    }
+  }
+
+  async function fetchYouTubeLatestVideo() {
+    try {
+      var res = await fetch('https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=' + youtubeConfig.channelId + '&order=date&maxResults=1&type=video&key=' + youtubeConfig.apiKey);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (data.items && data.items.length) {
+        return {
+          title: data.items[0].snippet.title,
+          videoId: data.items[0].id.videoId,
+          publishedAt: data.items[0].snippet.publishedAt
+        };
+      }
+      return null;
+    } catch(e) {
+      return null;
+    }
+  }
+
+  async function renderYouTube() {
+    var channel = await fetchYouTubeChannel();
+    var latestVideo = await fetchYouTubeLatestVideo();
+    
+    var subsStr = channel ? parseInt(channel.subscribers).toLocaleString('es-AR') : '—';
+    var videoTitle = latestVideo ? latestVideo.title : 'Sin videos';
+    var videoLink = latestVideo ? 'https://youtube.com/watch?v=' + latestVideo.videoId : '#';
+    
+    return '<div class="widget-youtube-name">' + (channel ? root.Data.esc(channel.title) : 'Pablin Schez') + '</div>' +
+      '<div class="widget-youtube-subs">' + subsStr + ' suscriptores</div>' +
+      '<a class="widget-youtube-video" href="' + videoLink + '" target="_blank" rel="noopener">📹 ' + root.Data.esc(videoTitle) + '</a>';
+  }
+
   function renderWidget(widget) {
     switch (widget.type) {
       case 'clock': return renderClock(widget.config);
@@ -249,6 +306,7 @@
       case 'all_resets': return renderAllResets();
       case 'gw2_news': return '<div class="widget widget--news"><div class="widget-title">📰 Noticias GW2</div><div class="widget-news-list"><div class="widget-news-placeholder">Cargando...</div></div></div>';
       case 'twitch': return '<div class="widget widget--twitch"><div class="widget-title">📺 Twitch</div><div class="widget-twitch-placeholder">Cargando...</div></div>';
+      case 'youtube': return '<div class="widget widget--youtube"><div class="widget-title">📊 YouTube</div><div class="widget-youtube-placeholder">Cargando...</div></div>';
       default: return '';
     }
   }
@@ -286,6 +344,16 @@
         var widgetCard = placeholder.closest('.widget--twitch');
         if (widgetCard) {
           widgetCard.innerHTML = '<div class="widget-title">📺 Twitch</div>' + html;
+        }
+      });
+    });
+    
+    // Cargar YouTube async
+    container.querySelectorAll('.widget-youtube-placeholder').forEach(function(placeholder) {
+      renderYouTube().then(function(html) {
+        var widgetCard = placeholder.closest('.widget--youtube');
+        if (widgetCard) {
+          widgetCard.innerHTML = '<div class="widget-title">📊 YouTube</div>' + html;
         }
       });
     });
@@ -333,7 +401,6 @@
     
     // Actualizar solo reloj y resets cada segundo
     setTimeout(function tick() {
-      // Reloj
       document.querySelectorAll('.widget--clock').forEach(function(clockEl) {
         var now = new Date();
         var timeStr = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
@@ -341,7 +408,6 @@
         if (timeEl) timeEl.textContent = timeStr;
       });
       
-      // Resets
       document.querySelectorAll('.widget--resets').forEach(function(resetEl) {
         var dailyMs = Math.max(0, nextDailyResetUTC().getTime() - Date.now());
         var weeklyMs = Math.max(0, nextWeeklyResetUTC().getTime() - Date.now());

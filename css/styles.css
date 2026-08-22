@@ -429,3 +429,42 @@ body.drop-external-active .categories-grid {
   text-align: center;
   padding: 8px;
 }
+
+/* ====== Widget YouTube ====== */
+.widget-youtube-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #e0e4ed;
+}
+
+.widget-youtube-subs {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #FF0000;
+  margin-top: 4px;
+}
+
+.widget-youtube-video {
+  display: block;
+  font-size: 0.75rem;
+  color: #cfd2d8;
+  text-decoration: none;
+  padding: 6px 8px;
+  background: #0a0c10;
+  border: 1px solid #1e2028;
+  border-radius: 6px;
+  margin-top: 8px;
+  transition: all 0.15s ease;
+}
+
+.widget-youtube-video:hover {
+  color: #FF0000;
+  border-color: #FF0000;
+}
+
+.widget-youtube-placeholder {
+  font-size: 0.75rem;
+  color: #6a7080;
+  text-align: center;
+  padding: 8px;
+}
