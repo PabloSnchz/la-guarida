@@ -64,7 +64,8 @@
             { type: 'greeting', position: 1, config: { name: '' } }
           ];
           state.widgets_right = [
-            { type: 'notes', position: 0, config: { text: '' } }
+            { type: 'notes', position: 0, config: { text: '' } },
+            { type: 'counter', position: 1, config: { title: 'Cuenta regresiva', date: '2026-12-25' } }
           ];
           save();
         }
