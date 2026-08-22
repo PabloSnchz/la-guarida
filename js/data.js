@@ -56,6 +56,18 @@
         state.categories = parsed.categories || [];
         state.widgets_left = parsed.widgets_left || [];
         state.widgets_right = parsed.widgets_right || [];
+        
+        // Si no hay widgets, usar defaults
+        if (!state.widgets_left.length && !state.widgets_right.length) {
+          state.widgets_left = [
+            { type: 'clock', position: 0, config: { format: '24h', showDate: true } },
+            { type: 'greeting', position: 1, config: { name: '' } }
+          ];
+          state.widgets_right = [
+            { type: 'notes', position: 0, config: { text: '' } }
+          ];
+          save();
+        }
         // Asegurar que todos tienen icon_url y emoji
         state.favorites.forEach(function(f) {
           if (f.icon_url === undefined) f.icon_url = '';

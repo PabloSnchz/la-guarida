@@ -47,7 +47,7 @@ body {
 
 /* ====== Favoritos ====== */
 .favorites-grid {
-  display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr));
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(80px, 1fr));
   gap:12px;
 }
 .fav-card {
@@ -73,7 +73,7 @@ body {
 
 /* ====== Categorías ====== */
 .categories-grid {
-  display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
   gap:16px;
 }
 .category-card {
@@ -219,7 +219,7 @@ body.drop-external-active .categories-grid {
 
 .side-panel--left { order: 0; }
 .side-panel--right { order: 2; }
-.main-content { order: 1; flex: 1; max-width: 800px; }
+      .main-content { order: 1; flex: 1; max-width: 1200px; min-width: 600px; }
 
 @media (max-width: 1200px) {
   .side-panel { display: none; }
