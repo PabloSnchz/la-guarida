@@ -1,12 +1,12 @@
 # 🐈‍⬛ La Guarida
 
-Página de inicio personal del Gato Negro — organizá tus enlaces frecuentes, favoritos y categorías en un dashboard editable con drag & drop, favicons inteligentes y persistencia local.
+Página de inicio personal del Gato Negro — organizá tus enlaces frecuentes, favoritos y categorías en un dashboard editable con drag & drop, widgets en tiempo real, favicons inteligentes y persistencia local. Diseñada para monitores ultrawide con paneles laterales configurables.
 
 ## ✨ Características
 
 ### Organización
-- ⭐ Favoritos con acceso rápido
-- 📁 Categorías personalizables (agregar, editar, eliminar)
+- ⭐ Favoritos con acceso rápido (9 por fila en ultrawide)
+- 📁 Categorías personalizables (3 por fila)
 - 🔀 Drag & drop para reordenar y mover entre secciones
 - 🦊 Arrastrar desde Firefox para crear links automáticamente
 
@@ -17,6 +17,17 @@ Página de inicio personal del Gato Negro — organizá tus enlaces frecuentes, 
 - 🎨 Emoji manual como override
 - 🖼️ URL de ícono personalizado
 - 🔄 Sistema de fallback: icon_url → icon_data → emoji → automático → genérico
+
+### Widgets en paneles laterales
+| Widget | Panel | Descripción |
+|--------|-------|-------------|
+| 🕐 Reloj | Izquierdo | Hora local + fecha |
+| ⏳ Resets GW2 | Izquierdo | Daily, Weekly y Season en un solo widget compacto |
+| 📰 Noticias GW2 | Izquierdo | 4 últimos titulares del feed oficial |
+| 📝 Notas | Derecho | Texto editable con guardado automático |
+| 🔢 Contador | Derecho | Editable — click para configurar título y fecha |
+| 📺 Twitch | Derecho | Seguidores + estado en vivo (juego, viewers) |
+| 📊 YouTube | Derecho | Suscriptores + vistas totales + último video |
 
 ### Persistencia
 - 💾 localStorage con guardado automático
@@ -31,9 +42,10 @@ Página de inicio personal del Gato Negro — organizá tus enlaces frecuentes, 
 
 | Archivo | Descripción |
 |---------|-------------|
-| `index.html` | Estructura HTML |
+| `index.html` | Estructura HTML con layout ultrawide |
 | `css/styles.css` | Estilos (misma piel que la Bóveda) |
 | `js/data.js` | Estado, persistencia y favicons |
+| `js/widgets.js` | Widgets: reloj, resets, noticias, Twitch, YouTube |
 | `js/drag-drop.js` | Drag & drop interno + externo |
 | `js/modal.js` | Modal de edición + auto-detección |
 | `js/app.js` | Init, render y eventos |
@@ -53,6 +65,12 @@ Página de inicio personal del Gato Negro — organizá tus enlaces frecuentes, 
 - **Mover a favoritos**: Arrastrá link de categoría → favoritos
 - **Desde Firefox**: Arrastrá el favicon de una pestaña → soltalo en La Guarida
 
+### Widgets
+- Click en "＋ Widget" para agregar
+- Elegí el widget del menú
+- **Contador editable**: Click en el widget → ingresá título y fecha (YYYY-MM-DD)
+- **Notas**: Escribí directamente en el textarea — se guarda solo
+
 ### Favicons problemáticos
 | Situación | Solución |
 |-----------|----------|
@@ -70,6 +88,23 @@ Página de inicio personal del Gato Negro — organizá tus enlaces frecuentes, 
 | 3 | Emoji manual |
 | 4 | Auto-detección (Icon Horse → Google → DuckDuckGo) |
 | 5 | 🔗 genérico |
+
+## 🔌 APIs integradas
+
+| Servicio | Uso | Credenciales |
+|----------|-----|--------------|
+| Twitch Helix | Seguidores + estado en vivo | Client ID + Access Token |
+| YouTube Data v3 | Suscriptores + último video | API Key |
+| GW2 RSS | Noticias oficiales | No requiere |
+
+## 🖥️ Diseño ultrawide
+
+En monitores de 34" (3440px):
+- Panel izquierdo: 220px (reloj, resets, noticias)
+- Panel central: 900px (favoritos 9 por fila, categorías 3 por fila)
+- Panel derecho: 220px (notas, contador, Twitch, YouTube)
+
+En pantallas < 1200px, los paneles laterales se ocultan automáticamente.
 
 ## 🐈‍⬛ Ecosistema
 
