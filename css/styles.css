@@ -583,3 +583,92 @@ body.drop-external-active .categories-grid {
 .category-link.chrome-forced .link-emoji {
   margin-left: 12px;
 }
+
+/* ====== Header compacto (estilo Bóveda) ====== */
+.an-header--compact {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #0e0e10;
+  border-bottom: 1px solid #1a1a1d;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.an-header--compact .an-utilbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: #0b0b0c;
+  border-bottom: 1px solid #1a1a1d;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.brand-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-logo-compact {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.brand-name {
+  font-family: "Cinzel Decorative", serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #fbe6b2;
+  text-shadow: 0 0 4px rgba(255,230,180,0.4);
+  white-space: nowrap;
+}
+
+.an-util-left,
+.an-util-right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.an-util-link {
+  color: #cfd3da;
+  text-decoration: none;
+  font-size: 13px;
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+.an-util-link:hover {
+  opacity: 1;
+  color: #fff;
+}
+
+.an-util-link--btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+}
+
+.an-sep {
+  color: #3a3a3f;
+}
+
+@media (max-width: 900px) {
+  .an-header--compact .an-utilbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .an-util-left,
+  .an-util-right {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

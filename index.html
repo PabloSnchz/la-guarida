@@ -8,6 +8,66 @@
 </head>
 <body>
 
+<!-- HEADER COMPACTO (estilo Bóveda) -->
+<header class="an-header an-header--compact" role="banner">
+  <div class="an-utilbar">
+    <div class="an-util-left">
+      <!-- Logo + nombre -->
+      <div class="brand-compact">
+        <img class="brand-logo-compact" src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/logo-gato-negro.png" alt="La Guarida" width="32" height="32">
+        <span class="brand-name">La Guarida</span>
+      </div>
+      
+      <span class="an-sep">|</span>
+      
+      <!-- Botón Editar -->
+      <button id="editModeBtn" class="an-util-link an-util-link--btn" type="button" title="Modo edición">✏️ Editar</button>
+      
+      <span class="an-sep">|</span>
+      
+      <!-- Botones de acción -->
+      <button id="addFavoriteBtn" class="an-util-link an-util-link--btn" type="button" title="Agregar favorito">⭐ Favorito</button>
+      <button id="addCategoryBtn" class="an-util-link an-util-link--btn" type="button" title="Agregar categoría">📁 Categoría</button>
+      
+      <span class="an-sep">|</span>
+      
+      <!-- Links GW2 -->
+      <a class="an-util-link" href="https://wiki-es.guildwars2.com/wiki/P%C3%A1gina_principal" target="_blank" rel="noopener">Wiki GW2</a>
+      <a class="an-util-link" href="https://en-forum.guildwars2.com/" target="_blank" rel="noopener">Foros</a>
+      <a class="an-util-link" href="https://account.arena.net/applications" target="_blank" rel="noopener">ANet Keys</a>
+    </div>
+
+    <div class="an-util-right" aria-label="Configuración y backup">
+      <!-- Backup -->
+      <button id="exportBtn" class="an-util-link" title="Exportar configuración" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:0;">
+        <img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/155034.png" width="16" height="16" alt="Backup">
+        Backup
+      </button>
+      
+      <!-- Restaurar -->
+      <button id="importBtn" class="an-util-link" title="Importar configuración" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:0;">
+        <img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/155033.png" width="16" height="16" alt="Restaurar">
+        Restaurar
+      </button>
+      
+      <input type="file" id="importFile" accept=".json" style="display:none;">
+      
+      <span class="an-sep">|</span>
+      
+      <!-- Badge Link in Bio -->
+      <a href="https://pablosnchz.github.io/bio/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;border-radius:4px;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;height:26px;">
+        <span style="background-color:#555555;color:#ffffff;padding:0 10px;font-size:10px;font-weight:600;display:flex;align-items:center;gap:6px;letter-spacing:0.3px;white-space:nowrap;height:100%;">
+          <img src="https://raw.githubusercontent.com/PabloSnchz/bio/main/assets/profile.png" alt="Foto" style="width:18px;height:18px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.3);">
+          Link in Bio
+        </span>
+        <span style="background-color:#E1306C;color:#ffffff;padding:0 12px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;white-space:nowrap;height:100%;">
+          Pablin Schez
+        </span>
+      </a>
+    </div>
+  </div>
+</header>
+
 <div class="container">
   <div class="layout-row">
     <!-- PANEL IZQUIERDO -->
@@ -17,20 +77,6 @@
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="main-content">
-      <header class="header">
-        <h1>🐈‍⬛ <span class="gold">La Guarida</span></h1>
-        <p style="color:#a0a0a6; font-size:0.85rem; margin-top:4px;">Página de inicio personal</p>
-        
-        <div class="toolbar">
-          <button id="editModeBtn" class="btn">✏️ Modo edición</button>
-          <button id="addFavoriteBtn" class="btn btn--gold">⭐ Agregar favorito</button>
-          <button id="addCategoryBtn" class="btn">📁 Agregar categoría</button>
-          <button id="exportBtn" class="btn">💾 Exportar</button>
-          <button id="importBtn" class="btn">📂 Importar</button>
-          <input type="file" id="importFile" accept=".json" style="display:none;">
-        </div>
-      </header>
-
       <section>
         <h2 class="section-title">⭐ Favoritos</h2>
         <div class="favorites-grid" id="favoritesGrid"></div>
