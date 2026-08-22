@@ -1,556 +1,519 @@
-/* ====== La Guarida — Estilos (v2 — Look & Feel Bóveda) ====== */
-{ margin:0; padding:0; box-sizing:border-box; }
+/*!
+ * js/widgets.js — Widgets editables para paneles laterales
+ * v5 — Twitch + YouTube integrados
+ */
+(function (root) {
+  'use strict';
+  var LOG = '[LaGuarida:Widgets]';
 
-body {
-  background:#0e0e10; color:#e9e9ee;
-  font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
-  line-height:1.42; padding:40px 20px;
-  min-height:100vh;
-}
+  function $(sel) { return document.querySelector(sel); }
 
-.container {
-  max-width:1400px; margin:0 auto;
-  display:flex; flex-direction:column; gap:24px;
-  width:100%;
-}
+  var WIDGET_TYPES = {
+    clock: { label: 'Reloj', icon: '🕐' },
+    greeting: { label: 'Saludo', icon: '👋' },
+    notes: { label: 'Notas', icon: '📝' },
+    counter: { label: 'Contador', icon: '🔢' },
+    all_resets: { label: 'Resets GW2', icon: '⏳' },
+    gw2_news: { label: 'Noticias GW2', icon: '📰' },
+    twitch: { label: 'Twitch', icon: '📺' },
+    youtube: { label: 'YouTube', icon: '📊' }
+  };
 
-/* ====== Header ====== */
-.header {
-  text-align:center; padding:30px 20px;
-  background:#141418; border-radius:24px;
-  border:1px solid #1d1d20;
-  box-shadow:0 0 0 1px #1d1d20 inset,0 8px 24px rgba(0,0,0,0.3);
-}
-.header h1 {
-  font-size:1.8rem; color:#ffffff;
-  display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;
-}
-.header h1 .gold { color:#ffd966; }
-.toolbar {
-  display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:16px;
-}
-.btn {
-  padding:8px 16px; border-radius:8px;
-  border:1px solid #2a2a2f; background:#1c1c20;
-  color:#e9e9ee; font-size:0.8rem; font-weight:600;
-  cursor:pointer; transition:box-shadow .18s ease,transform .18s ease;
-  display:inline-flex; align-items:center; gap:6px;
-}
-.btn:hover {
-  background:#24242a;
-  box-shadow:0 0 0 1px #3b1e1e,0 4px 12px rgba(208,71,71,.35);
-  transform:translateY(-1px);
-}
-.btn--gold { border-color:#ffd966; color:#ffd966; }
-.btn--gold:hover { background:#ffd96620; border-color:#ffd966; }
+  function getWidgets() {
+    var state = root.Data.state;
+    if (!state.widgets_left) state.widgets_left = [];
+    if (!state.widgets_right) state.widgets_right = [];
+    return { left: state.widgets_left, right: state.widgets_right };
+  }
 
-/* ====== Secciones ====== */
-.section-title {
-  font-size:1.1rem; color:#e9e9ee; margin:0;
-  display:flex; align-items:center; gap:8px;
-  font-weight:600;
-}
+  // ====== HELPERS DE TIEMPO ======
+  function formatCountdown(ms) {
+    if (!isFinite(ms) || ms <= 0) return '—';
+    var seconds = Math.floor(ms / 1000);
+    var days = Math.floor(seconds / 86400);
+    seconds %= 86400;
+    var hours = Math.floor(seconds / 3600);
+    seconds %= 3600;
+    var minutes = Math.floor(seconds / 60);
+    seconds %= 60;
+    
+    if (days > 0) return days + 'd ' + hours + 'h ' + minutes + 'm';
+    if (hours > 0) return hours + 'h ' + minutes + 'm';
+    if (minutes > 0) return minutes + 'm';
+    return seconds + 's';
+  }
 
-/* ====== Favoritos ====== */
-.favorites-grid {
-  display:grid; grid-template-columns:repeat(9, 1fr);
-  gap:12px;
-}
-.fav-card {
-  background:#15151a; border:1px solid #242428; border-radius:10px;
-  padding:16px 8px; text-align:center; text-decoration:none;
-  display:flex; flex-direction:column; align-items:center; gap:8px;
-  transition:box-shadow .18s ease,transform .18s ease,border-color .18s ease;
-  position:relative; box-shadow:0 0 0 1px #1d1d20 inset;
-}
-.fav-card:hover {
-  transform:translateY(-2px);
-  border-color:#334155;
-  box-shadow:0 0 0 1px #3b1e1e,0 4px 12px rgba(208,71,71,.35);
-}
-.fav-card .fav-icon {
-  width:40px; height:40px; border-radius:8px; object-fit:contain;
-}
-.fav-card .fav-emoji {
-  font-size:28px; line-height:1;
-}
-.fav-card .fav-name {
-  font-size:0.7rem; color:#d6d6db; font-weight:600;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
-}
+  function nextDailyResetUTC() {
+    var now = new Date();
+    var next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 24, 0, 0, 0));
+    if (next.getTime() <= now.getTime()) {
+      next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0, 0));
+    }
+    return next;
+  }
 
-/* ====== Categorías ====== */
-.categories-grid {
-  display:grid; grid-template-columns:repeat(3, 1fr);
-  gap:16px;
-}
-.category-card {
-  background:#15151a; border:1px solid #242428; border-radius:10px;
-  padding:16px; position:relative;
-  box-shadow:0 0 0 1px #1d1d20 inset;
-  transition:box-shadow .18s ease,border-color .18s ease;
-}
-.category-card:hover {
-  border-color:#2a2a2f;
-}
-.category-header {
-  display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:12px;
-}
-.category-title {
-  font-size:0.9rem; font-weight:700; color:#e9e9ee;
-  display:flex; align-items:center; gap:8px;
-}
-.category-links {
-  display:flex; flex-direction:column; gap:6px;
-}
-.category-link {
-  display:flex; align-items:center; gap:10px;
-  padding:8px 10px; background:#0f0f12;
-  border:1px solid #242428; border-radius:8px;
-  text-decoration:none;
-  transition:box-shadow .18s ease,transform .18s ease,border-color .18s ease;
-  position:relative;
-}
-.category-link:hover {
-  background:#111114;
-  border-color:#334155;
-  transform:translateX(2px);
-}
-.category-link .link-icon {
-  width:20px; height:20px; border-radius:4px; object-fit:contain;
-}
-.category-link .link-emoji {
-  font-size:16px; line-height:1;
-}
-.category-link .link-name {
-  font-size:0.8rem; color:#d6d6db; font-weight:500;
-  flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
+  function nextWeeklyResetUTC() {
+    var now = new Date();
+    var day = now.getUTCDay();
+    var daysUntilMonday = (1 - day + 7) % 7;
+    var base = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 7, 30, 0, 0));
+    var next = new Date(base.getTime() + daysUntilMonday * 24 * 60 * 60 * 1000);
+    if (next.getTime() <= now.getTime()) next = new Date(next.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return next;
+  }
 
-/* ====== Modo edición ====== */
-.edit-actions {
-  display:none; position:absolute; top:4px; right:4px; gap:4px;
-}
-.edit-mode .edit-actions { display:flex; }
-.edit-actions button {
-  width:20px; height:20px; border-radius:50%;
-  border:none; font-size:0.6rem; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-}
-.edit-actions .edit-btn { background:#1c1c20; color:#ffd966; }
-.edit-actions .del-btn { background:#1c1c20; color:#ff9d9d; }
+  function getSeasonEnd() {
+    return new Date('2026-09-15T16:00:00Z');
+  }
 
-.add-btn {
-  display:flex; align-items:center; gap:6px;
-  padding:8px 16px; border-radius:20px;
-  border:1px dashed #2a2a2f; background:transparent;
-  color:#a0a0a6; font-size:0.75rem; cursor:pointer;
-  transition:box-shadow .18s ease,border-color .18s ease;
-  width:100%; justify-content:center;
-}
-.add-btn:hover { border-color:#44546b; color:#c8c8ce; }
+  // ====== RENDER ======
+  function renderClock(config) {
+    var format = (config && config.format) || '24h';
+    var showDate = config && config.showDate !== false;
+    var now = new Date();
+    var timeStr;
+    if (format === '12h') {
+      timeStr = now.toLocaleTimeString('es-AR', { hour: 'numeric', minute: '2-digit', hour12: true });
+    } else {
+      timeStr = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+    }
+    var dateStr = showDate ? now.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }) : '';
+    
+    return '<div class="widget widget--clock">' +
+      '<div class="widget-title">🕐 Reloj</div>' +
+      '<div class="widget-clock-time">' + timeStr + '</div>' +
+      (dateStr ? '<div class="widget-clock-date">' + dateStr + '</div>' : '') +
+      '</div>';
+  }
 
-/* ====== Drag & Drop ====== */
-.fav-card.dragging,
-.category-link.dragging,
-.category-card.dragging {
-  opacity: 0.4;
-  transform: scale(0.95);
-}
-.drag-over {
-  border-color: #ffd966 !important;
-  box-shadow: 0 0 16px rgba(255,217,102,0.35) !important;
-  transform: scale(1.03);
-}
-.edit-mode .fav-card,
-.edit-mode .category-link {
-  cursor: grab;
-}
-.edit-mode .fav-card:active,
-.edit-mode .category-link:active {
-  cursor: grabbing;
-}
+  function renderGreeting(config) {
+    var name = (config && config.name) || '';
+    var hour = new Date().getHours();
+    var saludo;
+    if (hour < 6) saludo = 'Buenas noches';
+    else if (hour < 12) saludo = 'Buenos días';
+    else if (hour < 20) saludo = 'Buenas tardes';
+    else saludo = 'Buenas noches';
+    
+    return '<div class="widget widget--greeting">' +
+      '<div class="widget-title">👋 Saludo</div>' +
+      '<div class="widget-greeting-text">' + saludo + (name ? ', <strong>' + root.Data.esc(name) + '</strong>' : '') + '</div>' +
+      '</div>';
+  }
 
-/* ====== Modal ====== */
-.modal {
-  position:fixed; inset:0; z-index:10000;
-}
-.modal[hidden] { display:none !important; }
-.modal__backdrop {
-  position:absolute; inset:0;
-  background:rgba(0,0,0,0.55);
-  backdrop-filter:blur(2px);
-}
-.modal__dialog {
-  position:absolute; left:50%; top:50%;
-  transform:translate(-50%,-50%);
-  width:min(420px, calc(100vw - 28px));
-  max-height:calc(100vh - 28px);
-  overflow:auto;
-  background:#141418;
-  border:1px solid #242428;
-  border-radius:12px;
-  box-shadow:0 10px 28px rgba(0,0,0,0.5);
-  padding:0;
-  outline:none;
-}
-.modal-card {
-  background:#141418;
-  padding:24px;
-  width:100%;
-}
-.modal-card h3 {
-  color:#e9e9ee; margin-bottom:16px; font-size:1.1rem;
-  font-weight:600;
-}
-.field { margin-bottom:12px; }
-.field label {
-  display:block; font-size:0.75rem; color:#a0a0a6; margin-bottom:4px;
-  text-transform:uppercase; letter-spacing:0.5px;
-}
-.field input {
-  width:100%; padding:8px 12px; border-radius:8px;
-  border:1px solid #242428; background:#0f0f12;
-  color:#e9e9ee; font-size:0.85rem;
-  transition:border-color .15s ease, box-shadow .15s ease;
-}
-.field input:focus {
-  outline:none;
-  border-color:#334155;
-  box-shadow:0 0 0 1px rgba(255,255,255,0.08);
-}
-.modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:16px; }
+  function renderAllResets() {
+    var dailyMs = Math.max(0, nextDailyResetUTC().getTime() - Date.now());
+    var weeklyMs = Math.max(0, nextWeeklyResetUTC().getTime() - Date.now());
+    var seasonMs = Math.max(0, getSeasonEnd().getTime() - Date.now());
+    
+    return '<div class="widget widget--resets">' +
+      '<div class="widget-title">⏳ Resets GW2</div>' +
+      '<div class="widget-resets-list">' +
+        '<div class="widget-reset-row"><span class="reset-label">Daily</span><span class="reset-value">' + formatCountdown(dailyMs) + '</span></div>' +
+        '<div class="widget-reset-row"><span class="reset-label">Weekly</span><span class="reset-value">' + formatCountdown(weeklyMs) + '</span></div>' +
+        '<div class="widget-reset-row"><span class="reset-label">Season</span><span class="reset-value">' + formatCountdown(seasonMs) + '</span></div>' +
+      '</div>' +
+      '</div>';
+  }
 
-@media (max-width:600px) {
-  .container { padding:16px; gap:16px; }
-  .favorites-grid { grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); }
-  .categories-grid { grid-template-columns:1fr; }
-}
+  function renderNotes(config) {
+    var text = (config && config.text) || '';
+    return '<div class="widget widget--notes">' +
+      '<div class="widget-title">📝 Notas</div>' +
+      '<textarea class="widget-notes-input" placeholder="Escribí tus notas...">' + root.Data.esc(text) + '</textarea>' +
+      '</div>';
+  }
 
-/* ====== Drop externo (Firefox) ====== */
-body.drop-external-active .container {
-  outline: 3px dashed #ffd966;
-  outline-offset: 8px;
-  animation: pulse-drop 1.5s infinite;
-}
-body.drop-external-active .favorites-grid,
-body.drop-external-active .categories-grid {
-  border: 2px dashed rgba(255,217,102,0.5);
-  border-radius: 12px;
-}
-@keyframes pulse-drop {
-  0%, 100% { outline-color: #ffd966; }
-  50% { outline-color: rgba(255,217,102,0.4); }
-}
+  function renderCounter(config) {
+    var title = (config && config.title) || 'Cuenta regresiva';
+    var targetDate = (config && config.date) || '';
+    
+    var content;
+    if (!targetDate) {
+      content = '<div class="widget-counter-empty">Click para configurar</div>';
+    } else {
+      var target = new Date(targetDate);
+      var now = new Date();
+      var diff = target - now;
+      var days = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+      content = '<div class="widget-counter-days">' + days + '</div>' +
+                '<div class="widget-counter-label">días restantes</div>' +
+                '<div class="widget-counter-date">' + target.toLocaleDateString('es-AR') + '</div>';
+    }
+    
+    return '<div class="widget widget--counter" data-widget-type="counter" style="cursor:pointer;" title="Click para editar">' +
+      '<div class="widget-title">🔢 ' + root.Data.esc(title) + '</div>' +
+      content +
+      '</div>';
+  }
 
-/* ====== Layout ultrawide ====== */
-.layout-row {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-  justify-content: center;
-  width: 100%;
-}
-.side-panel {
-  width: 220px;
-  min-width: 220px;
-  max-width: 220px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  flex-shrink: 0;
-}
-.side-panel--left { order: 0; }
-.side-panel--right { order: 2; }
-.main-content {
-  order: 1;
-  width: 900px;
-  min-width: 900px;
-  max-width: 900px;
-  flex-shrink: 0;
-}
-@media (max-width: 1200px) {
-  .side-panel { display: none; }
-}
-@media (max-width: 900px) {
-  .favorites-grid { grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); }
-  .categories-grid { grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); }
-}
+  // ====== NOTICIAS GW2 ======
+  var newsCache = null;
+  var newsLastFetch = 0;
+  var NEWS_TTL = 10 * 60 * 1000;
 
-/* ====== Widgets ====== */
-.widget {
-  background:#15151a;
-  border:1px solid #242428;
-  border-radius:10px;
-  padding:16px;
-  text-align:center;
-  box-shadow:0 0 0 1px #1d1d20 inset;
-  transition:box-shadow .18s ease,transform .18s ease,border-color .18s ease;
-}
-.widget:hover {
-  transform:translateY(-2px);
-  border-color:#334155;
-  box-shadow:0 0 0 1px #3b1e1e,0 4px 12px rgba(208,71,71,.35);
-}
-.widget--clock { border-left: 3px solid #7bc2ff; }
-.widget--resets { border-left: 3px solid #ffd36b; }
-.widget--notes { border-left: 3px solid #a0ffc8; }
-.widget--counter { border-left: 3px solid #b19cd9; }
-.widget--news { border-left: 3px solid #ff9d9d; }
-.widget--twitch { border-left: 3px solid #9146FF; }
-.widget--youtube { border-left: 3px solid #FF0000; }
-.widget--greeting { border-left: 3px solid #ffd966; }
+  async function fetchGW2News() {
+    var now = Date.now();
+    if (newsCache && (now - newsLastFetch) < NEWS_TTL) return newsCache;
+    
+    try {
+      var res = await fetch('https://www.guildwars2.com/es/feed/', { mode: 'cors' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var text = await res.text();
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(text, 'text/xml');
+      var items = doc.querySelectorAll('item');
+      
+      newsCache = [];
+      items.forEach(function(item, index) {
+        if (index >= 4) return;
+        var title = item.querySelector('title') ? item.querySelector('title').textContent : '';
+        var link = item.querySelector('link') ? item.querySelector('link').textContent : '';
+        newsCache.push({ title: title, link: link });
+      });
+      
+      newsLastFetch = now;
+      return newsCache;
+    } catch(e) {
+      console.warn(LOG, 'Error fetching GW2 news:', e);
+      return [];
+    }
+  }
 
-.widget-title {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #ffd966;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
+  // ====== TWITCH ======
+  var twitchConfig = {
+    clientId: 'jtirnfb54v6fz1i823rsidesn2ojo4',
+    accessToken: 'msph7jsh5wthpeaf3me3cuwbc2sxh3',
+    userId: '401539231',
+    login: 'pblsnchz'
+  };
 
-.widget-clock-time {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #e9e9ee;
-  font-variant-numeric: tabular-nums;
-}
-.widget-clock-date {
-  font-size: 0.75rem;
-  color: #a0a0a6;
-  margin-top: 4px;
-}
+  async function fetchTwitchFollowers() {
+    try {
+      var res = await fetch('https://api.twitch.tv/helix/channels/followers?broadcaster_id=' + twitchConfig.userId, {
+        headers: { 'Client-ID': twitchConfig.clientId, 'Authorization': 'Bearer ' + twitchConfig.accessToken }
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      return data.total || 0;
+    } catch(e) { return null; }
+  }
 
-.widget-greeting-text {
-  font-size: 0.9rem;
-  color: #d6d6db;
-}
+  async function fetchTwitchStreamInfo() {
+    try {
+      var res = await fetch('https://api.twitch.tv/helix/streams?user_id=' + twitchConfig.userId, {
+        headers: { 'Client-ID': twitchConfig.clientId, 'Authorization': 'Bearer ' + twitchConfig.accessToken }
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (data.data && data.data.length > 0) {
+        var stream = data.data[0];
+        return {
+          isLive: true,
+          gameName: stream.game_name || 'Desconocido',
+          viewers: stream.viewer_count || 0,
+          title: stream.title || '',
+          startedAt: stream.started_at || null
+        };
+      }
+      return { isLive: false };
+    } catch(e) { return { isLive: false }; }
+  }
 
-.widget-notes-input {
-  width: 100%;
-  min-height: 100px;
-  background: #0f0f12;
-  border: 1px solid #242428;
-  border-radius: 8px;
-  padding: 8px;
-  color: #e9e9ee;
-  font-size: 0.8rem;
-  font-family: inherit;
-  resize: vertical;
-}
+  async function renderTwitch() {
+    var followers = await fetchTwitchFollowers();
+    var streamInfo = await fetchTwitchStreamInfo();
+    
+    var followersStr = followers !== null ? followers.toLocaleString('es-AR') : '—';
+    
+    var html = '<div class="widget-twitch-name">pblsnchz</div>' +
+      '<div class="widget-twitch-followers">' + followersStr + ' seguidores</div>';
+    
+    if (streamInfo.isLive) {
+      var startedStr = streamInfo.startedAt ? new Date(streamInfo.startedAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : '';
+      html += '<div class="widget-twitch-live">🔴 EN VIVO</div>' +
+        '<div class="widget-twitch-game">🎮 ' + root.Data.esc(streamInfo.gameName) + '</div>' +
+        '<div class="widget-twitch-viewers">👁️ ' + streamInfo.viewers + ' viewers</div>' +
+        (startedStr ? '<div class="widget-twitch-started">⏱️ Desde ' + startedStr + '</div>' : '');
+    } else {
+      html += '<div class="widget-twitch-offline">⚫ Offline</div>';
+    }
+    
+    return html;
+  }
 
-.widget-counter-days {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #7bc2ff;
-  font-variant-numeric: tabular-nums;
-}
-.widget-counter-label {
-  font-size: 0.7rem;
-  color: #a0a0a6;
-  margin-top: 4px;
-}
-.widget-counter-date {
-  font-size: 0.7rem;
-  color: #a0a0a6;
-  margin-top: 4px;
-}
-.widget-counter-empty {
-  color: #a0a0a6;
-  font-size: 0.8rem;
-}
+  // ====== YOUTUBE ======
+  var youtubeConfig = {
+    apiKey: 'AIzaSyC_IRdWIwyzor5qeSao5mEqlI-S8OHKcso',
+    channelId: 'UC4JTh35sJq644V0t7LfO76g'
+  };
 
-.add-widget-btn {
-  width: 100%;
-  padding: 8px;
-  border: 1px dashed #2a2a2f;
-  border-radius: 8px;
-  background: transparent;
-  color: #a0a0a6;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition:border-color .18s ease,color .18s ease;
-}
-.add-widget-btn:hover {
-  border-color: #44546b;
-  color: #c8c8ce;
-}
+  async function fetchYouTubeChannel() {
+    try {
+      var res = await fetch('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=' + youtubeConfig.channelId + '&key=' + youtubeConfig.apiKey);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (data.items && data.items.length) {
+        return {
+          title: data.items[0].snippet.title,
+          subscribers: data.items[0].statistics.subscriberCount,
+          videoCount: data.items[0].statistics.videoCount,
+          viewCount: data.items[0].statistics.viewCount
+        };
+      }
+      return null;
+    } catch(e) { return null; }
+  }
 
-/* ====== Widgets Reset ====== */
-.widget-resets-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.widget-reset-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.75rem;
-}
-.reset-label {
-  color: #a0a0a6;
-  font-weight: 600;
-}
-.reset-value {
-  color: #7bc2ff;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
+  async function fetchYouTubeLatestVideo() {
+    try {
+      var res = await fetch('https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=' + youtubeConfig.channelId + '&order=date&maxResults=1&type=video&key=' + youtubeConfig.apiKey);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (data.items && data.items.length) {
+        var videoId = data.items[0].id.videoId;
+        
+        var statsRes = await fetch('https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=' + videoId + '&key=' + youtubeConfig.apiKey);
+        var statsData = await statsRes.json();
+        
+        var stats = {};
+        if (statsData.items && statsData.items.length) {
+          stats = {
+            views: statsData.items[0].statistics.viewCount,
+            likes: statsData.items[0].statistics.likeCount,
+            duration: statsData.items[0].contentDetails.duration
+          };
+        }
+        
+        return {
+          title: data.items[0].snippet.title,
+          videoId: videoId,
+          publishedAt: data.items[0].snippet.publishedAt,
+          stats: stats
+        };
+      }
+      return null;
+    } catch(e) { return null; }
+  }
 
-/* ====== Widget News ====== */
-.widget-news-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.widget-news-item {
-  font-size: 0.75rem;
-  color: #d6d6db;
-  text-decoration: none;
-  padding: 6px 8px;
-  background: #0f0f12;
-  border: 1px solid #242428;
-  border-radius: 6px;
-  transition:border-color .18s ease,color .18s ease,background .18s ease;
-  text-align: left;
-}
-.widget-news-item:hover {
-  background: #111114;
-  border-color: #334155;
-  color: #7bc2ff;
-}
-.widget-news-empty,
-.widget-news-placeholder {
-  font-size: 0.75rem;
-  color: #a0a0a6;
-  text-align: center;
-  padding: 8px;
-}
+  function formatDuration(isoDuration) {
+    var match = isoDuration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+    if (!match) return '—';
+    var hours = match[1] ? parseInt(match[1]) : 0;
+    var minutes = match[2] ? parseInt(match[2]) : 0;
+    var seconds = match[3] ? parseInt(match[3]) : 0;
+    
+    if (hours > 0) {
+      return hours + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+    }
+    if (minutes > 0) {
+      return minutes + ':' + String(seconds).padStart(2, '0');
+    }
+    return '0:' + String(seconds).padStart(2, '0');
+  }
 
-/* ====== Widget Twitch ====== */
-.widget-twitch-name {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #e9e9ee;
-}
-.widget-twitch-followers {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #9146FF;
-  margin-top: 4px;
-  font-variant-numeric: tabular-nums;
-}
-.widget-twitch-live {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #ff4d4d;
-  margin-top: 6px;
-}
-.widget-twitch-offline {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #a0a0a6;
-  margin-top: 6px;
-}
-.widget-twitch-placeholder {
-  font-size: 0.75rem;
-  color: #a0a0a6;
-  text-align: center;
-  padding: 8px;
-}
+  async function renderYouTube() {
+    var channel = await fetchYouTubeChannel();
+    var latestVideo = await fetchYouTubeLatestVideo();
+    
+    var subsStr = channel ? parseInt(channel.subscribers).toLocaleString('es-AR') : '—';
+    var viewsStr = channel ? parseInt(channel.viewCount).toLocaleString('es-AR') : '—';
+    
+    var html = '<div class="widget-youtube-name">Pablin Schez</div>' +
+      '<div class="widget-youtube-subs">' + subsStr + ' suscriptores</div>' +
+      '<div class="widget-youtube-views">👁️ ' + viewsStr + ' vistas totales</div>';
+    
+    if (latestVideo) {
+      var videoViews = latestVideo.stats && latestVideo.stats.views ? parseInt(latestVideo.stats.views).toLocaleString('es-AR') : '—';
+      var videoLikes = latestVideo.stats && latestVideo.stats.likes ? parseInt(latestVideo.stats.likes).toLocaleString('es-AR') : '—';
+      var duration = latestVideo.stats && latestVideo.stats.duration ? formatDuration(latestVideo.stats.duration) : '—';
+      
+      html += '<a class="widget-youtube-video" href="https://youtube.com/watch?v=' + latestVideo.videoId + '" target="_blank" rel="noopener">' +
+        '📹 ' + root.Data.esc(latestVideo.title) + '</a>' +
+        '<div class="widget-youtube-video-stats">' +
+          '<span>👁️ ' + videoViews + '</span>' +
+          '<span>👍 ' + videoLikes + '</span>' +
+          '<span>⏱️ ' + duration + '</span>' +
+        '</div>';
+    }
+    
+    return html;
+  }
 
-/* ====== Widget YouTube ====== */
-.widget-youtube-name {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #e9e9ee;
-}
-.widget-youtube-subs {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #FF0000;
-  margin-top: 4px;
-  font-variant-numeric: tabular-nums;
-}
-.widget-youtube-views {
-  font-size: 0.8rem;
-  color: #a0a0a6;
-  margin-top: 4px;
-}
-.widget-youtube-video {
-  display: block;
-  font-size: 0.75rem;
-  color: #d6d6db;
-  text-decoration: none;
-  padding: 6px 8px;
-  background: #0f0f12;
-  border: 1px solid #242428;
-  border-radius: 6px;
-  margin-top: 8px;
-  transition:border-color .18s ease,color .18s ease,background .18s ease;
-}
-.widget-youtube-video:hover {
-  color: #FF0000;
-  border-color: #FF0000;
-  background: #111114;
-}
-.widget-youtube-video-stats {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 6px;
-  font-size: 0.7rem;
-  color: #a0a0a6;
-}
-.widget-youtube-placeholder {
-  font-size: 0.75rem;
-  color: #a0a0a6;
-  text-align: center;
-  padding: 8px;
-}
+  function renderWidget(widget) {
+    switch (widget.type) {
+      case 'clock': return renderClock(widget.config);
+      case 'greeting': return renderGreeting(widget.config);
+      case 'notes': return renderNotes(widget.config);
+      case 'counter': return renderCounter(widget.config);
+      case 'all_resets': return renderAllResets();
+      case 'gw2_news': return '<div class="widget widget--news"><div class="widget-title">📰 Noticias GW2</div><div class="widget-news-list"><div class="widget-news-placeholder">Cargando...</div></div></div>';
+      case 'twitch': return '<div class="widget widget--twitch"><div class="widget-title">📺 Twitch</div><div class="widget-twitch-placeholder">Cargando...</div></div>';
+      case 'youtube': return '<div class="widget widget--youtube"><div class="widget-title">📊 YouTube</div><div class="widget-youtube-placeholder">Cargando...</div></div>';
+      default: return '';
+    }
+  }
 
-/* ====== Layout ultrawide ====== */
-.layout-row {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-  justify-content: center;
-  width: 100%;
-}
+  function renderSidePanel(containerId, widgets) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    
+    var html = widgets.map(function(widget) {
+      return renderWidget(widget);
+    }).join('');
+    
+    html += '<button class="add-widget-btn" data-side="' + containerId + '">＋ Widget</button>';
+    
+    container.innerHTML = html;
+    
+    // Cargar noticias async
+    container.querySelectorAll('.widget-news-placeholder').forEach(function(placeholder) {
+      var listDiv = placeholder.closest('.widget-news-list');
+      fetchGW2News().then(function(news) {
+        var newsHTML = news.length ? news.map(function(item) {
+          return '<a class="widget-news-item" href="' + root.Data.esc(item.link) + '" target="_blank" rel="noopener">' + root.Data.esc(item.title) + '</a>';
+        }).join('') : '<div class="widget-news-empty">No se pudieron cargar noticias</div>';
+        if (listDiv) listDiv.innerHTML = newsHTML;
+      });
+    });
+    
+    // Cargar Twitch async
+    container.querySelectorAll('.widget-twitch-placeholder').forEach(function(placeholder) {
+      renderTwitch().then(function(html) {
+        var widgetCard = placeholder.closest('.widget--twitch');
+        if (widgetCard) widgetCard.innerHTML = '<div class="widget-title">📺 Twitch</div>' + html;
+      });
+    });
+    
+    // Cargar YouTube async
+    container.querySelectorAll('.widget-youtube-placeholder').forEach(function(placeholder) {
+      renderYouTube().then(function(html) {
+        var widgetCard = placeholder.closest('.widget--youtube');
+        if (widgetCard) widgetCard.innerHTML = '<div class="widget-title">📊 YouTube</div>' + html;
+      });
+    });
+  }
 
-.side-panel {
-  width: 220px;
-  min-width: 220px;
-  max-width: 220px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  flex-shrink: 0;
-}
+  function renderAll() {
+    var widgets = getWidgets();
+    
+    renderSidePanel('widgetsLeft', widgets.left);
+    renderSidePanel('widgetsRight', widgets.right);
+    
+    // Wire textareas
+    document.querySelectorAll('.widget-notes-input').forEach(function(textarea) {
+      textarea.addEventListener('input', function() {
+        var text = this.value;
+        var state = root.Data.state;
+        var side = this.closest('.side-panel');
+        var sideId = side ? side.id : '';
+        var widgetList = sideId === 'widgetsLeft' ? state.widgets_left : state.widgets_right;
+        widgetList.forEach(function(w) {
+          if (w.type === 'notes') {
+            if (!w.config) w.config = {};
+            w.config.text = text;
+          }
+        });
+        root.Data.save();
+      });
+    });
+    
+    // Wire contador editable
+    document.querySelectorAll('[data-widget-type="counter"]').forEach(function(el) {
+      el.addEventListener('click', function() { editCounterWidget(this); });
+    });
+    
+    // Wire botones + Widget
+    document.querySelectorAll('.add-widget-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        showWidgetPicker(btn.getAttribute('data-side'));
+      });
+    });
+    
+    // Actualizar reloj y resets cada segundo
+    setTimeout(function tick() {
+      document.querySelectorAll('.widget--clock').forEach(function(clockEl) {
+        var now = new Date();
+        var timeEl = clockEl.querySelector('.widget-clock-time');
+        if (timeEl) timeEl.textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+      });
+      
+      document.querySelectorAll('.widget--resets').forEach(function(resetEl) {
+        var dailyMs = Math.max(0, nextDailyResetUTC().getTime() - Date.now());
+        var weeklyMs = Math.max(0, nextWeeklyResetUTC().getTime() - Date.now());
+        var seasonMs = Math.max(0, getSeasonEnd().getTime() - Date.now());
+        var values = resetEl.querySelectorAll('.reset-value');
+        if (values.length >= 3) {
+          values[0].textContent = formatCountdown(dailyMs);
+          values[1].textContent = formatCountdown(weeklyMs);
+          values[2].textContent = formatCountdown(seasonMs);
+        }
+      });
+      
+      setTimeout(tick, 1000);
+    }, 1000);
+  }
 
-.side-panel--left { order: 0; }
-.side-panel--right { order: 2; }
+  function editCounterWidget(element) {
+    var state = root.Data.state;
+    var sideId = element.closest('.side-panel').id;
+    var widgetList = sideId === 'widgetsLeft' ? state.widgets_left : state.widgets_right;
+    
+    var widget = null;
+    widgetList.forEach(function(w) { if (w.type === 'counter') widget = w; });
+    if (!widget) return;
+    
+    var config = widget.config || {};
+    var title = prompt('Título del evento:', config.title || 'Cuenta regresiva');
+    if (title === null) return;
+    var dateStr = prompt('Fecha (YYYY-MM-DD):', config.date || '');
+    if (dateStr === null) return;
+    
+    widget.config = { title: title, date: dateStr };
+    root.Data.save();
+    renderAll();
+  }
 
-.main-content {
-  order: 1;
-  width: 900px;
-  min-width: 900px;
-  max-width: 900px;
-  flex-shrink: 0;
-}
+  function showWidgetPicker(side) {
+    var types = Object.keys(WIDGET_TYPES);
+    var options = types.map(function(type, index) {
+      return (index + 1) + '. ' + WIDGET_TYPES[type].label;
+    }).join('\n');
+    
+    var choice = prompt('Elegí un widget (número):\n\n' + options);
+    if (!choice) return;
+    
+    var index = parseInt(choice, 10) - 1;
+    if (isNaN(index) || index < 0 || index >= types.length) return;
+    
+    var selectedType = types[index];
+    var state = root.Data.state;
+    var widgetList;
+    
+    if (side === 'widgetsLeft') {
+      if (!state.widgets_left) state.widgets_left = [];
+      widgetList = state.widgets_left;
+    } else {
+      if (!state.widgets_right) state.widgets_right = [];
+      widgetList = state.widgets_right;
+    }
+    
+    var config = {};
+    if (selectedType === 'counter') config = { title: 'Cuenta regresiva', date: '' };
+    if (selectedType === 'notes') config = { text: '' };
+    if (selectedType === 'clock') config = { format: '24h', showDate: true };
+    if (selectedType === 'greeting') config = { name: '' };
+    
+    widgetList.push({ type: selectedType, position: widgetList.length, config: config });
+    
+    root.Data.save();
+    renderAll();
+  }
 
-@media (max-width: 1200px) {
-  .side-panel { display: none; }
-}
+  root.Widgets = {
+    renderAll: renderAll,
+    WIDGET_TYPES: WIDGET_TYPES,
+    showWidgetPicker: showWidgetPicker
+  };
 
-@media (max-width: 900px) {
-  .favorites-grid { grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); }
-  .categories-grid { grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); }
-}
+})(typeof window !== 'undefined' ? window : this);
