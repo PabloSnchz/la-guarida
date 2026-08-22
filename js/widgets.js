@@ -1,6 +1,6 @@
 /*!
  * js/widgets.js — Widgets editables para paneles laterales
- * v5 — Twitch + YouTube integrados
+ * v6 — Iconos oficiales de la Bóveda + Twitch + YouTube
  */
 (function (root) {
   'use strict';
@@ -8,16 +8,31 @@
 
   function $(sel) { return document.querySelector(sel); }
 
-  var WIDGET_TYPES = {
-    clock: { label: 'Reloj', icon: '🕐' },
-    greeting: { label: 'Saludo', icon: '👋' },
-    notes: { label: 'Notas', icon: '📝' },
-    counter: { label: 'Contador', icon: '🔢' },
-    all_resets: { label: 'Resets GW2', icon: '⏳' },
-    gw2_news: { label: 'Noticias GW2', icon: '📰' },
-    twitch: { label: 'Twitch', icon: '📺' },
-    youtube: { label: 'YouTube', icon: '📊' }
+  var WIDGET_ICONS = {
+    clock: 'https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/3380755.png',
+    all_resets: 'https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/534745.png',
+    gw2_news: 'https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/222580.png',
+    notes: 'https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/102353.png',
+    counter: 'https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/155911.png',
+    twitch: 'https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/twitchlogo.png',
+    youtube: 'https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/youtube.png',
+    greeting: 'https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/156409.png'
   };
+
+  var WIDGET_TYPES = {
+    clock: { label: 'Reloj', icon: WIDGET_ICONS.clock },
+    greeting: { label: 'Saludo', icon: WIDGET_ICONS.greeting },
+    notes: { label: 'Notas', icon: WIDGET_ICONS.notes },
+    counter: { label: 'Contador', icon: WIDGET_ICONS.counter },
+    all_resets: { label: 'Resets GW2', icon: WIDGET_ICONS.all_resets },
+    gw2_news: { label: 'Noticias GW2', icon: WIDGET_ICONS.gw2_news },
+    twitch: { label: 'Twitch', icon: WIDGET_ICONS.twitch },
+    youtube: { label: 'YouTube', icon: WIDGET_ICONS.youtube }
+  };
+
+  function widgetTitleHTML(iconUrl, label) {
+    return '<div class="widget-title"><img src="' + iconUrl + '" alt="" width="20" height="20" style="vertical-align:middle;margin-right:6px;border-radius:4px;object-fit:contain;">' + label + '</div>';
+  }
 
   function getWidgets() {
     var state = root.Data.state;
@@ -80,7 +95,7 @@
     var dateStr = showDate ? now.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }) : '';
     
     return '<div class="widget widget--clock">' +
-      '<div class="widget-title">🕐 Reloj</div>' +
+      widgetTitleHTML(WIDGET_ICONS.clock, 'Reloj') +
       '<div class="widget-clock-time">' + timeStr + '</div>' +
       (dateStr ? '<div class="widget-clock-date">' + dateStr + '</div>' : '') +
       '</div>';
@@ -96,7 +111,7 @@
     else saludo = 'Buenas noches';
     
     return '<div class="widget widget--greeting">' +
-      '<div class="widget-title">👋 Saludo</div>' +
+      widgetTitleHTML(WIDGET_ICONS.greeting, 'Saludo') +
       '<div class="widget-greeting-text">' + saludo + (name ? ', <strong>' + root.Data.esc(name) + '</strong>' : '') + '</div>' +
       '</div>';
   }
@@ -107,7 +122,7 @@
     var seasonMs = Math.max(0, getSeasonEnd().getTime() - Date.now());
     
     return '<div class="widget widget--resets">' +
-      '<div class="widget-title">⏳ Resets GW2</div>' +
+      widgetTitleHTML(WIDGET_ICONS.all_resets, 'Resets GW2') +
       '<div class="widget-resets-list">' +
         '<div class="widget-reset-row"><span class="reset-label">Daily</span><span class="reset-value">' + formatCountdown(dailyMs) + '</span></div>' +
         '<div class="widget-reset-row"><span class="reset-label">Weekly</span><span class="reset-value">' + formatCountdown(weeklyMs) + '</span></div>' +
@@ -119,7 +134,7 @@
   function renderNotes(config) {
     var text = (config && config.text) || '';
     return '<div class="widget widget--notes">' +
-      '<div class="widget-title">📝 Notas</div>' +
+      widgetTitleHTML(WIDGET_ICONS.notes, 'Notas') +
       '<textarea class="widget-notes-input" placeholder="Escribí tus notas...">' + root.Data.esc(text) + '</textarea>' +
       '</div>';
   }
@@ -142,7 +157,7 @@
     }
     
     return '<div class="widget widget--counter" data-widget-type="counter" style="cursor:pointer;" title="Click para editar">' +
-      '<div class="widget-title">🔢 ' + root.Data.esc(title) + '</div>' +
+      widgetTitleHTML(WIDGET_ICONS.counter, root.Data.esc(title)) +
       content +
       '</div>';
   }
@@ -347,9 +362,9 @@
       case 'notes': return renderNotes(widget.config);
       case 'counter': return renderCounter(widget.config);
       case 'all_resets': return renderAllResets();
-      case 'gw2_news': return '<div class="widget widget--news"><div class="widget-title">📰 Noticias GW2</div><div class="widget-news-list"><div class="widget-news-placeholder">Cargando...</div></div></div>';
-      case 'twitch': return '<div class="widget widget--twitch"><div class="widget-title">📺 Twitch</div><div class="widget-twitch-placeholder">Cargando...</div></div>';
-      case 'youtube': return '<div class="widget widget--youtube"><div class="widget-title">📊 YouTube</div><div class="widget-youtube-placeholder">Cargando...</div></div>';
+      case 'gw2_news': return '<div class="widget widget--news">' + widgetTitleHTML(WIDGET_ICONS.gw2_news, 'Noticias GW2') + '<div class="widget-news-list"><div class="widget-news-placeholder">Cargando...</div></div></div>';
+      case 'twitch': return '<div class="widget widget--twitch">' + widgetTitleHTML(WIDGET_ICONS.twitch, 'Twitch') + '<div class="widget-twitch-placeholder">Cargando...</div></div>';
+      case 'youtube': return '<div class="widget widget--youtube">' + widgetTitleHTML(WIDGET_ICONS.youtube, 'YouTube') + '<div class="widget-youtube-placeholder">Cargando...</div></div>';
       default: return '';
     }
   }
@@ -381,7 +396,7 @@
     container.querySelectorAll('.widget-twitch-placeholder').forEach(function(placeholder) {
       renderTwitch().then(function(html) {
         var widgetCard = placeholder.closest('.widget--twitch');
-        if (widgetCard) widgetCard.innerHTML = '<div class="widget-title">📺 Twitch</div>' + html;
+        if (widgetCard) widgetCard.innerHTML = widgetTitleHTML(WIDGET_ICONS.twitch, 'Twitch') + html;
       });
     });
     
@@ -389,7 +404,7 @@
     container.querySelectorAll('.widget-youtube-placeholder').forEach(function(placeholder) {
       renderYouTube().then(function(html) {
         var widgetCard = placeholder.closest('.widget--youtube');
-        if (widgetCard) widgetCard.innerHTML = '<div class="widget-title">📊 YouTube</div>' + html;
+        if (widgetCard) widgetCard.innerHTML = widgetTitleHTML(WIDGET_ICONS.youtube, 'YouTube') + html;
       });
     });
   }
