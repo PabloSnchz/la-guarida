@@ -11,9 +11,7 @@
   var DEFAULT_STATE = {
     widgets_left: [
       { type: 'clock', position: 0, config: { format: '24h', showDate: true } },
-      { type: 'daily_reset', position: 1, config: {} },
-      { type: 'weekly_reset', position: 2, config: {} },
-      { type: 'season_reset', position: 3, config: {} }
+      { type: 'all_resets', position: 1, config: {} }
     ],
     widgets_right: [
       { type: 'notes', position: 0, config: { text: '' } },

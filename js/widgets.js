@@ -13,9 +13,7 @@
     greeting: { label: 'Saludo', icon: '👋' },
     notes: { label: 'Notas', icon: '📝' },
     counter: { label: 'Contador', icon: '🔢' },
-    daily_reset: { label: 'Daily Reset GW2', icon: '⏳' },
-    weekly_reset: { label: 'Weekly Reset GW2', icon: '📅' },
-    season_reset: { label: 'Season Reset GW2', icon: '🔮' },
+    all_resets: { label: 'Resets GW2', icon: '⏳' },
     gw2_news: { label: 'Noticias GW2', icon: '📰' }
   };
 
@@ -103,40 +101,23 @@
       '</div>';
   }
 
-  function renderDailyReset() {
-    var next = nextDailyResetUTC();
-    var ms = Math.max(0, next.getTime() - Date.now());
-    var countdown = formatCountdown(ms);
+  function renderAllResets() {
+    var dailyNext = nextDailyResetUTC();
+    var dailyMs = Math.max(0, dailyNext.getTime() - Date.now());
     
-    return '<div class="widget widget--reset">' +
-      '<div class="widget-title">⏳ Daily Reset</div>' +
-      '<div class="widget-reset-countdown">' + countdown + '</div>' +
-      '<div class="widget-reset-label">00:00 UTC</div>' +
-      '</div>';
-  }
-
-  function renderWeeklyReset() {
-    var next = nextWeeklyResetUTC();
-    var ms = Math.max(0, next.getTime() - Date.now());
-    var countdown = formatCountdown(ms);
+    var weeklyNext = nextWeeklyResetUTC();
+    var weeklyMs = Math.max(0, weeklyNext.getTime() - Date.now());
     
-    return '<div class="widget widget--reset">' +
-      '<div class="widget-title">📅 Weekly Reset</div>' +
-      '<div class="widget-reset-countdown">' + countdown + '</div>' +
-      '<div class="widget-reset-label">Lunes 07:30 UTC</div>' +
-      '</div>';
-  }
-
-  function renderSeasonReset() {
-    var end = getSeasonEnd();
-    var ms = Math.max(0, end.getTime() - Date.now());
-    var countdown = formatCountdown(ms);
-    var dateStr = end.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
+    var seasonEnd = getSeasonEnd();
+    var seasonMs = Math.max(0, seasonEnd.getTime() - Date.now());
     
-    return '<div class="widget widget--reset">' +
-      '<div class="widget-title">🔮 Season Reset</div>' +
-      '<div class="widget-reset-countdown">' + countdown + '</div>' +
-      '<div class="widget-reset-label">' + dateStr + '</div>' +
+    return '<div class="widget widget--resets">' +
+      '<div class="widget-title">⏳ Resets GW2</div>' +
+      '<div class="widget-resets-list">' +
+        '<div class="widget-reset-row"><span class="reset-label">Daily</span><span class="reset-value">' + formatCountdown(dailyMs) + '</span></div>' +
+        '<div class="widget-reset-row"><span class="reset-label">Weekly</span><span class="reset-value">' + formatCountdown(weeklyMs) + '</span></div>' +
+        '<div class="widget-reset-row"><span class="reset-label">Season</span><span class="reset-value">' + formatCountdown(seasonMs) + '</span></div>' +
+      '</div>' +
       '</div>';
   }
 
@@ -230,10 +211,8 @@
       case 'greeting': return renderGreeting(widget.config);
       case 'notes': return renderNotes(widget.config);
       case 'counter': return renderCounter(widget.config);
-      case 'daily_reset': return renderDailyReset();
-      case 'weekly_reset': return renderWeeklyReset();
-      case 'season_reset': return renderSeasonReset();
-      case 'gw2_news': return '<div class="widget-news-placeholder">Cargando noticias...</div>';
+      case 'all_resets': return renderAllResets();
+      case 'gw2_news': return '<div class="widget widget--news"><div class="widget-title">📰 Noticias GW2</div><div class="widget-news-list"><div class="widget-news-placeholder">Cargando...</div></div></div>';
       default: return '';
     }
   }
@@ -251,23 +230,19 @@
     container.innerHTML = html;
     
     // Cargar noticias async
-    if (html.indexOf('widget-news-placeholder') !== -1) {
-      container.querySelectorAll('.widget-news-placeholder').forEach(function(placeholder) {
-        fetchGW2News().then(function(news) {
-          var parent = placeholder.closest('.widget--news') || placeholder;
-          var newsHTML = news.length ? news.map(function(item) {
-            return '<a class="widget-news-item" href="' + root.Data.esc(item.link) + '" target="_blank" rel="noopener">' +
-              root.Data.esc(item.title) + '</a>';
-          }).join('') : '<div class="widget-news-empty">No se pudieron cargar</div>';
-          
-          var listDiv = parent.querySelector('.widget-news-list');
-          if (listDiv) {
-            listDiv.innerHTML = newsHTML;
-          }
-          placeholder.remove();
-        });
+    container.querySelectorAll('.widget-news-placeholder').forEach(function(placeholder) {
+      var listDiv = placeholder.closest('.widget-news-list');
+      fetchGW2News().then(function(news) {
+        var newsHTML = news.length ? news.map(function(item) {
+          return '<a class="widget-news-item" href="' + root.Data.esc(item.link) + '" target="_blank" rel="noopener">' +
+            root.Data.esc(item.title) + '</a>';
+        }).join('') : '<div class="widget-news-empty">No se pudieron cargar noticias</div>';
+        
+        if (listDiv) {
+          listDiv.innerHTML = newsHTML;
+        }
       });
-    }
+    });
   }
 
   function renderAll() {

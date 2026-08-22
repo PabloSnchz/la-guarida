@@ -325,16 +325,28 @@ body.drop-external-active .categories-grid {
 }
 
 /* ====== Widgets Reset ====== */
-.widget-reset-countdown {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #7bc2ff;
+.widget-resets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.widget-reset-label {
-  font-size: 0.7rem;
+.widget-reset-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.reset-label {
   color: #9aa2b8;
-  margin-top: 4px;
+  font-weight: 600;
+}
+
+.reset-value {
+  color: #7bc2ff;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ====== Widget Counter ====== */
