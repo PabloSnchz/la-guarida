@@ -220,11 +220,11 @@
     
     if (!item) return;
     
-    // Usar protocol handler launch:
-    var launchUrl = 'launch:' + type + '=' + encodeURIComponent(item.name);
+    // Usar protocol handler launch: con la ruta completa
+    var launchUrl = 'launch:' + item.command;
     window.location.href = launchUrl;
     
-    console.log(LOG, 'Lanzando:', item.name, '→', launchUrl);
+    console.log(LOG, 'Lanzando:', item.name, '→', item.command);
   }
 
   function deleteLauncherItem(id, type) {
