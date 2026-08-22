@@ -412,8 +412,9 @@
   function renderAll() {
     var widgets = getWidgets();
     
-    renderSidePanel('widgetsLeft', widgets.left);
-    renderSidePanel('widgetsLeft', widgets.right);  // TODO: integrar en 2 columnas
+    // Combinar widgets izquierda + derecha en el panel izquierdo
+    var combinedWidgets = widgets.left.concat(widgets.right);
+    renderSidePanel('widgetsLeft', combinedWidgets);
     
     // Wire textareas
     document.querySelectorAll('.widget-notes-input').forEach(function(textarea) {
