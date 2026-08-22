@@ -47,7 +47,7 @@ body {
 
 /* ====== Favoritos ====== */
 .favorites-grid {
-  display:grid; grid-template-columns:repeat(auto-fill, minmax(80px, 1fr));
+  display:grid; grid-template-columns:repeat(9, 1fr);
   gap:12px;
 }
 .fav-card {
@@ -202,7 +202,7 @@ body.drop-external-active .categories-grid {
 }
 
 /* ====== Layout ultrawide ====== */
-.layout {
+.layout-row {
   display: flex;
   gap: 20px;
   align-items: flex-start;
@@ -223,6 +223,10 @@ body.drop-external-active .categories-grid {
 
 @media (max-width: 1200px) {
   .side-panel { display: none; }
+}
+
+@media (max-width: 900px) {
+  .favorites-grid { grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); }
 }
 
 /* ====== Widgets ====== */
@@ -309,3 +313,4 @@ body.drop-external-active .categories-grid {
   border-color: #5a6e9a;
   color: #9aa2b8;
 }
+

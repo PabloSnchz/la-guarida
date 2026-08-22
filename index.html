@@ -8,15 +8,15 @@
 </head>
 <body>
 
-<div class="container layout">
+<div class="container">
+  <div class="layout-row">
+    <!-- PANEL IZQUIERDO -->
+    <aside class="side-panel side-panel--left" id="widgetsLeft">
+      <!-- Widgets se renderizan acá -->
+    </aside>
 
-  <!-- PANEL IZQUIERDO -->
-  <aside class="side-panel side-panel--left" id="widgetsLeft">
-    <!-- Widgets se renderizan acá -->
-  </aside>
-
-  <!-- CONTENIDO PRINCIPAL -->
-  <div class="main-content">
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="main-content">
     <header class="header">
       <h1>🐈‍⬛ <span class="gold">La Guarida</span></h1>
       <p style="color:#a0a0a6; font-size:0.85rem; margin-top:4px;">Página de inicio personal</p>
@@ -42,11 +42,13 @@
     </section>
   </div>
 
-  <!-- PANEL DERECHO -->
-  <aside class="side-panel side-panel--right" id="widgetsRight">
-    <!-- Widgets se renderizan acá -->
-  </aside>
+    </div><!-- /main-content -->
 
+    <!-- PANEL DERECHO -->
+    <aside class="side-panel side-panel--right" id="widgetsRight">
+      <!-- Widgets se renderizan acá -->
+    </aside>
+  </div><!-- /layout-row -->
 </div>
 
 <!-- MODAL -->
