@@ -9,8 +9,9 @@ body {
 }
 
 .container {
-  max-width:1000px; margin:0 auto;
+  max-width:1400px; margin:0 auto;
   display:flex; flex-direction:column; gap:24px;
+  width:100%;
 }
 
 /* ====== Header ====== */
@@ -207,19 +208,28 @@ body.drop-external-active .categories-grid {
   gap: 20px;
   align-items: flex-start;
   justify-content: center;
+  width: 100%;
 }
 
 .side-panel {
-  width: 250px;
-  min-width: 250px;
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .side-panel--left { order: 0; }
 .side-panel--right { order: 2; }
-      .main-content { order: 1; flex: 1; max-width: 1200px; min-width: 600px; }
+      .main-content {
+  order: 1;
+  width: 900px;
+  min-width: 900px;
+  max-width: 900px;
+  flex-shrink: 0;
+}
 
 @media (max-width: 1200px) {
   .side-panel { display: none; }
