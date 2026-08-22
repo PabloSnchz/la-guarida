@@ -12,7 +12,7 @@
 
   function getHref(item) {
     if (item.open_chrome) {
-      return 'chrome-launch://' + item.url.replace(/^https?:\/\//, '');
+      return 'chrome-launch:' + item.url.replace(/^https?:\/\//, '');
     }
     return item.url;
   }
