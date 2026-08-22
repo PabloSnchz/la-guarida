@@ -70,7 +70,7 @@
 
 <div class="container">
   <div class="layout-row">
-    <!-- PANEL IZQUIERDO -->
+    <!-- PANEL IZQUIERDO — Widgets -->
     <aside class="side-panel side-panel--left" id="widgetsLeft">
       <!-- Widgets se renderizan acá -->
     </aside>
@@ -88,9 +88,25 @@
       </section>
     </div><!-- /main-content -->
 
-    <!-- PANEL DERECHO -->
-    <aside class="side-panel side-panel--right" id="widgetsRight">
-      <!-- Widgets se renderizan acá -->
+    <!-- PANEL DERECHO — Lanzador -->
+    <aside class="side-panel side-panel--right" id="launcherPanel">
+      <div class="launcher-card">
+        <div class="launcher-header">
+          <span class="launcher-title">🚀 Lanzador</span>
+        </div>
+        <div class="launcher-tabs">
+          <button id="launcherTabApps" class="launcher-tab active">Apps</button>
+          <button id="launcherTabGames" class="launcher-tab">Juegos</button>
+        </div>
+        <div class="launcher-content" id="launcherContent">
+          <!-- Se renderiza con app.js -->
+        </div>
+      </div>
+      
+      <!-- Widgets debajo del lanzador -->
+      <div id="widgetsRight">
+        <!-- Widgets se renderizan acá -->
+      </div>
     </aside>
   </div><!-- /layout-row -->
 </div>
@@ -107,15 +123,19 @@
       <label for="modalUrl">URL</label>
       <input type="url" id="modalUrl" placeholder="https://...">
     </div>
+    <div class="field" id="modalCommandField" style="display:none;">
+      <label for="modalCommand">Ruta o comando</label>
+      <input type="text" id="modalCommand" placeholder="C:\...\app.exe">
+    </div>
     <div class="field">
-      <label for="modalEmoji">Emoji (opcional, override del favicon)</label>
+      <label for="modalEmoji">Emoji (opcional)</label>
       <input type="text" id="modalEmoji" placeholder="🔗">
     </div>
     <div class="field">
-      <label for="modalIconUrl">URL del ícono (opcional, prioridad sobre favicon)</label>
+      <label for="modalIconUrl">URL del ícono (opcional)</label>
       <input type="url" id="modalIconUrl" placeholder="https://.../icon.png">
     </div>
-    <div class="field">
+    <div class="field" id="modalOpenChromeField">
       <label style="display:flex;align-items:center;gap:6px;cursor:pointer;text-transform:none;letter-spacing:0;">
         <input type="checkbox" id="modalOpenChrome" style="width:auto;margin:0;cursor:pointer;">
         Abrir en Chrome obligatoriamente

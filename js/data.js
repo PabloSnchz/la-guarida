@@ -1,6 +1,6 @@
 /*!
  * js/data.js — Estado y persistencia
- * v4 — Soporte icon_url + favicon personalizado
+ * v5 — Soporte apps y games para el lanzador
  */
 (function (root) {
   'use strict';
@@ -17,13 +17,14 @@
     widgets_right: [
       { type: 'notes', position: 0, config: { text: '' } },
       { type: 'counter', position: 1, config: { title: 'Cuenta regresiva', date: '' } },
-      { type: 'twitch', position: 2, config: {} }
+      { type: 'twitch', position: 2, config: {} },
+      { type: 'youtube', position: 3, config: {} }
     ],
     favorites: [
-      { id: 1, name: 'Bóveda', url: 'https://pablosnchz.github.io/gw2-wallet-ligero/', emoji: '', icon_url: 'https://pablosnchz.github.io/gw2-wallet-ligero/assets/favicon.png' },
-      { id: 2, name: 'Métricas', url: 'https://pablosnchz.github.io/gw2-metrics-dashboard/', emoji: '', icon_url: '' },
-      { id: 3, name: 'Link Bio', url: 'https://pablosnchz.github.io/bio/', emoji: '', icon_url: '' },
-      { id: 4, name: 'Traffic Stats', url: 'https://pablosnchz.github.io/github-repo-traffic-stats/', emoji: '', icon_url: '' }
+      { id: 1, name: 'Bóveda', url: 'https://pablosnchz.github.io/gw2-wallet-ligero/', emoji: '', icon_url: 'https://pablosnchz.github.io/gw2-wallet-ligero/assets/favicon.png', open_chrome: false },
+      { id: 2, name: 'Métricas', url: 'https://pablosnchz.github.io/gw2-metrics-dashboard/', emoji: '', icon_url: '', open_chrome: false },
+      { id: 3, name: 'Link Bio', url: 'https://pablosnchz.github.io/bio/', emoji: '', icon_url: '', open_chrome: false },
+      { id: 4, name: 'Traffic Stats', url: 'https://pablosnchz.github.io/github-repo-traffic-stats/', emoji: '', icon_url: '', open_chrome: false }
     ],
     categories: [
       {
@@ -31,9 +32,9 @@
         name: 'GW2',
         emoji: '🎮',
         links: [
-          { id: 1, name: 'Wiki ES', url: 'https://wiki-es.guildwars2.com/', emoji: '', icon_url: '' },
-          { id: 2, name: 'GW2 Efficiency', url: 'https://gw2efficiency.com/', emoji: '', icon_url: '' },
-          { id: 3, name: 'Metabattle', url: 'https://metabattle.com/', emoji: '', icon_url: '' }
+          { id: 1, name: 'Wiki ES', url: 'https://wiki-es.guildwars2.com/', emoji: '', icon_url: '', open_chrome: false },
+          { id: 2, name: 'GW2 Efficiency', url: 'https://gw2efficiency.com/', emoji: '', icon_url: '', open_chrome: false },
+          { id: 3, name: 'Metabattle', url: 'https://metabattle.com/', emoji: '', icon_url: '', open_chrome: false }
         ]
       },
       {
@@ -41,14 +42,22 @@
         name: 'Desarrollo',
         emoji: '💻',
         links: [
-          { id: 1, name: 'GitHub', url: 'https://github.com/', emoji: '', icon_url: '' },
-          { id: 2, name: 'Vercel', url: 'https://vercel.com/', emoji: '', icon_url: '' }
+          { id: 1, name: 'GitHub', url: 'https://github.com/', emoji: '', icon_url: '', open_chrome: false },
+          { id: 2, name: 'Vercel', url: 'https://vercel.com/', emoji: '', icon_url: '', open_chrome: false }
         ]
       }
+    ],
+    apps: [
+      { id: 1, name: 'Chrome', command: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', emoji: '🌐' },
+      { id: 2, name: 'VS Code', command: 'code', emoji: '💻' },
+      { id: 3, name: 'Discord', command: 'discord', emoji: '🎮' }
+    ],
+    games: [
+      { id: 1, name: 'GW2', command: 'C:\\Games\\Guild Wars 2\\gw2-64.exe', emoji: '⚔️' }
     ]
   };
 
-  var state = { favorites: [], categories: [] };
+  var state = { favorites: [], categories: [], apps: [], games: [], widgets_left: [], widgets_right: [] };
 
   function load() {
     try {
@@ -57,32 +66,23 @@
         var parsed = JSON.parse(raw);
         state.favorites = parsed.favorites || [];
         state.categories = parsed.categories || [];
+        state.apps = parsed.apps || [];
+        state.games = parsed.games || [];
         state.widgets_left = parsed.widgets_left || [];
         state.widgets_right = parsed.widgets_right || [];
         
-        // Si no hay widgets, usar defaults
-        if (!state.widgets_left.length && !state.widgets_right.length) {
-          state.widgets_left = [
-            { type: 'clock', position: 0, config: { format: '24h', showDate: true } },
-            { type: 'greeting', position: 1, config: { name: '' } }
-          ];
-          state.widgets_right = [
-            { type: 'notes', position: 0, config: { text: '' } },
-            { type: 'counter', position: 1, config: { title: 'Cuenta regresiva', date: '2026-12-25' } }
-          ];
-          save();
-        }
-        // Asegurar que todos tienen icon_url y emoji
         state.favorites.forEach(function(f) {
           if (f.icon_url === undefined) f.icon_url = '';
           if (f.icon_data === undefined) f.icon_data = '';
           if (f.emoji === undefined) f.emoji = '';
+          if (f.open_chrome === undefined) f.open_chrome = false;
         });
         state.categories.forEach(function(c) {
           (c.links || []).forEach(function(l) {
             if (l.icon_url === undefined) l.icon_url = '';
             if (l.icon_data === undefined) l.icon_data = '';
             if (l.emoji === undefined) l.emoji = '';
+            if (l.open_chrome === undefined) l.open_chrome = false;
           });
         });
         return;
@@ -91,9 +91,10 @@
     
     state.favorites = [];
     state.categories = [];
+    state.apps = [];
+    state.games = [];
     state.widgets_left = [];
     state.widgets_right = [];
-    // No guardar — solo si hay datos reales
   }
 
   function save() {
@@ -101,7 +102,7 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch(e) {
       console.error(LOG, 'Error guardando:', e);
-      alert('⚠️ No se pudo guardar. Usá Exportar para respaldar.');
+      alert('⚠️ No se pudo guardar. Usá Backup para respaldar.');
     }
   }
 
@@ -123,18 +124,10 @@
         if (data && data.favorites && data.categories) {
           state.favorites = data.favorites || [];
           state.categories = data.categories || [];
+          state.apps = data.apps || [];
+          state.games = data.games || [];
           state.widgets_left = data.widgets_left || [];
           state.widgets_right = data.widgets_right || [];
-          state.favorites.forEach(function(f) {
-            if (!f.icon_url) f.icon_url = '';
-            if (!f.icon_data) f.icon_data = '';
-          });
-          state.categories.forEach(function(c) {
-            (c.links || []).forEach(function(l) {
-              if (!l.icon_url) l.icon_url = '';
-              if (!l.icon_data) l.icon_data = '';
-            });
-          });
           save();
           if (root.App && typeof root.App.render === 'function') root.App.render();
           alert('✅ Datos importados correctamente');
@@ -160,25 +153,20 @@
     var icon_url = item.icon_url || '';
     var icon_data = item.icon_data || '';
     
-    
-    // 1er prioridad: icon_url manual
     if (icon_url && icon_url.trim()) {
       return '<img class="' + (cssClass || '') + '" src="' + esc(icon_url) + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
              'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';">' +
              '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
     }
     
-    // 2da prioridad: icon_data base64
     if (icon_data) {
       return '<img class="' + (cssClass || '') + '" src="' + icon_data + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;">';
     }
     
-    // 3ra prioridad: emoji manual
     if (emoji && emoji.trim()) {
       return '<span class="' + emojiClass + '" style="width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + emoji + '</span>';
     }
     
-    // 4ta PRIORIDAD: automático
     var domain = getDomain(url);
     if (domain) {
       var iconHorseFavicon = 'https://icon.horse/icon/' + domain;
@@ -187,10 +175,10 @@
       
       return '<img class="' + (cssClass || '') + '" src="' + iconHorseFavicon + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
              'onerror="if(!this.dataset.fallback1){this.dataset.fallback1=1;this.src=\'' + googleFavicon + '\';}else if(!this.dataset.fallback2){this.dataset.fallback2=1;this.src=\'' + duckduckgoFavicon + '\';}else{this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';}">' +
-             '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
+             '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">🔗</span>';
     }
     
-    return '<span class="' + emojiClass + '" style="width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
+    return '<span class="' + emojiClass + '" style="width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">🔗</span>';
   }
 
   root.Data = {

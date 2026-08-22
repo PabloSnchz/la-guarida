@@ -1,6 +1,6 @@
 /*!
  * js/modal.js — Modal de edición
- * v4 — Soporte open_chrome + auto-detectar favicon + base64
+ * v5 — Soporte para lanzador (apps y juegos)
  */
 (function (root) {
   'use strict';
@@ -22,15 +22,18 @@
     var emojiInput = $('#modalEmoji');
     var iconUrlInput = $('#modalIconUrl');
     var openChromeInput = $('#modalOpenChrome');
+    var commandInput = $('#modalCommand');
     var urlField = $('#modalUrlField');
+    var commandField = $('#modalCommandField');
     var autoDetectBtn = $('#modalAutoDetectFaviconBtn');
     var downloadBtn = $('#modalDownloadFaviconBtn');
 
+    // Reset de campos
     urlField.style.display = '';
-    if (autoDetectBtn) autoDetectBtn.textContent = '🔍 Auto-detectar favicon';
-    if (autoDetectBtn) autoDetectBtn.disabled = false;
-    if (downloadBtn) downloadBtn.textContent = '📥 Descargar como base64';
-    if (downloadBtn) downloadBtn.disabled = false;
+    if (commandField) commandField.style.display = 'none';
+    if (autoDetectBtn) { autoDetectBtn.style.display = ''; autoDetectBtn.textContent = '🔍 Auto-detectar favicon'; autoDetectBtn.disabled = false; }
+    if (downloadBtn) { downloadBtn.style.display = ''; downloadBtn.textContent = '📥 Descargar como base64'; downloadBtn.disabled = false; }
+    if (openChromeInput) openChromeInput.parentElement.style.display = '';
 
     if (type === 'favorite') {
       title.textContent = id ? '✏️ Editar favorito' : '⭐ Agregar favorito';
@@ -49,6 +52,9 @@
       emojiInput.value = cat ? (cat.emoji || '') : '';
       iconUrlInput.value = '';
       if (openChromeInput) openChromeInput.checked = false;
+      if (autoDetectBtn) autoDetectBtn.style.display = 'none';
+      if (downloadBtn) downloadBtn.style.display = 'none';
+      if (openChromeInput) openChromeInput.parentElement.style.display = 'none';
     } else if (type === 'link') {
       title.textContent = id ? '✏️ Editar link' : '🔗 Agregar link';
       var cat2 = root.Data.state.categories.find(function(c) { return c.id === catId; });
@@ -58,6 +64,30 @@
       emojiInput.value = link ? (link.emoji || '') : '';
       iconUrlInput.value = link ? (link.icon_url || '') : '';
       if (openChromeInput) openChromeInput.checked = link ? !!link.open_chrome : false;
+    } else if (type === 'launcher') {
+      var isApp = catId === 'apps';
+      title.textContent = id ? '✏️ Editar ' + (isApp ? 'app' : 'juego') : '🚀 Agregar ' + (isApp ? 'app' : 'juego');
+      
+      var item;
+      if (isApp) {
+        item = id ? root.Data.state.apps.find(function(a) { return a.id === id; }) : null;
+      } else {
+        item = id ? root.Data.state.games.find(function(g) { return g.id === id; }) : null;
+      }
+      
+      nameInput.value = item ? item.name : '';
+      emojiInput.value = item ? (item.emoji || '') : '';
+      
+      // Mostrar campo de comando en vez de URL
+      urlField.style.display = 'none';
+      if (commandField) {
+        commandField.style.display = '';
+        if (commandInput) commandInput.value = item ? (item.command || '') : '';
+      }
+      
+      if (autoDetectBtn) autoDetectBtn.style.display = 'none';
+      if (downloadBtn) downloadBtn.style.display = 'none';
+      if (openChromeInput) openChromeInput.parentElement.style.display = 'none';
     }
 
     modal.hidden = false;
@@ -123,6 +153,7 @@
     var emoji = $('#modalEmoji').value.trim();
     var iconUrl = $('#modalIconUrl').value.trim();
     var openChrome = $('#modalOpenChrome') ? $('#modalOpenChrome').checked : false;
+    var command = $('#modalCommand') ? $('#modalCommand').value.trim() : '';
     
     var finalIconData = iconUrl ? '' : (downloadedIconData || '');
 
@@ -157,6 +188,25 @@
         } else {
           var autoIcon = iconUrl || (root.Data.getDomain(url) ? 'https://icon.horse/icon/' + root.Data.getDomain(url) : '');
           cat2.links.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: autoIcon, icon_data: finalIconData, open_chrome: openChrome });
+        }
+      }
+    } else if (ctx.type === 'launcher') {
+      if (!command) { alert('El comando/ruta es obligatorio'); return; }
+      var isApp = ctx.catId === 'apps';
+      
+      if (isApp) {
+        if (ctx.id) {
+          var app = state.apps.find(function(a) { return a.id === ctx.id; });
+          if (app) { app.name = name; app.command = command; app.emoji = emoji; }
+        } else {
+          state.apps.push({ id: root.Data.genId(), name: name, command: command, emoji: emoji });
+        }
+      } else {
+        if (ctx.id) {
+          var game = state.games.find(function(g) { return g.id === ctx.id; });
+          if (game) { game.name = name; game.command = command; game.emoji = emoji; }
+        } else {
+          state.games.push({ id: root.Data.genId(), name: name, command: command, emoji: emoji });
         }
       }
     }

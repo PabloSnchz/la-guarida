@@ -1,12 +1,13 @@
 /*!
  * js/app.js — Init + render + wire events
- * v2 — Soporte open_chrome para abrir links en Chrome
+ * v3 — Lanzador de apps y juegos
  */
 (function (root) {
   'use strict';
   var LOG = '[LaGuarida]';
 
   var editMode = false;
+  var launcherTab = 'apps';
 
   function $(sel) { return document.querySelector(sel); }
 
@@ -21,6 +22,7 @@
   function render() {
     renderFavorites();
     renderCategories();
+    renderLauncher();
     root.Widgets.renderAll();
     root.DragDrop.init();
   }
@@ -65,8 +67,7 @@
           root.Modal.open('favorite', parseInt(this.getAttribute('data-id')));
         } else if (card.classList.contains('chrome-forced')) {
           e.preventDefault();
-          var href = card.getAttribute('href');
-          window.location.href = href;
+          window.location.href = card.getAttribute('href');
         }
       });
     });
@@ -142,11 +143,100 @@
           root.Modal.open('link', parseInt(this.getAttribute('data-link-id')), parseInt(this.getAttribute('data-cat-id')));
         } else if (link.classList.contains('chrome-forced')) {
           e.preventDefault();
-          var href = link.getAttribute('href');
-          window.location.href = href;
+          window.location.href = link.getAttribute('href');
         }
       });
     });
+  }
+
+  // ====== LANZADOR ======
+  function renderLauncher() {
+    var container = $('#launcherContent');
+    if (!container) return;
+    var state = root.Data.state;
+
+    var items = launcherTab === 'apps' ? state.apps : state.games;
+    var typeLabel = launcherTab === 'apps' ? 'app' : 'game';
+
+    container.innerHTML = items.map(function(item) {
+      return '<div class="launcher-item" data-id="' + item.id + '" data-type="' + typeLabel + '">' +
+        '<span class="launcher-emoji">' + root.Data.esc(item.emoji || '🚀') + '</span>' +
+        '<span class="launcher-name">' + root.Data.esc(item.name) + '</span>' +
+        '<div class="edit-actions">' +
+          '<button class="edit-btn" data-action="edit-launcher" data-id="' + item.id + '" data-type="' + typeLabel + '">✏️</button>' +
+          '<button class="del-btn" data-action="delete-launcher" data-id="' + item.id + '" data-type="' + typeLabel + '">🗑</button>' +
+        '</div>' +
+        '</div>';
+    }).join('') + '<button class="add-btn" id="addLauncherInline" data-type="' + typeLabel + '">+ ' + (launcherTab === 'apps' ? 'App' : 'Juego') + '</button>';
+
+    var addBtn = $('#addLauncherInline');
+    if (addBtn) addBtn.addEventListener('click', function() {
+      root.Modal.open('launcher', null, launcherTab);
+    });
+
+    container.querySelectorAll('[data-action="edit-launcher"]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = parseInt(this.getAttribute('data-id'));
+        var type = this.getAttribute('data-type');
+        root.Modal.open('launcher', id, type);
+      });
+    });
+
+    container.querySelectorAll('[data-action="delete-launcher"]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = parseInt(this.getAttribute('data-id'));
+        var type = this.getAttribute('data-type');
+        deleteLauncherItem(id, type);
+      });
+    });
+
+    container.querySelectorAll('.launcher-item').forEach(function(item) {
+      item.addEventListener('click', function(e) {
+        if (editMode) {
+          e.stopPropagation();
+          var id = parseInt(this.getAttribute('data-id'));
+          var type = this.getAttribute('data-type');
+          root.Modal.open('launcher', id, type);
+        } else {
+          launchApp(this);
+        }
+      });
+    });
+  }
+
+  function launchApp(element) {
+    var id = parseInt(element.getAttribute('data-id'));
+    var type = element.getAttribute('data-type');
+    var state = root.Data.state;
+    
+    var item;
+    if (type === 'app') {
+      item = state.apps.find(function(a) { return a.id === id; });
+    } else {
+      item = state.games.find(function(g) { return g.id === id; });
+    }
+    
+    if (!item) return;
+    
+    // Usar protocol handler launch:
+    var launchUrl = 'launch:' + type + '=' + encodeURIComponent(item.name);
+    window.location.href = launchUrl;
+    
+    console.log(LOG, 'Lanzando:', item.name, '→', launchUrl);
+  }
+
+  function deleteLauncherItem(id, type) {
+    if (!confirm('¿Eliminar este ' + (type === 'app' ? 'app' : 'juego') + '?')) return;
+    var state = root.Data.state;
+    if (type === 'app') {
+      state.apps = state.apps.filter(function(a) { return a.id !== id; });
+    } else {
+      state.games = state.games.filter(function(g) { return g.id !== id; });
+    }
+    root.Data.save();
+    render();
   }
 
   // ====== ACCIONES ======
@@ -175,7 +265,7 @@
   function wireEvents() {
     $('#editModeBtn').addEventListener('click', function() {
       editMode = !editMode;
-      this.textContent = editMode ? '✅ Modo edición: ON' : '✏️ Modo edición';
+      this.textContent = editMode ? '✅ Editar: ON' : '✏️ Editar';
       document.body.classList.toggle('edit-mode', editMode);
       root.DragDrop.setEditMode(editMode);
       render();
@@ -188,6 +278,22 @@
     $('#importFile').addEventListener('change', function(e) {
       if (this.files && this.files[0]) root.Data.importJSON(this.files[0]);
       this.value = '';
+    });
+
+    // Tabs del lanzador
+    var appsTab = $('#launcherTabApps');
+    var gamesTab = $('#launcherTabGames');
+    if (appsTab) appsTab.addEventListener('click', function() {
+      launcherTab = 'apps';
+      appsTab.classList.add('active');
+      if (gamesTab) gamesTab.classList.remove('active');
+      renderLauncher();
+    });
+    if (gamesTab) gamesTab.addEventListener('click', function() {
+      launcherTab = 'games';
+      gamesTab.classList.add('active');
+      if (appsTab) appsTab.classList.remove('active');
+      renderLauncher();
     });
 
     root.Modal.wire();
