@@ -1,39 +1,35 @@
 # 🐈‍⬛ La Guarida
 
-Página de inicio personal del Gato Negro — organizá tus enlaces frecuentes, favoritos y categorías en un dashboard editable con drag & drop, widgets en tiempo real, favicons inteligentes y persistencia local. Diseñada para monitores ultrawide con paneles laterales configurables.
+Página de inicio personal del Gato Negro — dashboard híbrido que combina links web, lanzador de aplicaciones locales, widgets en tiempo real y persistencia local. Diseñada para monitores ultrawide.
 
 ## ✨ Características
 
 ### Organización
-- ⭐ Favoritos con acceso rápido (9 por fila en ultrawide)
-- 📁 Categorías personalizables (3 por fila)
-- 🔀 Drag & drop para reordenar y mover entre secciones
-- 🦊 Arrastrar desde Firefox para crear links automáticamente
-- 🌐 Abrir links en Chrome obligatoriamente (protocol handler)
+
+- ⭐ Favoritos web con acceso rápido
+- 📁 Categorías personalizables
+- 🚀 Lanzador de aplicaciones y juegos locales
+- 🔀 Drag and drop para reordenar
+- 🦊 Arrastrar desde Firefox para crear links
+- 🌐 Abrir links en Chrome obligatoriamente
+
+### Widgets
+
+- 🕐 Reloj con fecha
+- ⏳ Resets GW2 (Daily, Weekly, Season)
+- 📰 Noticias GW2 (RSS oficial)
+- 📝 Notas editables
+- 🔢 Contador regresivo editable
+- 📺 Twitch (seguidores + estado en vivo)
+- 📊 YouTube (suscriptores + último video)
 
 ### Favicons inteligentes
-- 🔗 Auto-detección al pegar URL
-- 🔍 Botón "Auto-detectar favicon" (busca en HTML del sitio + Icon Horse + Google)
-- 📥 Botón "Descargar como base64" para guardar localmente
-- 🎨 Emoji manual como override
-- 🖼️ URL de ícono personalizado
-- 🔄 Sistema de fallback: icon_url → icon_data → emoji → automático → genérico
 
-### Widgets en paneles laterales
-| Widget | Panel | Descripción |
-|--------|-------|-------------|
-| 🕐 Reloj | Izquierdo | Hora local + fecha |
-| ⏳ Resets GW2 | Izquierdo | Daily, Weekly y Season en un solo widget compacto |
-| 📰 Noticias GW2 | Izquierdo | 4 últimos titulares del feed oficial |
-| 📝 Notas | Derecho | Texto editable con guardado automático |
-| 🔢 Contador | Derecho | Editable — click para configurar título y fecha |
-| 📺 Twitch | Derecho | Seguidores + estado en vivo (juego, viewers) |
-| 📊 YouTube | Derecho | Suscriptores + vistas totales + último video |
-
-### Persistencia
-- 💾 localStorage con guardado automático
-- 📂 Exportar/Importar JSON
-- 🔄 Migración automática de datos viejos
+- Auto-detección al pegar URL
+- Botón Auto-detectar (HTML + Icon Horse + Google)
+- Botón Descargar base64
+- Emoji manual como override
+- Prioridad: icon_url, icon_data, emoji, automático, genérico
 
 ## 🚀 Demo
 
@@ -43,69 +39,122 @@ Página de inicio personal del Gato Negro — organizá tus enlaces frecuentes, 
 
 | Archivo | Descripción |
 |---------|-------------|
-| `index.html` | Estructura HTML con layout ultrawide |
+| `index.html` | Estructura con header compacto + layout ultrawide |
 | `css/styles.css` | Estilos (misma piel que la Bóveda) |
-| `js/data.js` | Estado, persistencia y favicons |
+| `js/data.js` | Estado, persistencia, favicons, defaults |
 | `js/widgets.js` | Widgets: reloj, resets, noticias, Twitch, YouTube |
-| `js/drag-drop.js` | Drag & drop interno + externo |
-| `js/modal.js` | Modal de edición + auto-detección |
-| `js/app.js` | Init, render y eventos |
-| `docs/chrome-open.bat` | Script para abrir links en Chrome (backup) |
+| `js/drag-drop.js` | Drag and drop interno + externo |
+| `js/modal.js` | Modal de edición universal |
+| `js/app.js` | Init, render, lanzador |
+| `docs/chrome-open.bat` | Backup del script para Chrome-forced |
 
-## 🔧 Cómo usar
+## 🖥️ Requisitos del sistema (Windows)
 
-### Agregar links
-1. Click en "✏️ Modo edición"
-2. "⭐ Agregar favorito" o "+ Link" en una categoría
-3. Pegá la URL → el favicon se detecta automáticamente
-4. Si no carga, usá "🔍 Auto-detectar" o poné emoji manual
-5. Guardar
+### Protocol handler chrome-launch (para abrir en Chrome)
 
-### Drag & drop
-- **Reordenar**: Arrastrá un link sobre otro en la misma sección
-- **Mover a categoría**: Arrastrá favorito → categoría
-- **Mover a favoritos**: Arrastrá link de categoría → favoritos
-- **Desde Firefox**: Arrastrá el favicon de una pestaña → soltalo en La Guarida
+**Archivo local:** `C:\Users\psanc\chrome-open.bat`
 
-### Widgets
-- Click en "＋ Widget" para agregar
-- Elegí el widget del menú
-- **Contador editable**: Click en el widget → ingresá título y fecha (YYYY-MM-DD)
-- **Notas**: Escribí directamente en el textarea — se guarda solo
+```bat
+@echo off
+set "URL=%~1"
+set "URL=%URL:chrome-launch:=%"
+start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" "https://%URL%"
+```
 
-### Favicons problemáticos
-| Situación | Solución |
-|-----------|----------|
-| Favicon no carga | Click "🔍 Auto-detectar" |
-| Sigue fallando | Click "📥 Descargar como base64" |
-| Preferís emoji | Poné emoji en el campo correspondiente |
-| URL específica | Pegá la URL del ícono |
+**Registro de Windows:**
 
-## 🎨 Prioridad de favicons
+```reg
+Windows Registry Editor Version 5.00
 
-| Prioridad | Fuente |
-|-----------|--------|
-| 1 | URL de ícono manual |
-| 2 | Base64 descargado |
-| 3 | Emoji manual |
-| 4 | Auto-detección (Icon Horse → Google → DuckDuckGo) |
-| 5 | 🔗 genérico |
+[HKEY_CLASSES_ROOT\chrome-launch]
+@="URL: Chrome Launcher Protocol"
+"URL Protocol"=""
 
-## 🌐 Abrir en Chrome obligatoriamente
+[HKEY_CLASSES_ROOT\chrome-launch\shell]
 
-Permite marcar links para que se abran SIEMPRE en Google Chrome, sin importar el navegador que estés usando.
+[HKEY_CLASSES_ROOT\chrome-launch\shell\open]
 
-### Cómo funciona
-1. En el modal de edición, marcá "Abrir en Chrome obligatoriamente"
-2. El link muestra un badge 🌐
-3. Al clickear, Windows ejecuta el protocol handler `chrome-launch:`
-4. El script `chrome-open.bat` limpia la URL y la abre en Chrome
+[HKEY_CLASSES_ROOT\chrome-launch\shell\open\command]
+@="\"C:\\Users\\psanc\\chrome-open.bat\" \"%1\""
+```
 
-### Configuración (una sola vez)
-1. Copiá `docs/chrome-open.bat` a `C:\Users\TU_USUARIO\chrome-open.bat`
-2. Ejecutá el `.reg` para registrar el protocol handler:
-   - `HKEY_CLASSES_ROOT\chrome-launch\shell\open\command` → `C:\Users\TU_USUARIO\chrome-open.bat %1`
-3. Listo — los links marcados se abren en Chrome
+### Protocol handler launch (para lanzar apps y juegos)
+
+**Archivo local:** `C:\Users\psanc\launch-open.bat`
+
+```bat
+@echo off
+set "NAME=%~1"
+set "NAME=%NAME:launch:=%"
+
+if "%NAME%"=="Guild-Wars-2" start "" "C:\Guild Wars 2\Gw2-64.exe"
+if "%NAME%"=="GW2-Launcher" start "" "C:\Gw2launcher\Gw2Launcher.exe"
+if "%NAME%"=="Blish-HUD" start "" "C:\Blish.HUD.1.1.1\Blish HUD.exe"
+if "%NAME%"=="Riot-Client" start "" "C:\Riot Games\Riot Client\RiotClientServices.exe"
+if "%NAME%"=="Overwolf" start "" "C:\Program Files (x86)\Overwolf\OverwolfLauncher.exe"
+if "%NAME%"=="Steam" start "" "C:\Program Files (x86)\Steam\steam.exe"
+if "%NAME%"=="Epic-Games" start "" "C:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win32\EpicGamesLauncher.exe"
+if "%NAME%"=="GOG-Galaxy" start "" "C:\Program Files (x86)\GOG Galaxy\GalaxyClient.exe"
+if "%NAME%"=="Discord" start "" "C:\Users\psanc\AppData\Local\Discord\app-1.0.9253\Discord.exe"
+if "%NAME%"=="OBS-Studio" start "" "C:\Program Files\obs-studio\bin\64bit\obs64.exe"
+if "%NAME%"=="Filmora" start "" "C:\Users\psanc\AppData\Local\Wondershare\Wondershare Filmora\Wondershare Filmora Launcher.exe"
+if "%NAME%"=="Iriun-Webcam" start "" "C:\Program Files (x86)\Iriun Webcam\IriunWebcam.exe"
+if "%NAME%"=="CPU-Z" start "" "C:\Program Files\CPUID\CPU-Z\cpuz.exe"
+if "%NAME%"=="iCUE" start "" "C:\Program Files\Corsair\Corsair iCUE5 Software\iCUE.exe"
+if "%NAME%"=="NVIDIA-Broadcast" start "" "C:\Program Files\NVIDIA Corporation\NVIDIA Broadcast\NVIDIA Broadcast.exe"
+if "%NAME%"=="Explorador" start "" "explorer.exe"
+if "%NAME%"=="Configuracion" start "" "ms-settings:"
+if "%NAME%"=="Panel-NVIDIA" start "" "C:\Program Files\NVIDIA Corporation\Control Panel Client\nvcplui.exe"
+if "%NAME%"=="Admin.-Tareas" start "" "taskmgr.exe"
+```
+
+**Registro de Windows:**
+
+```reg
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\launch]
+@="URL: Launcher Protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\launch\shell]
+
+[HKEY_CLASSES_ROOT\launch\shell\open]
+
+[HKEY_CLASSES_ROOT\launch\shell\open\command]
+@="\"C:\\Users\\psanc\\launch-open.bat\" \"%1\""
+```
+
+## 🎮 Lanzador
+
+### Juegos (8)
+
+| Nombre | Ruta |
+|--------|------|
+| Guild Wars 2 | `C:\Guild Wars 2\Gw2-64.exe` |
+| GW2 Launcher | `C:\Gw2launcher\Gw2Launcher.exe` |
+| Blish HUD | `C:\Blish.HUD.1.1.1\Blish HUD.exe` |
+| Riot Client | `C:\Riot Games\Riot Client\RiotClientServices.exe` |
+| Overwolf | `C:\Program Files (x86)\Overwolf\OverwolfLauncher.exe` |
+| Steam | `C:\Program Files (x86)\Steam\steam.exe` |
+| Epic Games | `C:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win32\EpicGamesLauncher.exe` |
+| GOG Galaxy | `C:\Program Files (x86)\GOG Galaxy\GalaxyClient.exe` |
+
+### Aplicaciones (11)
+
+| Nombre | Ruta |
+|--------|------|
+| Discord | `C:\Users\psanc\AppData\Local\Discord\app-1.0.9253\Discord.exe` |
+| OBS Studio | `C:\Program Files\obs-studio\bin\64bit\obs64.exe` |
+| Filmora | `C:\Users\psanc\AppData\Local\Wondershare\Wondershare Filmora\Wondershare Filmora Launcher.exe` |
+| Iriun Webcam | `C:\Program Files (x86)\Iriun Webcam\IriunWebcam.exe` |
+| CPU-Z | `C:\Program Files\CPUID\CPU-Z\cpuz.exe` |
+| iCUE | `C:\Program Files\Corsair\Corsair iCUE5 Software\iCUE.exe` |
+| NVIDIA Broadcast | `C:\Program Files\NVIDIA Corporation\NVIDIA Broadcast\NVIDIA Broadcast.exe` |
+| Explorador | `explorer.exe` |
+| Configuración | `ms-settings:` |
+| Panel NVIDIA | `C:\Program Files\NVIDIA Corporation\Control Panel Client\nvcplui.exe` |
+| Admin. Tareas | `taskmgr.exe` |
 
 ## 🔌 APIs integradas
 
@@ -115,14 +164,19 @@ Permite marcar links para que se abran SIEMPRE en Google Chrome, sin importar el
 | YouTube Data v3 | Suscriptores + último video | API Key |
 | GW2 RSS | Noticias oficiales | No requiere |
 
-## 🖥️ Diseño ultrawide
+## 💾 Persistencia
 
-En monitores de 34" (3440px):
-- Panel izquierdo: 220px (reloj, resets, noticias)
-- Panel central: 900px (favoritos 9 por fila, categorías 3 por fila)
-- Panel derecho: 220px (notas, contador, Twitch, YouTube)
+- localStorage con guardado automático
+- Backup y Restaurar JSON en el header
+- Migración automática de datos viejos
+- Los defaults se cargan solo si no hay datos previos
 
-En pantallas < 1200px, los paneles laterales se ocultan automáticamente.
+## 🎨 Estética
+
+- Misma paleta que la Bóveda: `#0e0e10`, `#ffd966`, `#7bc2ff`
+- Hover: `translateY(-3px)` + shadow profunda
+- Border-left semántico por widget
+- Transiciones: `0.22s cubic-bezier(0.2, 0.9, 0.4, 1.1)`
 
 ## 🐈‍⬛ Ecosistema
 
