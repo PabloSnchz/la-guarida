@@ -1,6 +1,6 @@
 /*!
  * js/modal.js — Modal de edición
- * v3 — Auto-detectar favicon + descargar base64 + limpiar icon_data
+ * v4 — Soporte open_chrome + auto-detectar favicon + base64
  */
 (function (root) {
   'use strict';
@@ -21,6 +21,7 @@
     var urlInput = $('#modalUrl');
     var emojiInput = $('#modalEmoji');
     var iconUrlInput = $('#modalIconUrl');
+    var openChromeInput = $('#modalOpenChrome');
     var urlField = $('#modalUrlField');
     var autoDetectBtn = $('#modalAutoDetectFaviconBtn');
     var downloadBtn = $('#modalDownloadFaviconBtn');
@@ -38,6 +39,7 @@
       urlInput.value = fav ? fav.url : '';
       emojiInput.value = fav ? (fav.emoji || '') : '';
       iconUrlInput.value = fav ? (fav.icon_url || '') : '';
+      if (openChromeInput) openChromeInput.checked = fav ? !!fav.open_chrome : false;
     } else if (type === 'category') {
       title.textContent = id ? '✏️ Editar categoría' : '📁 Agregar categoría';
       var cat = id ? root.Data.state.categories.find(function(c) { return c.id === id; }) : null;
@@ -46,6 +48,7 @@
       urlField.style.display = 'none';
       emojiInput.value = cat ? (cat.emoji || '') : '';
       iconUrlInput.value = '';
+      if (openChromeInput) openChromeInput.checked = false;
     } else if (type === 'link') {
       title.textContent = id ? '✏️ Editar link' : '🔗 Agregar link';
       var cat2 = root.Data.state.categories.find(function(c) { return c.id === catId; });
@@ -54,6 +57,7 @@
       urlInput.value = link ? link.url : '';
       emojiInput.value = link ? (link.emoji || '') : '';
       iconUrlInput.value = link ? (link.icon_url || '') : '';
+      if (openChromeInput) openChromeInput.checked = link ? !!link.open_chrome : false;
     }
 
     modal.hidden = false;
@@ -71,6 +75,7 @@
     var urlInput = $('#modalUrl');
     var emojiInput = $('#modalEmoji');
     var iconUrlInput = $('#modalIconUrl');
+    var openChromeInput = $('#modalOpenChrome');
     var urlField = $('#modalUrlField');
     var autoDetectBtn = $('#modalAutoDetectFaviconBtn');
     var downloadBtn = $('#modalDownloadFaviconBtn');
@@ -91,6 +96,7 @@
     urlInput.value = url;
     emojiInput.value = '';
     iconUrlInput.value = '';
+    if (openChromeInput) openChromeInput.checked = false;
     
     modal.hidden = false;
   }
@@ -116,8 +122,8 @@
     var url = $('#modalUrl').value.trim();
     var emoji = $('#modalEmoji').value.trim();
     var iconUrl = $('#modalIconUrl').value.trim();
+    var openChrome = $('#modalOpenChrome') ? $('#modalOpenChrome').checked : false;
     
-    // Si hay icon_url manual, limpiar icon_data
     var finalIconData = iconUrl ? '' : (downloadedIconData || '');
 
     if (!name) { alert('El nombre es obligatorio'); return; }
@@ -129,10 +135,10 @@
       if (!url) { alert('La URL es obligatoria'); return; }
       if (ctx.id) {
         var fav = state.favorites.find(function(f) { return f.id === ctx.id; });
-        if (fav) { fav.name = name; fav.url = url; fav.emoji = emoji; fav.icon_url = iconUrl; fav.icon_data = finalIconData || (iconUrl ? '' : (fav.icon_data || '')); }
+        if (fav) { fav.name = name; fav.url = url; fav.emoji = emoji; fav.icon_url = iconUrl; fav.icon_data = finalIconData || (iconUrl ? '' : (fav.icon_data || '')); fav.open_chrome = openChrome; }
       } else {
         var autoIcon = iconUrl || (root.Data.getDomain(url) ? 'https://icon.horse/icon/' + root.Data.getDomain(url) : '');
-        state.favorites.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: autoIcon, icon_data: finalIconData });
+        state.favorites.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: autoIcon, icon_data: finalIconData, open_chrome: openChrome });
       }
     } else if (ctx.type === 'category') {
       if (ctx.id) {
@@ -147,10 +153,10 @@
       if (cat2) {
         if (ctx.id) {
           var link = cat2.links.find(function(l) { return l.id === ctx.id; });
-          if (link) { link.name = name; link.url = url; link.emoji = emoji; link.icon_url = iconUrl; link.icon_data = finalIconData || (iconUrl ? '' : (link.icon_data || '')); }
+          if (link) { link.name = name; link.url = url; link.emoji = emoji; link.icon_url = iconUrl; link.icon_data = finalIconData || (iconUrl ? '' : (link.icon_data || '')); link.open_chrome = openChrome; }
         } else {
           var autoIcon = iconUrl || (root.Data.getDomain(url) ? 'https://icon.horse/icon/' + root.Data.getDomain(url) : '');
-          cat2.links.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: autoIcon, icon_data: finalIconData });
+          cat2.links.push({ id: root.Data.genId(), name: name, url: url, emoji: emoji, icon_url: autoIcon, icon_data: finalIconData, open_chrome: openChrome });
         }
       }
     }
@@ -171,7 +177,6 @@
     
     var domain = root.Data.getDomain(url);
     
-    // 1. Buscar en el HTML del sitio
     try {
       var res = await fetch(url, { mode: 'cors' });
       if (res.ok) {
@@ -187,11 +192,8 @@
           return;
         }
       }
-    } catch(e) {
-      // CORS bloqueado — continuar con servicios externos
-    }
+    } catch(e) {}
     
-    // 2. Icon Horse
     if (domain) {
       try {
         var iconHorse = 'https://icon.horse/icon/' + domain;

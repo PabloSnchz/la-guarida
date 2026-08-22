@@ -554,3 +554,20 @@ body.drop-external-active .categories-grid {
   .favorites-grid { grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); }
   .categories-grid { grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); }
 }
+
+/* ====== Badge Chrome ====== */
+.chrome-badge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-size: 0.6rem;
+  background: #1a1c24;
+  border: 1px solid #2a2c35;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}

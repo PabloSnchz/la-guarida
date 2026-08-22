@@ -1,5 +1,6 @@
 /*!
  * js/app.js — Init + render + wire events
+ * v2 — Soporte open_chrome para abrir links en Chrome
  */
 (function (root) {
   'use strict';
@@ -8,6 +9,13 @@
   var editMode = false;
 
   function $(sel) { return document.querySelector(sel); }
+
+  function getHref(item) {
+    if (item.open_chrome) {
+      return 'chrome-launch://' + item.url.replace(/^https?:\/\//, '');
+    }
+    return item.url;
+  }
 
   // ====== RENDER ======
   function render() {
@@ -23,7 +31,11 @@
     var state = root.Data.state;
 
     grid.innerHTML = state.favorites.map(function(fav) {
-      return '<a class="fav-card" href="' + root.Data.esc(fav.url) + '" target="_blank" rel="noopener" data-id="' + fav.id + '">' +
+      var href = getHref(fav);
+      var chromeBadge = fav.open_chrome ? '<span class="chrome-badge" title="Abrir en Chrome">🌐</span>' : '';
+      
+      return '<a class="fav-card' + (fav.open_chrome ? ' chrome-forced' : '') + '" href="' + root.Data.esc(href) + '" target="_blank" rel="noopener" data-id="' + fav.id + '">' +
+        chromeBadge +
         root.Data.getFaviconHTML(fav, 40, 'fav-icon') +
         '<span class="fav-name">' + root.Data.esc(fav.name) + '</span>' +
         '<div class="edit-actions">' +
@@ -63,8 +75,12 @@
 
     grid.innerHTML = state.categories.map(function(cat) {
       var linksHTML = cat.links.map(function(link) {
-        return '<a class="category-link" href="' + root.Data.esc(link.url) + '" target="_blank" rel="noopener" data-cat-id="' + cat.id + '" data-link-id="' + link.id + '" data-id="' + link.id + '">' +
-        root.Data.getFaviconHTML(link, 20, 'link-icon') +
+        var href = getHref(link);
+        var chromeBadge = link.open_chrome ? '<span class="chrome-badge" title="Abrir en Chrome">🌐</span>' : '';
+        
+        return '<a class="category-link' + (link.open_chrome ? ' chrome-forced' : '') + '" href="' + root.Data.esc(href) + '" target="_blank" rel="noopener" data-cat-id="' + cat.id + '" data-link-id="' + link.id + '" data-id="' + link.id + '">' +
+          chromeBadge +
+          root.Data.getFaviconHTML(link, 20, 'link-icon') +
           '<span class="link-name">' + root.Data.esc(link.name) + '</span>' +
           '<div class="edit-actions">' +
             '<button class="edit-btn" data-action="edit-link" data-cat-id="' + cat.id + '" data-link-id="' + link.id + '">✏️</button>' +
