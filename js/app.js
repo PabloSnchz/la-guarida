@@ -295,6 +295,22 @@
     }
   }
 
+  // ====== TEMA ======
+  function applyTheme(theme) {
+    if (theme === 'random') {
+      var themes = ['boveda', 'fluent', 'macos', 'ps5', 'steam', 'discord', 'notion', 'cyberpunk'];
+      theme = themes[Math.floor(Math.random() * themes.length)];
+    }
+    document.body.setAttribute('data-theme', theme);
+    root.Data.state.theme = theme;
+    root.Data.save();
+    
+    var select = $('#themeSelect');
+    if (select && select.value !== theme && theme !== 'random') {
+      select.value = theme;
+    }
+  }
+
   // ====== WIRE ======
   function wireEvents() {
     $('#editModeBtn').addEventListener('click', function() {
@@ -303,6 +319,11 @@
       document.body.classList.toggle('edit-mode', editMode);
       root.DragDrop.setEditMode(editMode);
       render();
+    });
+
+    var themeSelect = $('#themeSelect');
+    if (themeSelect) themeSelect.addEventListener('change', function() {
+      applyTheme(this.value);
     });
 
     $('#addFavoriteBtn').addEventListener('click', function() { root.Modal.open('favorite'); });
@@ -325,6 +346,14 @@
     root.Data.load();
     wireEvents();
     render();
+    
+    // Aplicar tema guardado
+    var savedTheme = root.Data.state.theme || 'boveda';
+    document.body.setAttribute('data-theme', savedTheme);
+    var themeSelect = $('#themeSelect');
+    if (themeSelect && savedTheme !== 'random') {
+      themeSelect.value = savedTheme;
+    }
   }
 
   root.App = {

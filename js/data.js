@@ -65,7 +65,7 @@
     ]
   };
 
-  var state = { favorites: [], categories: [], apps: [], games: [], widgets_left: [], widgets_right: [] };
+  var state = { favorites: [], categories: [], apps: [], games: [], widgets_left: [], widgets_right: [], theme: 'boveda' };
 
   function load() {
     try {
@@ -78,6 +78,7 @@
         state.games = parsed.games || [];
         state.widgets_left = parsed.widgets_left || [];
         state.widgets_right = parsed.widgets_right || [];
+        state.theme = parsed.theme || 'boveda';
         
         state.favorites.forEach(function(f) {
           if (f.icon_url === undefined) f.icon_url = '';
