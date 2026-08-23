@@ -1,12 +1,30 @@
 /*!
  * js/data.js — Estado y persistencia
- * v6 — Juegos y apps cargados
+ * v7 — Íconos oficiales en el lanzador
  */
 (function (root) {
   'use strict';
   var LOG = '[LaGuarida:Data]';
 
   var STORAGE_KEY = 'la_guarida_data_v1';
+
+  var LAUNCHER_ICONS = {
+    'gw2': 'assets/icons/launcher/gw2.png',
+    'gw2launcher': 'assets/icons/launcher/gw2launcher.png',
+    'blishhud': 'assets/icons/launcher/blishhud.png',
+    'riot': 'assets/icons/launcher/riot.png',
+    'overwolf': 'assets/icons/launcher/overwolf.png',
+    'steam': 'assets/icons/launcher/steam.png',
+    'epic': 'assets/icons/launcher/epic.png',
+    'gog': 'assets/icons/launcher/gog.png',
+    'discord': 'assets/icons/launcher/discord.png',
+    'obs': 'assets/icons/launcher/obs.png',
+    'filmora': 'assets/icons/launcher/filmora.png',
+    'iriun': 'assets/icons/launcher/iriun.png',
+    'cpuz': 'assets/icons/launcher/cpuz.png',
+    'icue': 'assets/icons/launcher/icue.png',
+    'nvidia_broadcast': 'assets/icons/launcher/nvidia_broadcast.png'
+  };
 
   var DEFAULT_STATE = {
     widgets_left: [
@@ -23,27 +41,27 @@
     favorites: [],
     categories: [],
     apps: [
-      { id: 101, name: 'Discord', command: 'C:\\Users\\psanc\\AppData\\Local\\Discord\\app-1.0.9253\\Discord.exe', emoji: '💬' },
-      { id: 102, name: 'OBS Studio', command: 'C:\\Program Files\\obs-studio\\bin\\64bit\\obs64.exe', emoji: '🎥' },
-      { id: 103, name: 'Filmora', command: 'C:\\Users\\psanc\\AppData\\Local\\Wondershare\\Wondershare Filmora\\Wondershare Filmora Launcher.exe', emoji: '🎬' },
-      { id: 104, name: 'Iriun Webcam', command: 'C:\\Program Files (x86)\\Iriun Webcam\\IriunWebcam.exe', emoji: '📷' },
-      { id: 105, name: 'CPU-Z', command: 'C:\\Program Files\\CPUID\\CPU-Z\\cpuz.exe', emoji: '🔧' },
-      { id: 106, name: 'iCUE', command: 'C:\\Program Files\\Corsair\\Corsair iCUE5 Software\\iCUE.exe', emoji: '🎨' },
-      { id: 107, name: 'NVIDIA Broadcast', command: 'C:\\Program Files\\NVIDIA Corporation\\NVIDIA Broadcast\\NVIDIA Broadcast.exe', emoji: '🎙️' },
-      { id: 108, name: 'Explorador', command: 'explorer.exe', emoji: '📁' },
-      { id: 109, name: 'Configuración', command: 'ms-settings:', emoji: '⚙️' },
-      { id: 110, name: 'Panel NVIDIA', command: 'C:\\Program Files\\NVIDIA Corporation\\Control Panel Client\\nvcplui.exe', emoji: '🖥️' },
-      { id: 111, name: 'Admin. Tareas', command: 'taskmgr.exe', emoji: '📊' }
+      { id: 101, name: 'Discord', command: 'C:\\Users\\psanc\\AppData\\Local\\Discord\\app-1.0.9253\\Discord.exe', emoji: '💬', icon_url: 'assets/icons/launcher/discord.png' },
+      { id: 102, name: 'OBS Studio', command: 'C:\\Program Files\\obs-studio\\bin\\64bit\\obs64.exe', emoji: '🎥', icon_url: 'assets/icons/launcher/obs.png' },
+      { id: 103, name: 'Filmora', command: 'C:\\Users\\psanc\\AppData\\Local\\Wondershare\\Wondershare Filmora\\Wondershare Filmora Launcher.exe', emoji: '🎬', icon_url: 'assets/icons/launcher/filmora.png' },
+      { id: 104, name: 'Iriun Webcam', command: 'C:\\Program Files (x86)\\Iriun Webcam\\IriunWebcam.exe', emoji: '📷', icon_url: 'assets/icons/launcher/iriun.png' },
+      { id: 105, name: 'CPU-Z', command: 'C:\\Program Files\\CPUID\\CPU-Z\\cpuz.exe', emoji: '🔧', icon_url: 'assets/icons/launcher/cpuz.png' },
+      { id: 106, name: 'iCUE', command: 'C:\\Program Files\\Corsair\\Corsair iCUE5 Software\\iCUE.exe', emoji: '🎨', icon_url: 'assets/icons/launcher/icue.png' },
+      { id: 107, name: 'NVIDIA Broadcast', command: 'C:\\Program Files\\NVIDIA Corporation\\NVIDIA Broadcast\\NVIDIA Broadcast.exe', emoji: '🎙️', icon_url: 'assets/icons/launcher/nvidia_broadcast.png' },
+      { id: 108, name: 'Explorador', command: 'explorer.exe', emoji: '📁', icon_url: '' },
+      { id: 109, name: 'Configuración', command: 'ms-settings:', emoji: '⚙️', icon_url: '' },
+      { id: 110, name: 'Panel NVIDIA', command: 'C:\\Program Files\\NVIDIA Corporation\\Control Panel Client\\nvcplui.exe', emoji: '🖥️', icon_url: '' },
+      { id: 111, name: 'Admin. Tareas', command: 'taskmgr.exe', emoji: '📊', icon_url: '' }
     ],
     games: [
-      { id: 201, name: 'Guild Wars 2', command: 'C:\\Guild Wars 2\\Gw2-64.exe', emoji: '⚔️' },
-      { id: 202, name: 'GW2 Launcher', command: 'C:\\Gw2launcher\\Gw2Launcher.exe', emoji: '🚀' },
-      { id: 203, name: 'Blish HUD', command: 'C:\\Blish.HUD.1.1.1\\Blish HUD.exe', emoji: '🗺️' },
-      { id: 204, name: 'Riot Client', command: 'C:\\Riot Games\\Riot Client\\RiotClientServices.exe', emoji: '🎮' },
-      { id: 205, name: 'Overwolf', command: 'C:\\Program Files (x86)\\Overwolf\\OverwolfLauncher.exe', emoji: '🐺' },
-      { id: 206, name: 'Steam', command: 'C:\\Program Files (x86)\\Steam\\steam.exe', emoji: '🚂' },
-      { id: 207, name: 'Epic Games', command: 'C:\\Program Files (x86)\\Epic Games\\Launcher\\Portal\\Binaries\\Win32\\EpicGamesLauncher.exe', emoji: '🏰' },
-      { id: 208, name: 'GOG Galaxy', command: 'C:\\Program Files (x86)\\GOG Galaxy\\GalaxyClient.exe', emoji: '🌟' }
+      { id: 201, name: 'Guild Wars 2', command: 'C:\\Guild Wars 2\\Gw2-64.exe', emoji: '⚔️', icon_url: 'assets/icons/launcher/gw2.png' },
+      { id: 202, name: 'GW2 Launcher', command: 'C:\\Gw2launcher\\Gw2Launcher.exe', emoji: '🚀', icon_url: 'assets/icons/launcher/gw2launcher.png' },
+      { id: 203, name: 'Blish HUD', command: 'C:\\Blish.HUD.1.1.1\\Blish HUD.exe', emoji: '🗺️', icon_url: 'assets/icons/launcher/blishhud.png' },
+      { id: 204, name: 'Riot Client', command: 'C:\\Riot Games\\Riot Client\\RiotClientServices.exe', emoji: '🎮', icon_url: 'assets/icons/launcher/riot.png' },
+      { id: 205, name: 'Overwolf', command: 'C:\\Program Files (x86)\\Overwolf\\OverwolfLauncher.exe', emoji: '🐺', icon_url: 'assets/icons/launcher/overwolf.png' },
+      { id: 206, name: 'Steam', command: 'C:\\Program Files (x86)\\Steam\\steam.exe', emoji: '🚂', icon_url: 'assets/icons/launcher/steam.png' },
+      { id: 207, name: 'Epic Games', command: 'C:\\Program Files (x86)\\Epic Games\\Launcher\\Portal\\Binaries\\Win32\\EpicGamesLauncher.exe', emoji: '🏰', icon_url: 'assets/icons/launcher/epic.png' },
+      { id: 208, name: 'GOG Galaxy', command: 'C:\\Program Files (x86)\\GOG Galaxy\\GalaxyClient.exe', emoji: '🌟', icon_url: 'assets/icons/launcher/gog.png' }
     ]
   };
 

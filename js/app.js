@@ -156,7 +156,9 @@
 
     container.innerHTML = items.map(function(item) {
       return '<div class="launcher-item" data-id="' + item.id + '" data-type="' + typeLabel + '">' +
-        '<span class="launcher-emoji">' + root.Data.esc(item.emoji || '🚀') + '</span>' +
+        '<span class="launcher-icon">' + 
+          (item.icon_url ? '<img src="' + item.icon_url + '" alt="" style="width:24px;height:24px;object-fit:contain;border-radius:4px;">' : root.Data.esc(item.emoji || '🚀')) +
+        '</span>' +
         '<span class="launcher-name">' + root.Data.esc(item.name) + '</span>' +
         '<div class="edit-actions">' +
           '<button class="edit-btn" data-action="edit-launcher" data-id="' + item.id + '" data-type="' + typeLabel + '">✏️</button>' +
