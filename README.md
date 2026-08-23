@@ -1,6 +1,6 @@
 # 🐈‍⬛ La Guarida
 
-Página de inicio personal del Gato Negro — dashboard híbrido que combina links web, lanzador de aplicaciones locales, widgets en tiempo real y persistencia local. Diseñada para monitores ultrawide.
+Página de inicio personal del Gato Negro — dashboard híbrido que combina links web, lanzador de aplicaciones locales, widgets en tiempo real, sistema de 8 temas visuales y persistencia local. Diseñada para monitores ultrawide.
 
 ## ✨ Características
 
@@ -8,10 +8,34 @@ Página de inicio personal del Gato Negro — dashboard híbrido que combina lin
 
 - ⭐ Favoritos web con acceso rápido
 - 📁 Categorías personalizables
-- 🚀 Lanzador de aplicaciones y juegos locales
+- 🚀 Lanzador de aplicaciones y juegos locales (2 columnas)
 - 🔀 Drag and drop para reordenar
 - 🦊 Arrastrar desde Firefox para crear links
 - 🌐 Abrir links en Chrome obligatoriamente
+
+### Sistema de temas
+
+- 🐈‍⬛ Bóveda (default)
+- 🪟 Windows 11 Fluent
+- 🍎 macOS Big Sur
+- 🎮 PS5
+- 🚂 Steam
+- 💬 Discord
+- 📝 Notion
+- 🌆 Cyberpunk Neon
+- 🎲 Random (cambia al azar)
+
+Cada tema incluye:
+- Paleta de colores propia
+- Fuente tipográfica específica
+- Bordes con estilo propio (sólido, sin borde, neón)
+- Hover effects distintos (shadow, glow, brighten, neon)
+- Velocidad de transición única
+- Textura de fondo
+- Escala de cards
+- Scrollbar personalizada
+- Animación de entrada
+- Mood (personalidad visual)
 
 ### Widgets
 
@@ -40,13 +64,55 @@ Página de inicio personal del Gato Negro — dashboard híbrido que combina lin
 | Archivo | Descripción |
 |---------|-------------|
 | `index.html` | Estructura con header compacto + layout ultrawide |
-| `css/styles.css` | Estilos (misma piel que la Bóveda) |
+| `css/styles.css` | Estilos base (layout y componentes sin colores) |
+| `css/themes/` | 8 archivos CSS con variables por tema |
 | `js/data.js` | Estado, persistencia, favicons, defaults |
 | `js/widgets.js` | Widgets: reloj, resets, noticias, Twitch, YouTube |
 | `js/drag-drop.js` | Drag and drop interno + externo |
 | `js/modal.js` | Modal de edición universal |
-| `js/app.js` | Init, render, lanzador |
+| `js/app.js` | Init, render, lanzador, selector de temas |
 | `docs/chrome-open.bat` | Backup del script para Chrome-forced |
+| `assets/icons/launcher/` | Íconos oficiales de apps y juegos |
+
+## 🎨 Sistema de temas
+
+### Cómo funciona
+
+| Componente | Detalle |
+|------------|---------|
+| `styles.css` | Solo estructura — usa variables CSS |
+| `themes/xxx.css` | Define las variables para cada tema |
+| Selector en header | Cambia `data-theme` en el body |
+| Persistencia | El tema elegido se guarda en localStorage |
+| Random | Elige un tema al azar cada vez |
+
+### Variables por tema
+
+| Variable | Qué controla |
+|----------|--------------|
+| `--bg` | Fondo principal |
+| `--panel` | Fondo de cards |
+| `--accent` | Color de acento |
+| `--font` | Familia tipográfica |
+| `--border-style` | Estilo de borde (solid, none) |
+| `--border-width` | Grosor de borde |
+| `--hover-scale` | Escala al hacer hover |
+| `--hover-filter` | Filtro visual al hover |
+| `--transition-speed` | Velocidad de transición |
+| `--bg-texture` | Textura o gradiente de fondo |
+| `--spacing` | Espaciado entre elementos |
+| `--scrollbar-color` | Color de la barra de scroll |
+| `--animation` | Animación de entrada |
+| `--mood` | Personalidad del tema |
+| `--glow-color` | Color del glow |
+
+### Agregar un tema nuevo
+
+| Paso | Acción |
+|------|--------|
+| 1 | Crear `css/themes/nuevo-tema.css` |
+| 2 | Agregar la opción al select en `index.html` |
+| 3 | Agregar al array de random en `app.js` |
 
 ## 🖥️ Requisitos del sistema (Windows)
 
@@ -169,14 +235,8 @@ Windows Registry Editor Version 5.00
 - localStorage con guardado automático
 - Backup y Restaurar JSON en el header
 - Migración automática de datos viejos
+- Tema elegido guardado en localStorage
 - Los defaults se cargan solo si no hay datos previos
-
-## 🎨 Estética
-
-- Misma paleta que la Bóveda: `#0e0e10`, `#ffd966`, `#7bc2ff`
-- Hover: `translateY(-3px)` + shadow profunda
-- Border-left semántico por widget
-- Transiciones: `0.22s cubic-bezier(0.2, 0.9, 0.4, 1.1)`
 
 ## 🐈‍⬛ Ecosistema
 
