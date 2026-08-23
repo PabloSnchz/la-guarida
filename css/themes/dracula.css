@@ -1,0 +1,29 @@
+/* ====== Tema Dracula ====== */
+[data-theme="dracula"] {
+  --bg: #282a36;
+  --panel: #343746;
+  --panel-alt: #3b3d4f;
+  --border: #44475a;
+  --border-hover: #565970;
+  --accent: #bd93f9;
+  --accent-2: #50fa7b;
+  --text: #f8f8f2;
+  --muted: #a0a0b0;
+  --radius: 10px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.25);
+  --shadow-hover: 0 6px 18px rgba(189,147,249,0.25);
+  --font: 'Fira Code', 'Courier New', monospace;
+  --border-style: solid;
+  --border-width: 1px;
+  --hover-effect: dracula-glow;
+  --transition-speed: 0.18s;
+  --bg-texture: none;
+  --card-scale: 1;
+  --spacing: 12px;
+  --scrollbar-color: #44475a;
+  --animation: fadeIn 0.18s ease-out;
+  --mood: vampirico;
+  --glow-color: rgba(189,147,249,0.3);
+  --hover-scale: 1;
+  --hover-filter: brightness(1.1);
+}

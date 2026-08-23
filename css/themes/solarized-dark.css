@@ -1,0 +1,29 @@
+/* ====== Tema Solarized Dark ====== */
+[data-theme="solarized-dark"] {
+  --bg: #002b36;
+  --panel: #073642;
+  --panel-alt: #0a3d4a;
+  --border: #0e4b5c;
+  --border-hover: #115c70;
+  --accent: #2aa198;
+  --accent-2: #b58900;
+  --text: #eee8d5;
+  --muted: #839496;
+  --radius: 6px;
+  --shadow: 0 2px 6px rgba(0,0,0,0.2);
+  --shadow-hover: 0 4px 12px rgba(0,0,0,0.3);
+  --font: 'Segoe UI', system-ui, sans-serif;
+  --border-style: solid;
+  --border-width: 1px;
+  --hover-effect: solar-glow;
+  --transition-speed: 0.2s;
+  --bg-texture: none;
+  --card-scale: 1;
+  --spacing: 12px;
+  --scrollbar-color: #0e4b5c;
+  --animation: fadeIn 0.2s ease-out;
+  --mood: terroso;
+  --glow-color: rgba(42,161,152,0.25);
+  --hover-scale: 1;
+  --hover-filter: brightness(1.05);
+}

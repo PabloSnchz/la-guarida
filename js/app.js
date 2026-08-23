@@ -298,7 +298,7 @@
   // ====== TEMA ======
   function applyTheme(theme) {
     if (theme === 'random') {
-      var themes = ['boveda', 'fluent', 'macos', 'ps5', 'steam', 'discord', 'notion', 'cyberpunk'];
+      var themes = ['boveda', 'fluent', 'macos', 'ps5', 'steam', 'discord', 'notion', 'cyberpunk', 'glassmorphism', 'material-dark', 'nord', 'dracula', 'solarized-dark', 'tokyo-night', 'catppuccin', 'gruvbox', 'everforest', 'one-dark'];
       theme = themes[Math.floor(Math.random() * themes.length)];
     }
     document.body.setAttribute('data-theme', theme);

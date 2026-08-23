@@ -1,0 +1,29 @@
+/* ====== Tema Catppuccin ====== */
+[data-theme="catppuccin"] {
+  --bg: #1e1e2e;
+  --panel: #28283a;
+  --panel-alt: #313146;
+  --border: #45475a;
+  --border-hover: #585b70;
+  --accent: #f5c2e7;
+  --accent-2: #89b4fa;
+  --text: #cdd6f4;
+  --muted: #6c7086;
+  --radius: 12px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-hover: 0 6px 16px rgba(245,194,231,0.2);
+  --font: 'Segoe UI', system-ui, sans-serif;
+  --border-style: solid;
+  --border-width: 1px;
+  --hover-effect: cat-glow;
+  --transition-speed: 0.2s;
+  --bg-texture: none;
+  --card-scale: 1;
+  --spacing: 14px;
+  --scrollbar-color: #45475a;
+  --animation: fadeIn 0.2s ease-out;
+  --mood: pastel;
+  --glow-color: rgba(245,194,231,0.25);
+  --hover-scale: 1;
+  --hover-filter: brightness(1.05);
+}

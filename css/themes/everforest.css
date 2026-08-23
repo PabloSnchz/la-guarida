@@ -1,0 +1,29 @@
+/* ====== Tema Everforest ====== */
+[data-theme="everforest"] {
+  --bg: #2d353b;
+  --panel: #343f44;
+  --panel-alt: #3d484d;
+  --border: #475258;
+  --border-hover: #576268;
+  --accent: #a7c080;
+  --accent-2: #83c092;
+  --text: #d3c6aa;
+  --muted: #859289;
+  --radius: 10px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.25);
+  --shadow-hover: 0 6px 16px rgba(167,192,128,0.2);
+  --font: 'Segoe UI', system-ui, sans-serif;
+  --border-style: solid;
+  --border-width: 1px;
+  --hover-effect: forest-glow;
+  --transition-speed: 0.2s;
+  --bg-texture: linear-gradient(180deg, #2d353b 0%, #262e33 100%);
+  --card-scale: 1;
+  --spacing: 14px;
+  --scrollbar-color: #475258;
+  --animation: fadeIn 0.2s ease-out;
+  --mood: boscoso;
+  --glow-color: rgba(167,192,128,0.25);
+  --hover-scale: 1;
+  --hover-filter: brightness(1.08);
+}

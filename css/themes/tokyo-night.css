@@ -1,0 +1,29 @@
+/* ====== Tema Tokyo Night ====== */
+[data-theme="tokyo-night"] {
+  --bg: #1a1b26;
+  --panel: #24283b;
+  --panel-alt: #2c3049;
+  --border: #3b4261;
+  --border-hover: #4a5278;
+  --accent: #7aa2f7;
+  --accent-2: #bb9af7;
+  --text: #c0caf5;
+  --muted: #565f89;
+  --radius: 10px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-hover: 0 6px 18px rgba(122,162,247,0.25);
+  --font: 'JetBrains Mono', 'Courier New', monospace;
+  --border-style: solid;
+  --border-width: 1px;
+  --hover-effect: tokyo-glow;
+  --transition-speed: 0.18s;
+  --bg-texture: linear-gradient(180deg, #1a1b26 0%, #16161e 100%);
+  --card-scale: 1.01;
+  --spacing: 14px;
+  --scrollbar-color: #3b4261;
+  --animation: slideUp 0.18s ease-out;
+  --mood: nocturno;
+  --glow-color: rgba(122,162,247,0.3);
+  --hover-scale: 1.01;
+  --hover-filter: brightness(1.08);
+}

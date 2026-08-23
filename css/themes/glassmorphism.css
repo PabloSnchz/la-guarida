@@ -1,0 +1,29 @@
+/* ====== Tema Glassmorphism ====== */
+[data-theme="glassmorphism"] {
+  --bg: #1a1a2e;
+  --panel: rgba(255,255,255,0.08);
+  --panel-alt: rgba(255,255,255,0.12);
+  --border: rgba(255,255,255,0.15);
+  --border-hover: rgba(255,255,255,0.25);
+  --accent: #64ffda;
+  --accent-2: #a78bfa;
+  --text: #ffffff;
+  --muted: rgba(255,255,255,0.6);
+  --radius: 16px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.3);
+  --shadow-hover: 0 12px 40px rgba(0,0,0,0.4);
+  --font: 'Segoe UI', system-ui, sans-serif;
+  --border-style: solid;
+  --border-width: 1px;
+  --hover-effect: glass-glow;
+  --transition-speed: 0.25s;
+  --bg-texture: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+  --card-scale: 1.02;
+  --spacing: 18px;
+  --scrollbar-color: rgba(255,255,255,0.3);
+  --animation: fadeIn 0.25s ease-out;
+  --mood: vidrio;
+  --glow-color: rgba(100,255,218,0.3);
+  --hover-scale: 1.02;
+  --hover-filter: brightness(1.1);
+}

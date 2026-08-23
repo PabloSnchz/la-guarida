@@ -1,0 +1,29 @@
+/* ====== Tema Nord ====== */
+[data-theme="nord"] {
+  --bg: #2e3440;
+  --panel: #3b4252;
+  --panel-alt: #434c5e;
+  --border: #4c566a;
+  --border-hover: #5e6a82;
+  --accent: #88c0d0;
+  --accent-2: #81a1c1;
+  --text: #eceff4;
+  --muted: #a0a8b8;
+  --radius: 10px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-hover: 0 6px 18px rgba(0,0,0,0.3);
+  --font: 'Segoe UI', system-ui, sans-serif;
+  --border-style: solid;
+  --border-width: 1px;
+  --hover-effect: nord-glow;
+  --transition-speed: 0.2s;
+  --bg-texture: none;
+  --card-scale: 1;
+  --spacing: 14px;
+  --scrollbar-color: #4c566a;
+  --animation: fadeIn 0.2s ease-out;
+  --mood: nordico;
+  --glow-color: rgba(136,192,208,0.25);
+  --hover-scale: 1;
+  --hover-filter: brightness(1.08);
+}

@@ -1,0 +1,29 @@
+/* ====== Tema Gruvbox ====== */
+[data-theme="gruvbox"] {
+  --bg: #282828;
+  --panel: #3c3836;
+  --panel-alt: #45403d;
+  --border: #504945;
+  --border-hover: #665c54;
+  --accent: #d79921;
+  --accent-2: #fabd2f;
+  --text: #ebdbb2;
+  --muted: #a89984;
+  --radius: 8px;
+  --shadow: 0 2px 6px rgba(0,0,0,0.3);
+  --shadow-hover: 0 6px 14px rgba(215,153,33,0.25);
+  --font: 'Courier New', monospace;
+  --border-style: solid;
+  --border-width: 1px;
+  --hover-effect: gruv-glow;
+  --transition-speed: 0.15s;
+  --bg-texture: none;
+  --card-scale: 1;
+  --spacing: 10px;
+  --scrollbar-color: #504945;
+  --animation: fadeIn 0.15s ease-out;
+  --mood: vintage;
+  --glow-color: rgba(215,153,33,0.3);
+  --hover-scale: 1;
+  --hover-filter: brightness(1.1);
+}

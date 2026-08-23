@@ -1,0 +1,29 @@
+/* ====== Tema Material Dark ====== */
+[data-theme="material-dark"] {
+  --bg: #121212;
+  --panel: #1e1e1e;
+  --panel-alt: #262626;
+  --border: #333333;
+  --border-hover: #444444;
+  --accent: #bb86fc;
+  --accent-2: #03dac6;
+  --text: #e0e0e0;
+  --muted: #888888;
+  --radius: 8px;
+  --shadow: 0 2px 4px rgba(0,0,0,0.3);
+  --shadow-hover: 0 8px 16px rgba(0,0,0,0.4);
+  --font: 'Roboto', 'Segoe UI', sans-serif;
+  --border-style: solid;
+  --border-width: 1px;
+  --hover-effect: elevation;
+  --transition-speed: 0.2s;
+  --bg-texture: none;
+  --card-scale: 1.01;
+  --spacing: 12px;
+  --scrollbar-color: #444444;
+  --animation: slideUp 0.2s ease-out;
+  --mood: material;
+  --glow-color: rgba(187,134,252,0.3);
+  --hover-scale: 1.01;
+  --hover-filter: brightness(1.05);
+}
