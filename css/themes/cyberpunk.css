@@ -1,1 +1,29 @@
-
+/* ====== Tema Cyberpunk ====== */
+[data-theme="cyberpunk"] {
+  --bg: #0a0a0f;
+  --panel: #12121a;
+  --panel-alt: #181825;
+  --border: #00ffff;
+  --border-hover: #ff00ff;
+  --accent: #ff00ff;
+  --accent-2: #00ffff;
+  --text: #ffffff;
+  --muted: #8888aa;
+  --radius: 12px;
+  --shadow: 0 0 10px rgba(0,255,255,0.15);
+  --shadow-hover: 0 0 24px rgba(255,0,255,0.3);
+  --font: 'Courier New', monospace;
+  --border-style: solid;
+  --border-width: 2px;
+  --hover-effect: neon-glow;
+  --transition-speed: 0.1s;
+  --bg-texture: repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(0,255,255,0.03) 20px, rgba(0,255,255,0.03) 21px);
+  --card-scale: 1.03;
+  --spacing: 10px;
+  --scrollbar-color: #00ffff;
+  --animation: glitchIn 0.1s ease-out;
+  --mood: agresivo;
+  --glow-color: rgba(0,255,255,0.3);
+  --hover-scale: 1.03;
+  --hover-filter: brightness(1.2) drop-shadow(0 0 8px var(--accent));
+}

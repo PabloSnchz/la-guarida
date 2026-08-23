@@ -1,1 +1,29 @@
-
+/* ====== Tema Windows 11 Fluent ====== */
+[data-theme="fluent"] {
+  --bg: #202020;
+  --panel: rgba(255,255,255,0.06);
+  --panel-alt: rgba(255,255,255,0.09);
+  --border: rgba(255,255,255,0.10);
+  --border-hover: rgba(255,255,255,0.18);
+  --accent: #0078d4;
+  --accent-2: #4cc2ff;
+  --text: #ffffff;
+  --muted: #aaaaaa;
+  --radius: 14px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.3);
+  --shadow-hover: 0 12px 40px rgba(0,0,0,0.4), 0 0 20px rgba(0,120,212,0.3);
+  --font: 'Segoe UI', -apple-system, sans-serif;
+  --border-style: solid;
+  --border-width: 1px;
+  --hover-effect: glow;
+  --transition-speed: 0.25s;
+  --bg-texture: none;
+  --card-scale: 1.02;
+  --spacing: 20px;
+  --scrollbar-color: #4a4a4a;
+  --animation: slideUp 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  --mood: limpio;
+  --glow-color: rgba(0,120,212,0.4);
+  --hover-scale: 1.02;
+  --hover-filter: brightness(1.05);
+}

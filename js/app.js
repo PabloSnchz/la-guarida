@@ -305,6 +305,11 @@
     root.Data.state.theme = theme;
     root.Data.save();
     
+    var link = $('#themeStylesheet');
+    if (link) {
+      link.href = 'css/themes/' + theme + '.css';
+    }
+    
     var select = $('#themeSelect');
     if (select && select.value !== theme && theme !== 'random') {
       select.value = theme;

@@ -1,1 +1,29 @@
-
+/* ====== Tema Discord ====== */
+[data-theme="discord"] {
+  --bg: #1e1f22;
+  --panel: #2b2d31;
+  --panel-alt: #313338;
+  --border: #3f4147;
+  --border-hover: #4e5058;
+  --accent: #5865f2;
+  --accent-2: #7b83f5;
+  --text: #dbdee1;
+  --muted: #949ba4;
+  --radius: 8px;
+  --shadow: none;
+  --shadow-hover: 0 4px 8px rgba(0,0,0,0.25);
+  --font: 'gg sans', 'Segoe UI', sans-serif;
+  --border-style: none;
+  --border-width: 0;
+  --hover-effect: bg-lighten;
+  --transition-speed: 0.12s;
+  --bg-texture: none;
+  --card-scale: 0.97;
+  --spacing: 8px;
+  --scrollbar-color: #4e5058;
+  --animation: fadeIn 0.12s ease-out;
+  --mood: funcional;
+  --glow-color: none;
+  --hover-scale: 0.97;
+  --hover-filter: brightness(1.08);
+}

@@ -1,1 +1,29 @@
-
+/* ====== Tema PS5 ====== */
+[data-theme="ps5"] {
+  --bg: #0c0c14;
+  --panel: #161626;
+  --panel-alt: #1a1a2e;
+  --border: #2a2a3e;
+  --border-hover: #3d3d5c;
+  --accent: #d4af37;
+  --accent-2: #00d4ff;
+  --text: #ffffff;
+  --muted: #8888aa;
+  --radius: 20px;
+  --shadow: 0 0 0 1px #2a2a3e inset;
+  --shadow-hover: 0 0 30px rgba(212,175,55,0.15);
+  --font: 'Segoe UI', system-ui, sans-serif;
+  --border-style: solid;
+  --border-width: 1px;
+  --hover-effect: glow-gold;
+  --transition-speed: 0.2s;
+  --bg-texture: linear-gradient(180deg, #0c0c14 0%, #141428 100%);
+  --card-scale: 1.05;
+  --spacing: 18px;
+  --scrollbar-color: #d4af37;
+  --animation: scaleIn 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  --mood: premium;
+  --glow-color: rgba(212,175,55,0.3);
+  --hover-scale: 1.05;
+  --hover-filter: brightness(1.08);
+}

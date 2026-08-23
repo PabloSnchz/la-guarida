@@ -1,1 +1,29 @@
-
+/* ====== Tema Notion ====== */
+[data-theme="notion"] {
+  --bg: #ffffff;
+  --panel: #f7f7f5;
+  --panel-alt: #efefed;
+  --border: #e9e9e7;
+  --border-hover: #d9d9d7;
+  --accent: #e16259;
+  --accent-2: #5a67d8;
+  --text: #37352f;
+  --muted: #787774;
+  --radius: 6px;
+  --shadow: none;
+  --shadow-hover: 0 2px 8px rgba(0,0,0,0.06);
+  --font: Georgia, 'Times New Roman', serif;
+  --border-style: none;
+  --border-width: 0;
+  --hover-effect: shadow-min;
+  --transition-speed: 0.25s;
+  --bg-texture: none;
+  --card-scale: 1;
+  --spacing: 16px;
+  --scrollbar-color: #d9d9d7;
+  --animation: fadeIn 0.25s ease-out;
+  --mood: calma;
+  --glow-color: none;
+  --hover-scale: 1;
+  --hover-filter: none;
+}

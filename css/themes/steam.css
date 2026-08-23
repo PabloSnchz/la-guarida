@@ -1,1 +1,29 @@
-
+/* ====== Tema Steam ====== */
+[data-theme="steam"] {
+  --bg: #1b2838;
+  --panel: #2a3f5f;
+  --panel-alt: #22344d;
+  --border: #3d5a80;
+  --border-hover: #4d6d96;
+  --accent: #66c0f4;
+  --accent-2: #1a9fff;
+  --text: #e6e6e6;
+  --muted: #8b9bb0;
+  --radius: 8px;
+  --shadow: 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-hover: 0 6px 18px rgba(102,192,244,0.2);
+  --font: 'Arial Narrow', Arial, sans-serif;
+  --border-style: solid;
+  --border-width: 1px;
+  --hover-effect: brighten;
+  --transition-speed: 0.15s;
+  --bg-texture: linear-gradient(180deg, #1b2838 0%, #16212e 100%);
+  --card-scale: 1;
+  --spacing: 12px;
+  --scrollbar-color: #66c0f4;
+  --animation: slideUp 0.15s ease-out;
+  --mood: retro;
+  --glow-color: rgba(102,192,244,0.2);
+  --hover-scale: 1;
+  --hover-filter: brightness(1.15);
+}
