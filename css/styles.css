@@ -510,6 +510,13 @@ body {
 }
 
 .modal__dialog {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+}
+
+.modal__dialog {
   position: relative;
   left: auto;
   top: auto;
