@@ -520,7 +520,8 @@ body {
   left: 50%;
   top: 50%;
   transform: translate(-50%,-50%);
-  width: min(420px, calc(100vw - 28px));
+  width: 420px;
+  max-width: 90vw;
   max-height: calc(100vh - 28px);
   overflow: auto;
   background: #141418;
