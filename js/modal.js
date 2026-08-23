@@ -25,12 +25,14 @@
     var commandInput = $('#modalCommand');
     var urlField = $('#modalUrlField');
     var commandField = $('#modalCommandField');
+    var extractIconField = $('#modalExtractIconField');
     var autoDetectBtn = $('#modalAutoDetectFaviconBtn');
     var downloadBtn = $('#modalDownloadFaviconBtn');
 
     // Reset de campos
     urlField.style.display = '';
     if (commandField) commandField.style.display = 'none';
+    if (extractIconField) extractIconField.style.display = 'none';
     if (autoDetectBtn) { autoDetectBtn.style.display = ''; autoDetectBtn.textContent = '🔍 Auto-detectar favicon'; autoDetectBtn.disabled = false; }
     if (downloadBtn) { downloadBtn.style.display = ''; downloadBtn.textContent = '📥 Descargar como base64'; downloadBtn.disabled = false; }
     if (openChromeInput) openChromeInput.parentElement.style.display = '';
@@ -84,6 +86,7 @@
         commandField.style.display = '';
         if (commandInput) commandInput.value = item ? (item.command || '') : '';
       }
+      if (extractIconField) extractIconField.style.display = '';
       
       if (autoDetectBtn) autoDetectBtn.style.display = 'none';
       if (downloadBtn) downloadBtn.style.display = 'none';
@@ -301,6 +304,14 @@
   function wireModal() {
     $('#modalCancel').addEventListener('click', closeModal);
     $('#modalSave').addEventListener('click', saveModal);
+    var extractBtn = $('#modalExtractIconBtn');
+    if (extractBtn) extractBtn.addEventListener('click', function() {
+      var appName = $('#modalName').value.trim();
+      if (!appName) { alert('Primero ingresá el nombre'); return; }
+      var launchUrl = 'launch:extract=' + appName.replace(/ /g, '-');
+      window.location.href = launchUrl;
+      alert('⏳ Extrayendo ícono... Revisá Downloads\\launcher-icons\\');
+    });
     var autoDetectBtn = $('#modalAutoDetectFaviconBtn');
     if (autoDetectBtn) autoDetectBtn.addEventListener('click', autoDetectFavicon);
     var downloadBtn = $('#modalDownloadFaviconBtn');
