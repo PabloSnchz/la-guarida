@@ -161,6 +161,7 @@
         '</span>' +
         '<span class="launcher-name">' + root.Data.esc(item.name) + '</span>' +
         '<div class="edit-actions">' +
+          '<button class="extract-btn" data-action="extract-icon" data-id="' + item.id + '" data-type="' + typeLabel + '" title="Extraer ícono">📥</button>' +
           '<button class="edit-btn" data-action="edit-launcher" data-id="' + item.id + '" data-type="' + typeLabel + '">✏️</button>' +
           '<button class="del-btn" data-action="delete-launcher" data-id="' + item.id + '" data-type="' + typeLabel + '">🗑</button>' +
         '</div>' +
@@ -180,6 +181,15 @@
         var id = parseInt(this.getAttribute('data-id'));
         var type = this.getAttribute('data-type');
         root.Modal.open('launcher', id, type === 'app' ? 'apps' : 'games');
+      });
+    });
+
+    container.querySelectorAll('[data-action="extract-icon"]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = parseInt(this.getAttribute('data-id'));
+        var type = this.getAttribute('data-type');
+        extractIconForItem(id, type);
       });
     });
 
@@ -231,6 +241,24 @@
     window.location.href = launchUrl;
     
     console.log(LOG, 'Lanzando:', item.name, '→', item.command);
+  }
+
+  function extractIconForItem(id, type) {
+    var state = root.Data.state;
+    var item;
+    
+    if (type === 'app') {
+      item = state.apps.find(function(a) { return a.id === id; });
+    } else {
+      item = state.games.find(function(g) { return g.id === id; });
+    }
+    
+    if (!item) return;
+    
+    var launchUrl = 'launch:extract=' + item.command.replace(/\\/g, '/');
+    window.location.href = launchUrl;
+    
+    alert('📥 Extrayendo ícono de ' + item.name + '...\n\nRevisá Downloads\\launcher-icons\\');
   }
 
   function deleteLauncherItem(id, type) {

@@ -811,3 +811,8 @@ body.drop-external-active .container {
   min-width: 420px;
   max-width: 420px;
 }
+
+.edit-actions .extract-btn {
+  background: #1c1c20;
+  color: #7bc2ff;
+}
