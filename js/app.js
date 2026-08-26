@@ -218,6 +218,29 @@
 
   function renderLauncher() {
     var state = root.Data.state;
+    var defaults = root.Data.DEFAULT_STATE;
+    
+    // FUSIONAR apps: agregar las que están en defaults pero NO en el estado actual
+    if (defaults.apps) {
+      defaults.apps.forEach(function(defaultApp) {
+        var exists = state.apps.some(function(app) { return app.name === defaultApp.name; });
+        if (!exists) {
+          state.apps.push(defaultApp);
+        }
+      });
+    }
+    
+    // FUSIONAR juegos: agregar los que están en defaults pero NO en el estado actual
+    if (defaults.games) {
+      defaults.games.forEach(function(defaultGame) {
+        var exists = state.games.some(function(game) { return game.name === defaultGame.name; });
+        if (!exists) {
+          state.games.push(defaultGame);
+        }
+      });
+    }
+    
+    root.Data.save();
     renderLauncherGrid('launcherGamesGrid', state.games, 'game');
     renderLauncherGrid('launcherAppsGrid', state.apps, 'app');
   }
