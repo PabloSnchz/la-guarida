@@ -51,7 +51,8 @@
       { id: 108, name: 'Explorador', command: 'explorer.exe', emoji: '📁', icon_url: '' },
       { id: 109, name: 'Configuración', command: 'ms-settings:', emoji: '⚙️', icon_url: '' },
       { id: 110, name: 'Panel NVIDIA', command: 'C:\\Program Files\\NVIDIA Corporation\\Control Panel Client\\nvcplui.exe', emoji: '🖥️', icon_url: '' },
-      { id: 111, name: 'Admin. Tareas', command: 'taskmgr.exe', emoji: '📊', icon_url: '' }
+      { id: 111, name: 'Admin. Tareas', command: 'taskmgr.exe', emoji: '📊', icon_url: '' },
+      { id: 112, name: 'WhatsApp', command: 'shell:AppsFolder\\5319275A.WhatsAppDesktop_cv1g1gvanyjgm!App', emoji: '💬', icon_url: '' }
     ],
     games: [
       { id: 201, name: 'Guild Wars 2', command: 'C:\\Guild Wars 2\\Gw2-64.exe', emoji: '⚔️', icon_url: 'assets/icons/launcher/gw2.png' },
