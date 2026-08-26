@@ -259,11 +259,11 @@
     
     if (!item) return;
     
-    // Usar protocol handler launch: con la ruta completa
+    // Usar protocol handler launch: con el nombre
     var launchUrl = 'launch:' + item.name.replace(/ /g, '-');
     window.location.href = launchUrl;
     
-    console.log(LOG, 'Lanzando:', item.name, '→', item.command);
+    console.log(LOG, 'Lanzando:', item.name, '→', item.launch_command || item.command);
   }
 
   function extractIconForItem(id, type) {
@@ -278,7 +278,14 @@
     
     if (!item) return;
     
-    var launchUrl = 'launch:extract=' + item.command.replace(/\\/g, '/');
+    // Usar extract_command si existe, sino launch_command
+    var extractPath = item.extract_command || item.launch_command || item.command;
+    if (!extractPath) {
+      alert('⚠️ Esta app no tiene una ruta para extraer ícono.');
+      return;
+    }
+    
+    var launchUrl = 'launch:extract=' + extractPath.replace(/\\/g, '/');
     window.location.href = launchUrl;
     
     alert('📥 Extrayendo ícono de ' + item.name + '...\n\nRevisá Downloads\\launcher-icons\\');

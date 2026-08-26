@@ -1,0 +1,186 @@
+{
+  "games": [
+    {
+      "id": 201,
+      "name": "Guild Wars 2",
+      "launch_command": "C:\\Guild Wars 2\\Gw2-64.exe",
+      "extract_command": "C:\\Guild Wars 2\\Gw2-64.exe",
+      "is_stable_path": true,
+      "emoji": "⚔️",
+      "icon_url": "assets/icons/launcher/gw2.png"
+    },
+    {
+      "id": 202,
+      "name": "GW2 Launcher",
+      "launch_command": "C:\\Gw2launcher\\Gw2Launcher.exe",
+      "extract_command": "C:\\Gw2launcher\\Gw2Launcher.exe",
+      "is_stable_path": true,
+      "emoji": "🚀",
+      "icon_url": "assets/icons/launcher/gw2launcher.png"
+    },
+    {
+      "id": 203,
+      "name": "Blish HUD",
+      "launch_command": "C:\\Blish.HUD.1.1.1\\Blish HUD.exe",
+      "extract_command": "C:\\Blish.HUD.1.1.1\\Blish HUD.exe",
+      "is_stable_path": true,
+      "emoji": "🗺️",
+      "icon_url": "assets/icons/launcher/blishhud.png"
+    },
+    {
+      "id": 204,
+      "name": "Riot Client",
+      "launch_command": "C:\\Riot Games\\Riot Client\\RiotClientServices.exe",
+      "extract_command": "C:\\Riot Games\\Riot Client\\RiotClientServices.exe",
+      "is_stable_path": true,
+      "emoji": "🎮",
+      "icon_url": "assets/icons/launcher/riot.png"
+    },
+    {
+      "id": 205,
+      "name": "Overwolf",
+      "launch_command": "C:\\Program Files (x86)\\Overwolf\\OverwolfLauncher.exe",
+      "extract_command": "C:\\Program Files (x86)\\Overwolf\\OverwolfLauncher.exe",
+      "is_stable_path": true,
+      "emoji": "🐺",
+      "icon_url": "assets/icons/launcher/overwolf.png"
+    },
+    {
+      "id": 206,
+      "name": "Steam",
+      "launch_command": "C:\\Program Files (x86)\\Steam\\steam.exe",
+      "extract_command": "C:\\Program Files (x86)\\Steam\\steam.exe",
+      "is_stable_path": true,
+      "emoji": "🚂",
+      "icon_url": "assets/icons/launcher/steam.png"
+    },
+    {
+      "id": 207,
+      "name": "Epic Games",
+      "launch_command": "C:\\Program Files (x86)\\Epic Games\\Launcher\\Portal\\Binaries\\Win32\\EpicGamesLauncher.exe",
+      "extract_command": "C:\\Program Files (x86)\\Epic Games\\Launcher\\Portal\\Binaries\\Win32\\EpicGamesLauncher.exe",
+      "is_stable_path": true,
+      "emoji": "🏰",
+      "icon_url": "assets/icons/launcher/epic.png"
+    },
+    {
+      "id": 208,
+      "name": "GOG Galaxy",
+      "launch_command": "C:\\Program Files (x86)\\GOG Galaxy\\GalaxyClient.exe",
+      "extract_command": "C:\\Program Files (x86)\\GOG Galaxy\\GalaxyClient.exe",
+      "is_stable_path": true,
+      "emoji": "🌟",
+      "icon_url": "assets/icons/launcher/gog.png"
+    }
+  ],
+  "apps": [
+    {
+      "id": 101,
+      "name": "Discord",
+      "launch_command": "C:\\Users\\psanc\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Discord.lnk",
+      "extract_command": "C:\\Users\\psanc\\AppData\\Local\\Discord\\app-1.0.9255\\Discord.exe",
+      "is_stable_path": false,
+      "emoji": "💬",
+      "icon_url": "assets/icons/launcher/discord.png"
+    },
+    {
+      "id": 102,
+      "name": "OBS Studio",
+      "launch_command": "C:\\Program Files\\obs-studio\\bin\\64bit\\obs64.exe",
+      "extract_command": "C:\\Program Files\\obs-studio\\bin\\64bit\\obs64.exe",
+      "is_stable_path": true,
+      "emoji": "🎥",
+      "icon_url": "assets/icons/launcher/obs.png"
+    },
+    {
+      "id": 103,
+      "name": "Filmora",
+      "launch_command": "C:\\Users\\psanc\\AppData\\Local\\Wondershare\\Wondershare Filmora\\Wondershare Filmora Launcher.exe",
+      "extract_command": "C:\\Users\\psanc\\AppData\\Local\\Wondershare\\Wondershare Filmora\\Wondershare Filmora Launcher.exe",
+      "is_stable_path": false,
+      "emoji": "🎬",
+      "icon_url": "assets/icons/launcher/filmora.png"
+    },
+    {
+      "id": 104,
+      "name": "Iriun Webcam",
+      "launch_command": "C:\\Program Files (x86)\\Iriun Webcam\\IriunWebcam.exe",
+      "extract_command": "C:\\Program Files (x86)\\Iriun Webcam\\IriunWebcam.exe",
+      "is_stable_path": true,
+      "emoji": "📷",
+      "icon_url": "assets/icons/launcher/iriun.png"
+    },
+    {
+      "id": 105,
+      "name": "CPU-Z",
+      "launch_command": "C:\\Program Files\\CPUID\\CPU-Z\\cpuz.exe",
+      "extract_command": "C:\\Program Files\\CPUID\\CPU-Z\\cpuz.exe",
+      "is_stable_path": true,
+      "emoji": "🔧",
+      "icon_url": "assets/icons/launcher/cpuz.png"
+    },
+    {
+      "id": 106,
+      "name": "iCUE",
+      "launch_command": "C:\\Program Files\\Corsair\\Corsair iCUE5 Software\\iCUE.exe",
+      "extract_command": "C:\\Program Files\\Corsair\\Corsair iCUE5 Software\\iCUE.exe",
+      "is_stable_path": true,
+      "emoji": "🎨",
+      "icon_url": "assets/icons/launcher/icue.png"
+    },
+    {
+      "id": 107,
+      "name": "NVIDIA Broadcast",
+      "launch_command": "C:\\Program Files\\NVIDIA Corporation\\NVIDIA Broadcast\\NVIDIA Broadcast.exe",
+      "extract_command": "C:\\Program Files\\NVIDIA Corporation\\NVIDIA Broadcast\\NVIDIA Broadcast.exe",
+      "is_stable_path": true,
+      "emoji": "🎙️",
+      "icon_url": "assets/icons/launcher/nvidia_broadcast.png"
+    },
+    {
+      "id": 108,
+      "name": "Explorador",
+      "launch_command": "explorer.exe",
+      "extract_command": "explorer.exe",
+      "is_stable_path": true,
+      "emoji": "📁",
+      "icon_url": ""
+    },
+    {
+      "id": 109,
+      "name": "Configuración",
+      "launch_command": "ms-settings:",
+      "extract_command": "ms-settings:",
+      "is_stable_path": true,
+      "emoji": "⚙️",
+      "icon_url": ""
+    },
+    {
+      "id": 110,
+      "name": "Panel NVIDIA",
+      "launch_command": "C:\\Program Files\\NVIDIA Corporation\\Control Panel Client\\nvcplui.exe",
+      "extract_command": "C:\\Program Files\\NVIDIA Corporation\\Control Panel Client\\nvcplui.exe",
+      "is_stable_path": true,
+      "emoji": "🖥️",
+      "icon_url": ""
+    },
+    {
+      "id": 111,
+      "name": "Admin. Tareas",
+      "launch_command": "taskmgr.exe",
+      "extract_command": "taskmgr.exe",
+      "is_stable_path": true,
+      "emoji": "📊",
+      "icon_url": ""
+    },
+    {
+      "id": 112,
+      "name": "WhatsApp",
+      "launch_command": "shell:AppsFolder\\5319275A.WhatsAppDesktop_cv1g1gvanyjgm!App",
+      "extract_command": "",
+      "is_stable_path": false,
+      "emoji": "💬",
+      "icon_url": "assets/icons/launcher/whatsapp.png"
+    }
+  ]
+}

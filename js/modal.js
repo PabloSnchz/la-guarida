@@ -217,6 +217,11 @@
     root.Data.save();
     if (root.App && typeof root.App.render === 'function') root.App.render();
     closeModal();
+    
+    // Enviar sync-bat para actualizar el .bat
+    if (ctx.type === 'launcher') {
+      window.location.href = 'launch:sync-bat';
+    }
   }
 
   // ====== Auto-detectar favicon ======
