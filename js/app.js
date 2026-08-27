@@ -259,11 +259,21 @@
     
     if (!item) return;
     
-    // Usar protocol handler launch: con el nombre
-    var launchUrl = 'launch:' + item.name.replace(/ /g, '-');
+    // Normalizar tildes y espacios para que coincida con el .bat
+    var cleanName = item.name
+      .replace(/[áàäâ]/g, 'a')
+      .replace(/[éèëê]/g, 'e')
+      .replace(/[íìïî]/g, 'i')
+      .replace(/[óòöô]/g, 'o')
+      .replace(/[úùüû]/g, 'u')
+      .replace(/ñ/g, 'n')
+      .replace(/\s+/g, '-');
+    
+    // Usar protocol handler launch: con el nombre limpio
+    var launchUrl = 'launch:' + cleanName;
     window.location.href = launchUrl;
     
-    console.log(LOG, 'Lanzando:', item.name, '→', item.launch_command || item.command);
+    console.log(LOG, 'Lanzando:', item.name, '→', cleanName);
   }
 
   function extractIconForItem(id, type) {
