@@ -3,9 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0F1117">
   <title>🐈‍⬛ La Guarida — Página de Inicio</title>
+  <!-- Identidad Gato Negro: favicon oficial, la tipografía de la marca y el theme oficial por defecto -->
+  <link rel="icon" type="image/svg+xml" href="assets/brand/gato-negro.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/themes/boveda.css" id="themeStylesheet">
+  <link rel="stylesheet" href="css/themes/gato.css" id="themeStylesheet">
 </head>
 <body>
 
@@ -15,7 +21,7 @@
     <div class="an-util-left">
       <!-- Logo + nombre -->
       <div class="brand-compact">
-        <img class="brand-logo-compact" src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/logo-gato-negro.png" alt="La Guarida" width="32" height="32">
+        <img class="brand-logo-compact" src="assets/brand/gato-negro.svg" alt="La Guarida" width="32" height="32">
         <span class="brand-name">La Guarida</span>
       </div>
       
@@ -28,7 +34,8 @@
       
       <!-- Selector de tema -->
       <select id="themeSelect" class="theme-select" title="Cambiar tema visual">
-        <option value="boveda">🐈‍⬛ Bóveda</option>
+        <option value="gato">🐈‍⬛ Gato Negro</option>
+        <option value="boveda">🏛️ Bóveda</option>
         <option value="fluent">🪟 Windows 11</option>
         <option value="macos">🍎 macOS</option>
         <option value="ps5">🎮 PS5</option>
@@ -80,13 +87,13 @@
       
       <span class="an-sep">|</span>
       
-      <!-- Badge Link in Bio -->
+      <!-- Badge Link in Bio: colores oficiales de Gato Negro, fijos (no siguen el theme) -->
       <a href="https://pablosnchz.github.io/bio/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;border-radius:4px;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;height:26px;">
-        <span style="background-color:#555555;color:#ffffff;padding:0 10px;font-size:10px;font-weight:600;display:flex;align-items:center;gap:6px;letter-spacing:0.3px;white-space:nowrap;height:100%;">
+        <span style="background-color:#232A3A;color:#F4F6FA;padding:0 10px;font-size:10px;font-weight:600;display:flex;align-items:center;gap:6px;letter-spacing:0.3px;white-space:nowrap;height:100%;">
           <img src="https://raw.githubusercontent.com/PabloSnchz/bio/main/assets/profile.png" alt="Foto" style="width:18px;height:18px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.3);">
           Link in Bio
         </span>
-        <span style="background-color:#E1306C;color:#ffffff;padding:0 12px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;white-space:nowrap;height:100%;">
+        <span style="background-color:#5A3DDB;color:#FFFFFF;padding:0 12px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;white-space:nowrap;height:100%;">
           Pablin Schez
         </span>
       </a>
