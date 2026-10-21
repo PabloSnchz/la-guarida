@@ -1,6 +1,7 @@
 /*!
  * js/app.js — Init + render + wire events
  * v3 — Lanzador de apps y juegos
+ * v3.1 — Theme oficial Gato Negro; el theme guardado se aplica de verdad al abrir
  */
 (function (root) {
   'use strict';
@@ -338,7 +339,7 @@
   // ====== TEMA ======
   function applyTheme(theme) {
     if (theme === 'random') {
-      var themes = ['boveda', 'fluent', 'macos', 'ps5', 'steam', 'discord', 'notion', 'cyberpunk', 'glassmorphism', 'material-dark', 'nord', 'dracula', 'solarized-dark', 'tokyo-night', 'catppuccin', 'gruvbox', 'everforest', 'one-dark'];
+      var themes = ['gato', 'boveda', 'fluent', 'macos', 'ps5', 'steam', 'discord', 'notion', 'cyberpunk', 'glassmorphism', 'material-dark', 'nord', 'dracula', 'solarized-dark', 'tokyo-night', 'catppuccin', 'gruvbox', 'everforest', 'one-dark'];
       theme = themes[Math.floor(Math.random() * themes.length)];
     }
     document.body.setAttribute('data-theme', theme);
@@ -389,16 +390,11 @@
   function init() {
     console.log(LOG, 'Iniciando...');
     root.Data.load();
+    // Aplicar el tema guardado antes de dibujar. Antes solo se marcaba data-theme
+    // y la hoja seguía siendo boveda.css: al recargar, cualquier otro theme se perdía.
+    applyTheme(root.Data.state.theme || root.Data.DEFAULT_THEME || 'gato');
     wireEvents();
     render();
-    
-    // Aplicar tema guardado
-    var savedTheme = root.Data.state.theme || 'boveda';
-    document.body.setAttribute('data-theme', savedTheme);
-    var themeSelect = $('#themeSelect');
-    if (themeSelect && savedTheme !== 'random') {
-      themeSelect.value = savedTheme;
-    }
   }
 
   root.App = {

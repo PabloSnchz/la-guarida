@@ -1,12 +1,16 @@
 /*!
  * js/data.js — Estado y persistencia
- * v7 — Íconos oficiales en el lanzador
+ * v8 — Theme oficial Gato Negro por defecto (migración de una sola vez desde Bóveda)
  */
 (function (root) {
   'use strict';
   var LOG = '[LaGuarida:Data]';
 
   var STORAGE_KEY = 'la_guarida_data_v1';
+  // Theme oficial del ecosistema Gato Negro. La marca evita repetir la migración:
+  // si después elegís Bóveda u otro theme, se respeta.
+  var DEFAULT_THEME = 'gato';
+  var OFFICIAL_MARK = 'gato-v1';
 
   var LAUNCHER_ICONS = {
     'gw2': 'assets/icons/launcher/gw2.png',
@@ -66,7 +70,16 @@
     ]
   };
 
-  var state = { favorites: [], categories: [], apps: [], games: [], widgets_left: [], widgets_right: [], theme: 'boveda' };
+  var state = { favorites: [], categories: [], apps: [], games: [], widgets_left: [], widgets_right: [], theme: DEFAULT_THEME, theme_official: OFFICIAL_MARK };
+
+  // Una sola vez: quien tenía Bóveda (el default anterior) o nada pasa a Gato Negro.
+  function migrateToOfficial() {
+    if (state.theme_official === OFFICIAL_MARK) return false;
+    var migrated = (!state.theme || state.theme === 'boveda');
+    if (migrated) state.theme = DEFAULT_THEME;
+    state.theme_official = OFFICIAL_MARK;
+    return migrated;
+  }
 
   function load() {
     try {
@@ -79,7 +92,9 @@
         state.games = parsed.games || [];
         state.widgets_left = parsed.widgets_left || [];
         state.widgets_right = parsed.widgets_right || [];
-        state.theme = parsed.theme || 'boveda';
+        state.theme = parsed.theme || '';
+        state.theme_official = parsed.theme_official || '';
+        migrateToOfficial();
         
         state.favorites.forEach(function(f) {
           if (f.icon_url === undefined) f.icon_url = '';
@@ -201,7 +216,8 @@
     esc: esc,
     getDomain: getDomain,
     getFaviconHTML: getFaviconHTML,
-    DEFAULT_STATE: DEFAULT_STATE
+    DEFAULT_STATE: DEFAULT_STATE,
+    DEFAULT_THEME: DEFAULT_THEME
   };
 
 })(typeof window !== 'undefined' ? window : this);
