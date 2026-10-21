@@ -1,0 +1,34 @@
+/* ====== Tema Gato Negro (oficial, por defecto) ======
+   Gato Design System, el mismo de La Bóveda y del panel de la Factory:
+   obsidiana para fondos, niebla para texto, ámbar para la marca y los títulos,
+   arcano para el foco y el hover. */
+:root,
+[data-theme="gato"] {
+  --bg: #0F1117;
+  --panel: #1A1F2B;
+  --panel-alt: #232A3A;
+  --border: #2E3649;
+  --border-hover: #7B5CFF;
+  --accent: #F2B94B;
+  --accent-2: #A896FF;
+  --text: #F4F6FA;
+  --muted: #8E96A3;
+  --radius: 8px;
+  --shadow: 0 0 0 1px #232A3A inset;
+  --shadow-hover: 0 0 0 1px #7B5CFF, 0 4px 12px rgba(123,92,255,.25);
+  --font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --border-style: solid;
+  --border-width: 1px;
+  --hover-effect: shadow;
+  --transition-speed: 0.18s;
+  --bg-texture: none;
+  --card-scale: 1;
+  --spacing: 16px;
+  --scrollbar-color: #3B4560;
+  --animation: fadeIn 0.18s ease-out;
+  --mood: oficial;
+  --glow-color: rgba(123,92,255,0.35);
+  --hover-scale: 1;
+  --hover-filter: none;
+  color-scheme: dark;
+}
