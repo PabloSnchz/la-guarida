@@ -1,6 +1,6 @@
 # 🐈‍⬛ La Guarida
 
-Página de inicio personal del Gato Negro — dashboard híbrido que combina links web, lanzador de aplicaciones locales, widgets en tiempo real, sistema de 8 temas visuales y persistencia local. Diseñada para monitores ultrawide.
+Página de inicio personal del Gato Negro — dashboard híbrido que combina links web, lanzador de aplicaciones locales, widgets en tiempo real, 19 temas visuales y persistencia local. Diseñada para monitores ultrawide, y desde la versión 2.0 con el mismo lenguaje visual que el Centro de decisiones de la Factory.
 
 ## ✨ Características
 
@@ -13,9 +13,17 @@ Página de inicio personal del Gato Negro — dashboard híbrido que combina lin
 - 🦊 Arrastrar desde Firefox para crear links
 - 🌐 Abrir links en Chrome obligatoriamente
 
+### Resumen de la Factory con Shiruvana
+
+- Saludo del momento del día y la fecha
+- Estados en chips: decisiones, acciones tuyas, validaciones y si la Factory está trabajando
+- Un mensaje de Shiruvana con lo que la Factory te pide (hasta 3) y en qué está trabajando
+- Enlace directo al [Centro de decisiones](https://pablosnchz.github.io/gw2-factory-dashboard/)
+
 ### Sistema de temas
 
-- 🐈‍⬛ Bóveda (default)
+- 🐈‍⬛ Gato Negro (oficial, por defecto)
+- 🏛️ Bóveda
 - 🪟 Windows 11 Fluent
 - 🍎 macOS Big Sur
 - 🎮 PS5
@@ -23,16 +31,15 @@ Página de inicio personal del Gato Negro — dashboard híbrido que combina lin
 - 💬 Discord
 - 📝 Notion
 - 🌆 Cyberpunk Neon
+- Glassmorphism, Material Dark, Nord, Dracula, Solarized Dark, Tokyo Night, Catppuccin, Gruvbox, Everforest y One Dark
 - 🎲 Random (cambia al azar)
 
 Cada tema incluye:
 - Paleta de colores propia
 - Fuente tipográfica específica
-- Bordes con estilo propio (sólido, sin borde, neón)
 - Hover effects distintos (shadow, glow, brighten, neon)
 - Velocidad de transición única
 - Textura de fondo
-- Escala de cards
 - Scrollbar personalizada
 - Animación de entrada
 - Mood (personalidad visual)
@@ -59,20 +66,49 @@ Cada tema incluye:
 
 🔗 [Ver en vivo](https://pablosnchz.github.io/la-guarida/)
 
+## 🎨 Diseño 2.0 (Gato Design System)
+
+| Pieza | Como en el Centro de decisiones |
+|-------|--------------------------------|
+| Cabecera | Marca a la izquierda, pestañas de acciones y enlaces al centro, estado de la Factory, theme y backup a la derecha |
+| Resumen | Rótulo, saludo grande, chips de estado y el mensaje de Shiruvana |
+| Secciones | Título y una línea que explica para qué sirve |
+| Tarjetas | Fondo de panel, borde fino, esquinas redondeadas; el borde se ilumina al pasar el mouse |
+| Estados | Chips con ícono y texto: el color acompaña, nunca informa solo |
+| Accesibilidad | Foco visible, objetivos de 44 px en la cabecera, "Saltar al contenido", movimiento reducido |
+
+Los colores salen siempre de las variables del tema activo, así que los 19 temas siguen funcionando. Con el tema Gato Negro, La Guarida queda igual al panel.
+
+La grilla se adapta: en pantallas anchas, widgets | favoritos y categorías | lanzador; debajo de 1400 px, favoritos y categorías arriba y widgets y lanzador abajo; en el celular, todo en una columna. Ya no se esconden widgets ni lanzador en pantallas chicas.
+
+## 🐈‍⬛ Shiruvana en La Guarida
+
+Shiruvana es la voz de la Factory. En La Guarida aparece en **un solo lugar**: el resumen de arriba, porque es la página con la que empieza el día.
+
+| Regla | Detalle |
+|-------|---------|
+| Dónde | Solo en el resumen. Nunca en favoritos, categorías, lanzador ni widgets |
+| Qué dice | Lo que la Factory te pide (acciones, validaciones, decisiones) y en qué está trabajando |
+| Fuente | `ai-memory/status.md` de gw2-factory-dev, el mismo archivo que lee el Centro de decisiones |
+| Frecuencia | Copia de 5 minutos; se actualiza sola y con el botón "Actualizar" |
+| Sin conexión | Muestra la última copia y lo dice; sin copia, lo explica y deja el enlace al panel |
+| Seguridad | Todo texto de la memoria se escapa antes de mostrarse |
+
 ## 📁 Estructura
 
 | Archivo | Descripción |
 |---------|-------------|
-| `index.html` | Estructura con header compacto + layout ultrawide |
-| `css/styles.css` | Estilos base (layout y componentes sin colores) |
-| `css/themes/` | 8 archivos CSS con variables por tema |
+| `index.html` | Cabecera, resumen y grilla de widgets, favoritos, categorías y lanzador |
+| `css/styles.css` | Diseño 2.0: estructura y componentes sobre las variables del tema |
+| `css/themes/` | 19 archivos CSS con variables por tema |
 | `js/data.js` | Estado, persistencia, favicons, defaults |
 | `js/widgets.js` | Widgets: reloj, resets, noticias, Twitch, YouTube |
 | `js/drag-drop.js` | Drag and drop interno + externo |
 | `js/modal.js` | Modal de edición universal |
 | `js/app.js` | Init, render, lanzador, selector de temas |
+| `js/shiruvana.js` | Resumen de la Factory y mensaje de Shiruvana |
+| `tests/shiruvana.test.cjs` | Tests del resumen: `node --test tests/*.test.cjs` |
 | `docs/chrome-open.bat` | Backup del script para Chrome-forced |
-| `assets/icons/launcher/` | Íconos oficiales de apps y juegos |
 
 ## 🎨 Sistema de temas
 
@@ -80,7 +116,7 @@ Cada tema incluye:
 
 | Componente | Detalle |
 |------------|---------|
-| `styles.css` | Solo estructura — usa variables CSS |
+| `styles.css` | Estructura y componentes — usa variables CSS |
 | `themes/xxx.css` | Define las variables para cada tema |
 | Selector en header | Cambia `data-theme` en el body |
 | Persistencia | El tema elegido se guarda en localStorage |
@@ -92,15 +128,16 @@ Cada tema incluye:
 |----------|--------------|
 | `--bg` | Fondo principal |
 | `--panel` | Fondo de cards |
-| `--accent` | Color de acento |
+| `--panel-alt` | Fondo de filas y controles |
+| `--border` / `--border-hover` | Bordes y borde al pasar el mouse |
+| `--accent` / `--accent-2` | Colores de acento |
+| `--text` / `--muted` | Texto principal y secundario |
+| `--radius` | Redondeo base |
 | `--font` | Familia tipográfica |
-| `--border-style` | Estilo de borde (solid, none) |
-| `--border-width` | Grosor de borde |
 | `--hover-scale` | Escala al hacer hover |
 | `--hover-filter` | Filtro visual al hover |
 | `--transition-speed` | Velocidad de transición |
 | `--bg-texture` | Textura o gradiente de fondo |
-| `--spacing` | Espaciado entre elementos |
 | `--scrollbar-color` | Color de la barra de scroll |
 | `--animation` | Animación de entrada |
 | `--mood` | Personalidad del tema |
@@ -229,6 +266,7 @@ Windows Registry Editor Version 5.00
 | Twitch Helix | Seguidores + estado en vivo | Client ID + Access Token |
 | YouTube Data v3 | Suscriptores + último video | API Key |
 | GW2 RSS | Noticias oficiales | No requiere |
+| GitHub (raw) | Estado de la Factory para el resumen | No requiere |
 
 ## 💾 Persistencia
 
@@ -237,12 +275,14 @@ Windows Registry Editor Version 5.00
 - Migración automática de datos viejos
 - Tema elegido guardado en localStorage
 - Los defaults se cargan solo si no hay datos previos
+- El resumen de la Factory guarda una copia de 5 minutos (`guarida:factory:v1`)
 
 ## 🐈‍⬛ Ecosistema
 
 | Proyecto | Enlace |
 |----------|--------|
 | Bóveda del Gato Negro | [WebApp GW2](https://pablosnchz.github.io/gw2-wallet-ligero/) |
+| Centro de decisiones | [Gato Negro Factory](https://pablosnchz.github.io/gw2-factory-dashboard/) |
 | Link in Bio | [Bio](https://pablosnchz.github.io/bio/) |
 | Métricas GA4 | [Dashboard](https://pablosnchz.github.io/gw2-metrics-dashboard/) |
 | Traffic Stats | [Histórico](https://pablosnchz.github.io/github-repo-traffic-stats/) |
