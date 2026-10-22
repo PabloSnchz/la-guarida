@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0F1117">
   <title>🐈‍⬛ La Guarida — Página de Inicio</title>
-  <!-- Identidad Gato Negro: favicon oficial y el theme oficial por defecto.
-       Diseño 2.0 (BL-051): el lenguaje visual del Centro de decisiones. -->
+  <!-- Identidad Gato Negro. Diseño 2.1 (BL-052, DEC-028): el lenguaje visual
+       del Gato Design System; La Guarida sigue siendo un lanzador personal. -->
   <link rel="icon" type="image/svg+xml" href="assets/brand/gato-negro.svg">
-  <link rel="stylesheet" href="css/styles.css?v=2.0.0">
+  <link rel="stylesheet" href="css/styles.css?v=2.1.0">
   <link rel="stylesheet" href="css/themes/gato.css" id="themeStylesheet">
 </head>
 <body>
 
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
-<!-- CABECERA (como el Centro de decisiones: marca, pestañas, estado y acciones) -->
-<header class="app-header" role="banner">
+<!-- CABECERA: marca, navegación de La Guarida y herramientas -->
+<header class="app-header">
   <div class="app-bar">
     <a class="brand" href="./" aria-label="La Guarida, inicio">
       <img class="brand__logo" src="assets/brand/gato-negro.svg" alt="" width="36" height="36">
@@ -26,19 +26,15 @@
       </span>
     </a>
 
-    <nav class="app-nav" aria-label="Acciones y enlaces">
-      <button id="editModeBtn" class="app-tab" type="button" title="Modo edición">✏️ Editar</button>
-      <button id="addFavoriteBtn" class="app-tab" type="button" title="Agregar favorito">⭐ Favorito</button>
-      <button id="addCategoryBtn" class="app-tab" type="button" title="Agregar categoría">📁 Categoría</button>
-      <span class="app-nav__sep" aria-hidden="true"></span>
-      <a class="app-tab" href="https://wiki-es.guildwars2.com/wiki/P%C3%A1gina_principal" target="_blank" rel="noopener">Wiki GW2</a>
-      <a class="app-tab" href="https://en-forum.guildwars2.com/" target="_blank" rel="noopener">Foros</a>
-      <a class="app-tab" href="https://account.arena.net/applications" target="_blank" rel="noopener">ANet Keys</a>
+    <nav class="app-nav" aria-label="Secciones">
+      <a class="app-tab" href="#inicio" data-nav="inicio" aria-current="true">Inicio</a>
+      <a class="app-tab" href="#seccionFavoritos" data-nav="seccionFavoritos">Favoritos</a>
+      <a class="app-tab" href="#seccionCategorias" data-nav="seccionCategorias">Categorías</a>
+      <a class="app-tab" href="#launcherPanel" data-nav="launcherPanel">Lanzador</a>
+      <a class="app-tab" href="#seccionWidgets" data-nav="seccionWidgets">Widgets</a>
     </nav>
 
-    <div class="app-meta" aria-label="Estado, theme y backup">
-      <span id="factoryPill" aria-live="polite"></span>
-
+    <div class="app-tools">
       <select id="themeSelect" class="theme-select" title="Cambiar tema visual" aria-label="Tema visual">
         <option value="gato">🐈‍⬛ Gato Negro</option>
         <option value="boveda">🏛️ Bóveda</option>
@@ -62,18 +58,40 @@
         <option value="random">🎲 Random</option>
       </select>
 
-      <button id="exportBtn" class="app-btn" type="button" title="Exportar configuración">
-        <img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/155034.png" width="16" height="16" alt="">
-        Backup
-      </button>
-      <button id="importBtn" class="app-btn" type="button" title="Importar configuración">
-        <img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/155033.png" width="16" height="16" alt="">
-        Restaurar
-      </button>
-      <input type="file" id="importFile" accept=".json" style="display:none;">
+      <button id="editModeBtn" class="app-btn" type="button" title="Modo edición">✏️ Editar</button>
+
+      <details class="gn-menu">
+        <summary class="app-btn">＋ Agregar</summary>
+        <div class="gn-menu__panel">
+          <button id="addFavoriteBtn" class="gn-menu__item" type="button">⭐ Favorito</button>
+          <button id="addCategoryBtn" class="gn-menu__item" type="button">📁 Categoría</button>
+        </div>
+      </details>
+
+      <details class="gn-menu">
+        <summary class="app-btn">💾 Backup</summary>
+        <div class="gn-menu__panel">
+          <button id="exportBtn" class="gn-menu__item" type="button">⬇️ Descargar backup</button>
+          <button id="importBtn" class="gn-menu__item" type="button">📂 Restaurar desde archivo</button>
+        </div>
+      </details>
+      <input type="file" id="importFile" accept=".json" hidden>
+
+      <details class="gn-menu gn-menu--end">
+        <summary class="app-btn">🐾 Ecosistema</summary>
+        <div class="gn-menu__panel">
+          <p class="gn-menu__group">Gato Negro</p>
+          <a class="gn-menu__item" href="https://pablosnchz.github.io/gw2-wallet-ligero/" target="_blank" rel="noopener" data-portal="boveda" data-emoji="🐈‍⬛">🐈‍⬛ La Bóveda del Gato Negro</a>
+          <a class="gn-menu__item" href="https://pablosnchz.github.io/gw2-factory-dashboard/" target="_blank" rel="noopener" data-portal="panel" data-emoji="🧭">🧭 Centro de decisiones</a>
+          <p class="gn-menu__group">Guild Wars 2</p>
+          <a class="gn-menu__item" href="https://wiki-es.guildwars2.com/wiki/P%C3%A1gina_principal" target="_blank" rel="noopener" data-portal="wiki" data-emoji="📖" data-label="Wiki GW2 (español)">📖 Wiki GW2</a>
+          <a class="gn-menu__item" href="https://en-forum.guildwars2.com/" target="_blank" rel="noopener" data-portal="foros" data-emoji="💬" data-label="Foros GW2">💬 Foros</a>
+          <a class="gn-menu__item" href="https://account.arena.net/applications" target="_blank" rel="noopener" data-portal="anet" data-emoji="🔑" data-label="ANet Keys (API keys)">🔑 ANet Keys</a>
+        </div>
+      </details>
 
       <!-- Badge Link in Bio: colores oficiales de Gato Negro, fijos (no siguen el theme) -->
-      <a href="https://pablosnchz.github.io/bio/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;border-radius:4px;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;height:26px;">
+      <a class="bio-badge" href="https://pablosnchz.github.io/bio/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;border-radius:4px;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;height:26px;">
         <span style="background-color:#232A3A;color:#F4F6FA;padding:0 10px;font-size:10px;font-weight:600;display:flex;align-items:center;gap:6px;letter-spacing:0.3px;white-space:nowrap;height:100%;">
           <img src="https://raw.githubusercontent.com/PabloSnchz/bio/main/assets/profile.png" alt="Foto" style="width:18px;height:18px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.3);">
           Link in Bio
@@ -87,21 +105,34 @@
 </header>
 
 <main id="contenido" class="app-main">
-  <!-- RESUMEN: saludo, estado de la Factory y mi mensaje (js/shiruvana.js, DEC-027) -->
-  <section class="hero" aria-labelledby="heroTitle">
-    <p class="kicker">La Guarida · <span id="heroDate"></span></p>
-    <h1 id="heroTitle" class="hero__title">Hola, Pablo</h1>
-    <div id="factoryChips" class="hero__chips" aria-live="polite"></div>
-    <div id="shiruvanaVoice" class="hero__voice"></div>
+  <!-- RESUMEN: saludo, fecha, tus números y el portal de Shiruvana (DEC-028) -->
+  <section class="hero" id="inicio" aria-labelledby="heroTitle">
+    <div class="hero__intro">
+      <p class="kicker">La Guarida · <span id="heroDate"></span></p>
+      <h1 id="heroTitle" class="hero__title">Hola, Pablo</h1>
+      <div id="heroBadges" class="hero__badges"></div>
+    </div>
+    <div class="hero__host">
+      <button type="button" id="portalTrigger" class="gn-portal-trigger" aria-haspopup="dialog" aria-keyshortcuts="Control+K /">
+        <img class="gn-avatar-slot gn-portal-trigger__avatar" alt="" width="40" height="40">
+        <span class="gn-portal-trigger__text"><strong>¿A dónde vamos?</strong> <span>Buscá un favorito, un enlace o una app…</span></span>
+        <span class="gn-portal-trigger__keys" aria-hidden="true"><kbd class="gn-kbd">Ctrl</kbd><kbd class="gn-kbd">K</kbd></span>
+      </button>
+      <div id="usualRow" class="gn-usual" hidden>
+        <span class="gn-usual__label">Lo de siempre a esta hora</span>
+        <div id="usualChips" class="gn-usual__chips"></div>
+      </div>
+    </div>
   </section>
 
   <div class="layout-row">
     <!-- WIDGETS -->
-    <section class="col col--widgets" aria-labelledby="tituloWidgets">
-      <div class="section-head">
-        <h2 id="tituloWidgets" class="section-title">Widgets</h2>
-        <p class="section-desc">Reloj, resets, noticias y tus canales.</p>
+    <section class="gn-panel col--widgets" id="seccionWidgets" aria-labelledby="tituloWidgets">
+      <div class="gn-panel__head">
+        <h2 id="tituloWidgets" class="gn-panel__title">Widgets</h2>
+        <span id="widgetCount" class="gn-count"></span>
       </div>
+      <p class="gn-panel__desc">Hora, reinicios, noticias de Tyria y tus canales.</p>
       <aside class="side-panel side-panel--left" id="widgetsLeft">
         <!-- Widgets se renderizan acá -->
       </aside>
@@ -109,39 +140,40 @@
 
     <!-- FAVORITOS Y CATEGORÍAS -->
     <div class="main-content">
-      <section aria-labelledby="tituloFavoritos">
-        <div class="section-head">
-          <h2 id="tituloFavoritos" class="section-title">Favoritos</h2>
-          <p class="section-desc">Tus accesos de un clic. Soltá un enlace acá para agregarlo.</p>
+      <section class="gn-panel" id="seccionFavoritos" aria-labelledby="tituloFavoritos">
+        <div class="gn-panel__head">
+          <h2 id="tituloFavoritos" class="gn-panel__title">Favoritos</h2>
+          <span id="favCount" class="gn-count"></span>
         </div>
+        <p class="gn-panel__desc">Tus accesos de un clic. Soltá un enlace acá para agregarlo; en modo edición, arrastrá para ordenar.</p>
         <div class="favorites-grid" id="favoritesGrid"></div>
       </section>
 
-      <section aria-labelledby="tituloCategorias">
-        <div class="section-head">
-          <h2 id="tituloCategorias" class="section-title">Categorías</h2>
-          <p class="section-desc">Enlaces agrupados. En modo edición podés ordenarlos arrastrando.</p>
+      <section class="gn-panel" id="seccionCategorias" aria-labelledby="tituloCategorias">
+        <div class="gn-panel__head">
+          <h2 id="tituloCategorias" class="gn-panel__title">Categorías</h2>
+          <span id="catCount" class="gn-count"></span>
         </div>
+        <p class="gn-panel__desc">Enlaces agrupados por tema.</p>
         <div class="categories-grid" id="categoriesGrid"></div>
       </section>
     </div><!-- /main-content -->
 
     <!-- LANZADOR -->
-    <section class="col col--launcher" id="launcherPanel" aria-labelledby="tituloLanzador">
-      <div class="section-head">
-        <h2 id="tituloLanzador" class="section-title">Lanzador</h2>
-        <p class="section-desc">Juegos y apps de la PC.</p>
+    <section class="gn-panel col--launcher" id="launcherPanel" aria-labelledby="tituloLanzador">
+      <div class="gn-panel__head">
+        <h2 id="tituloLanzador" class="gn-panel__title">Lanzador</h2>
+        <span id="launcherCount" class="gn-count"></span>
       </div>
-      <div class="launcher-card">
-        <div class="launcher-sections">
-          <div class="launcher-section">
-            <h3 class="launcher-section-title">Juegos</h3>
-            <div class="launcher-grid" id="launcherGamesGrid"></div>
-          </div>
-          <div class="launcher-section">
-            <h3 class="launcher-section-title">Apps</h3>
-            <div class="launcher-grid" id="launcherAppsGrid"></div>
-          </div>
+      <p class="gn-panel__desc">Abrí juegos y programas de tu PC.</p>
+      <div class="launcher-sections">
+        <div class="launcher-section">
+          <h3 class="launcher-section-title">Juegos</h3>
+          <div class="launcher-grid" id="launcherGamesGrid"></div>
+        </div>
+        <div class="launcher-section">
+          <h3 class="launcher-section-title">Apps</h3>
+          <div class="launcher-grid" id="launcherAppsGrid"></div>
         </div>
       </div>
     </section>
@@ -199,6 +231,7 @@
 <script src="js/drag-drop.js"></script>
 <script src="js/modal.js"></script>
 <script src="js/app.js"></script>
-<script src="js/shiruvana.js?v=1.0.0"></script>
+<script src="js/shiruvana.js?v=2.0.0"></script>
+<script src="js/ui.js?v=1.0.0"></script>
 </body>
 </html>
