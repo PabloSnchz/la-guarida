@@ -1,6 +1,6 @@
 # 🐈‍⬛ La Guarida
 
-Página de inicio personal del Gato Negro — dashboard híbrido que combina links web, lanzador de aplicaciones locales, widgets en tiempo real, 19 temas visuales y persistencia local. Diseñada para monitores ultrawide, y desde la versión 2.0 con el mismo lenguaje visual que el Centro de decisiones de la Factory.
+Página de inicio personal del Gato Negro — lanzador híbrido que combina links web, aplicaciones y juegos locales, widgets en tiempo real, 19 temas visuales y persistencia local. Diseñada para monitores ultrawide. Desde la versión 2.1 comparte con el Centro de decisiones el lenguaje visual del Gato Design System, pero sigue siendo solo un lanzador: no muestra datos de la Factory.
 
 ## ✨ Características
 
@@ -8,17 +8,16 @@ Página de inicio personal del Gato Negro — dashboard híbrido que combina lin
 
 - ⭐ Favoritos web con acceso rápido
 - 📁 Categorías personalizables
-- 🚀 Lanzador de aplicaciones y juegos locales (2 columnas)
+- 🚀 Lanzador de aplicaciones y juegos locales
 - 🔀 Drag and drop para reordenar
 - 🦊 Arrastrar desde Firefox para crear links
 - 🌐 Abrir links en Chrome obligatoriamente
 
-### Resumen de la Factory con Shiruvana
+### Shiruvana, tu anfitriona
 
-- Saludo del momento del día y la fecha
-- Estados en chips: decisiones, acciones tuyas, validaciones y si la Factory está trabajando
-- Un mensaje de Shiruvana con lo que la Factory te pide (hasta 3) y en qué está trabajando
-- Enlace directo al [Centro de decisiones](https://pablosnchz.github.io/gw2-factory-dashboard/)
+- 🔎 **Portal «¿A dónde vamos?»**: barra en el resumen; también se abre con **Ctrl+K** o **/**. Busca en favoritos, enlaces, apps, juegos, atajos (Wiki, Foros, ANet Keys, La Bóveda, Centro de decisiones) y acciones (theme, modo edición, agregar, backup). Encuentra aunque escribas con errores o sin acentos; ↑ ↓ para moverse, Enter abre, Esc cierra.
+- ⏱️ **Lo de siempre**: hasta 5 accesos que más abrís en esta franja del día (mañana, tarde o noche). Aparece con 10 aperturas o más.
+- 🧹 **Consejos de orden**: un aviso abajo a la derecha, como mucho uno por día, sobre enlaces repetidos, categorías vacías o un backup viejo. Cada uno trae su botón para resolverlo y «Ahora no» lo silencia 30 días. Nunca aparece mientras editás.
 
 ### Sistema de temas
 
@@ -66,48 +65,47 @@ Cada tema incluye:
 
 🔗 [Ver en vivo](https://pablosnchz.github.io/la-guarida/)
 
-## 🎨 Diseño 2.0 (Gato Design System)
+## 🎨 Diseño 2.1 (Gato Design System)
 
-| Pieza | Como en el Centro de decisiones |
-|-------|--------------------------------|
-| Cabecera | Marca a la izquierda, pestañas de acciones y enlaces al centro, estado de la Factory, theme y backup a la derecha |
-| Resumen | Rótulo, saludo grande, chips de estado y el mensaje de Shiruvana |
-| Secciones | Título y una línea que explica para qué sirve |
-| Tarjetas | Fondo de panel, borde fino, esquinas redondeadas; el borde se ilumina al pasar el mouse |
-| Estados | Chips con ícono y texto: el color acompaña, nunca informa solo |
-| Accesibilidad | Foco visible, objetivos de 44 px en la cabecera, "Saltar al contenido", movimiento reducido |
+| Pieza | Detalle |
+|-------|---------|
+| Cabecera | Marca a la izquierda; navegación de La Guarida (Inicio, Favoritos, Categorías, Lanzador, Widgets); a la derecha theme, Editar, «＋ Agregar», «Backup», «Ecosistema» y la bio |
+| Resumen | Saludo, fecha y badges con tus números (favoritos, categorías, enlaces, apps y juegos) junto al portal de Shiruvana |
+| Paneles | Título, contador y una línea que explica para qué sirve, como en el Centro de decisiones |
+| Tarjetas | Borde fino y brillo arcano al pasar el mouse |
+| Accesibilidad | Foco visible, «Saltar al contenido», todo usable con teclado, textos secundarios con contraste 4,5:1 también en temas claros, movimiento reducido |
 
-Los colores salen siempre de las variables del tema activo, así que los 19 temas siguen funcionando. Con el tema Gato Negro, La Guarida queda igual al panel.
+Los colores salen siempre de las variables del tema activo, así que los 19 temas siguen funcionando. Con el tema Gato Negro, La Guarida queda igual al panel. Menús, portal y avisos son opacos aunque el tema use paneles translúcidos.
 
-La grilla se adapta: en pantallas anchas, widgets | favoritos y categorías | lanzador; debajo de 1400 px, favoritos y categorías arriba y widgets y lanzador abajo; en el celular, todo en una columna. Ya no se esconden widgets ni lanzador en pantallas chicas.
+La grilla se adapta: en pantallas anchas, widgets | favoritos y categorías | lanzador; debajo de 1400 px, favoritos y categorías arriba y widgets y lanzador abajo; en el celular, todo en una columna.
 
 ## 🐈‍⬛ Shiruvana en La Guarida
 
-Shiruvana es la voz de la Factory. En La Guarida aparece en **un solo lugar**: el resumen de arriba, porque es la página con la que empieza el día.
+En el Centro de decisiones Shiruvana es la operadora: informa y pide decisiones. En La Guarida es la **anfitriona**: te ayuda a llegar rápido a lo tuyo y a mantenerlo ordenado (DEC-028).
 
 | Regla | Detalle |
 |-------|---------|
-| Dónde | Solo en el resumen. Nunca en favoritos, categorías, lanzador ni widgets |
-| Qué dice | Lo que la Factory te pide (acciones, validaciones, decisiones) y en qué está trabajando |
-| Fuente | `ai-memory/status.md` de gw2-factory-dev, el mismo archivo que lee el Centro de decisiones |
-| Frecuencia | Copia de 5 minutos; se actualiza sola y con el botón "Actualizar" |
-| Sin conexión | Muestra la última copia y lo dice; sin copia, lo explica y deja el enlace al panel |
-| Seguridad | Todo texto de la memoria se escapa antes de mostrarse |
+| Dónde | Su avatar está fijo en un solo lugar: la barra del portal. El consejo de orden aparece abajo a la derecha, como mucho uno por día |
+| Nunca | Datos de la Factory (decisiones, validaciones, backlog, estado, tareas). Tampoco en favoritos, categorías, lanzador, widgets ni en el modal |
+| Cómo abre | Hace clic en el elemento real de la pantalla: respeta Chrome forzado, el protocolo `launch:` y el modo edición |
+| Red | Ninguna: busca solo en tu Guarida |
+| Datos | `guarida:uso:v1` (qué abrís y en qué franja) y `guarida:shiruvana:v1` (consejos silenciados y último backup), solo en este navegador. No entran en el backup |
 
 ## 📁 Estructura
 
 | Archivo | Descripción |
 |---------|-------------|
 | `index.html` | Cabecera, resumen y grilla de widgets, favoritos, categorías y lanzador |
-| `css/styles.css` | Diseño 2.0: estructura y componentes sobre las variables del tema |
+| `css/styles.css` | Diseño 2.1: estructura y componentes sobre las variables del tema |
 | `css/themes/` | 19 archivos CSS con variables por tema |
 | `js/data.js` | Estado, persistencia, favicons, defaults |
 | `js/widgets.js` | Widgets: reloj, resets, noticias, Twitch, YouTube |
 | `js/drag-drop.js` | Drag and drop interno + externo |
 | `js/modal.js` | Modal de edición universal |
 | `js/app.js` | Init, render, lanzador, selector de temas |
-| `js/shiruvana.js` | Resumen de la Factory y mensaje de Shiruvana |
-| `tests/shiruvana.test.cjs` | Tests del resumen: `node --test tests/*.test.cjs` |
+| `js/ui.js` | Saludo, badges, contadores de paneles, menús y navegación por secciones |
+| `js/shiruvana.js` | Shiruvana anfitriona: portal, «Lo de siempre» y consejos de orden |
+| `tests/*.test.cjs` | Tests: `node --test tests/*.test.cjs` |
 | `docs/chrome-open.bat` | Backup del script para Chrome-forced |
 
 ## 🎨 Sistema de temas
@@ -148,7 +146,7 @@ Shiruvana es la voz de la Factory. En La Guarida aparece en **un solo lugar**: e
 | Paso | Acción |
 |------|--------|
 | 1 | Crear `css/themes/nuevo-tema.css` |
-| 2 | Agregar la opción al select en `index.html` |
+| 2 | Agregar la opción al select en `index.html` (el portal la toma sola) |
 | 3 | Agregar al array de random en `app.js` |
 
 ## 🖥️ Requisitos del sistema (Windows)
@@ -266,16 +264,15 @@ Windows Registry Editor Version 5.00
 | Twitch Helix | Seguidores + estado en vivo | Client ID + Access Token |
 | YouTube Data v3 | Suscriptores + último video | API Key |
 | GW2 RSS | Noticias oficiales | No requiere |
-| GitHub (raw) | Estado de la Factory para el resumen | No requiere |
 
 ## 💾 Persistencia
 
 - localStorage con guardado automático
-- Backup y Restaurar JSON en el header
+- Backup y Restaurar JSON desde el menú «Backup»
 - Migración automática de datos viejos
 - Tema elegido guardado en localStorage
 - Los defaults se cargan solo si no hay datos previos
-- El resumen de la Factory guarda una copia de 5 minutos (`guarida:factory:v1`)
+- Shiruvana guarda solo en este navegador `guarida:uso:v1` y `guarida:shiruvana:v1`; la copia vieja de la Factory (`guarida:factory:v1`) se borra sola
 
 ## 🐈‍⬛ Ecosistema
 
