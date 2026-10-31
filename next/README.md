@@ -13,10 +13,12 @@ Acá se arma el restyle de La Guarida sin tocar la de todos los días. Propuesta
 | RG-2 | Cabecera de dos filas (`next/js/header.js` 1.0.0 + `next/css/header.css`): relojes con íconos de La Bóveda, temporada de la Cámara del Brujo desde `/v2/wizardsvault` (una vez por día, clave `guarida:temporada:v1`, solo `{ end, t }`), consejo de Shiruvana como franja, «⋯» con backup (punto dorado a los 30 días), Link in Bio y Ecosistema; «Lo de siempre» pasa a Favoritos; sin resumen grande ni badges | Hecho 2026-10-31 |
 | RG-3 | Tarjetas (`next/css/cards.css` 1.0.0, solo CSS): línea de color arriba de cada panel; Favoritos ámbar (ícono en baldosa), Categorías violeta (borde izquierdo, título violeta claro solo en el theme oficial), Lanzador turquesa (ícono en baldosa); los colores fijos nunca como texto en otros themes; estado vacío con el gato robot `assets/brand/gato-en-construccion-256.webp` | Hecho 2026-10-31 |
 | RG-3b | Mi cara nueva (`next/js/header.js` 1.1.0): portal cerrado `hola`, portal abierto `pensando`, consejo `explica` (u `ojo` si es del backup), desde `assets/brand/shiruvana/*-cara-128.webp`; si una imagen no carga, vuelve el avatar anterior. `shiruvana.js` no cambia | Hecho 2026-10-31 |
-| RG-4 | Widgets: panel «Agregar un widget», cuenta regresiva con selector de fecha | Pendiente |
+| RG-4 | Widgets (`next/js/widgets-ui.js` 1.0.0 + `next/css/widgets.css`, `js/widgets.js` sin cambios): panel «Agregar un widget» con ícono, nombre, para qué sirve y cuántos tenés (reemplaza el `prompt()` con números); cuenta regresiva con título y selector de fecha (reemplaza dos `prompt()` y un `alert()`), cada contador se edita a sí mismo; la fecha se muestra en hora local (antes en Argentina mostraba el día anterior); se oculta la fila «Season» del widget de reinicios (fija en 2026-09-15; la temporada real está en la cabecera). Mismo formato de datos (`YYYY-MM-DD`) | Hecho 2026-10-31 |
 | RG-5 | Editor plegado, avisos y confirmación con «Deshacer»; revisión en 19 themes, teclado y celular | Pendiente |
 | RG-6 | `next/` reemplaza a la raíz | Pendiente |
 
 Desde RG-2, `next/index.html` se edita a mano: ya no es una copia de la raíz. Lo único que la raíz puede perder en la vista previa es lo que figura en `QUITADOS` de `tests/next-preview.test.cjs` (hoy: `heroBadges`).
 
-Tests: `node --test tests/*.test.cjs` (`kit.test.cjs`, `next-preview.test.cjs`, `header.test.cjs` y `cards.test.cjs` son de esta etapa).
+Tests: `node --test tests/*.test.cjs` (`kit.test.cjs`, `next-preview.test.cjs`, `header.test.cjs`, `cards.test.cjs` y `widgets-ui.test.cjs` son de esta etapa).
+
+Pendiente fuera del restyle (anotado en RG-4): `js/widgets.js` tiene escritos el token de Twitch y la clave de YouTube en un repositorio público, y cada `renderAll()` arranca otro reloj de un segundo sin frenar el anterior. No se tocan en la vista previa.

@@ -41,11 +41,14 @@ test('misma estructura que La Guarida de siempre (todos los id salvo los quitado
   assert.deepEqual(dup, [], 'ningún id repetido');
 });
 
-test('carga los mismos módulos, en el mismo orden, después del kit y la cabecera', () => {
+// Los módulos propios de next/, en orden: van antes que los de la raíz.
+const PROPIOS = ['next/js/preview.js', 'next/js/kit.js', 'next/js/header.js', 'next/js/widgets-ui.js'];
+
+test('carga los mismos módulos, en el mismo orden, después de los de next/', () => {
   const r = scripts(rootHtml);
   const n = scripts(nextHtml);
-  assert.deepEqual(n.slice(0, 3), ['next/js/preview.js', 'next/js/kit.js', 'next/js/header.js']);
-  assert.deepEqual(n.slice(3), r);
+  assert.deepEqual(n.slice(0, PROPIOS.length), PROPIOS);
+  assert.deepEqual(n.slice(PROPIOS.length), r);
   assert.ok(nextHtml.includes('href="next/css/kit.css'), 'carga los estilos del kit');
   assert.ok(nextHtml.indexOf('next/css/header.css') > nextHtml.indexOf('css/styles.css'), 'header.css va después de styles.css');
 });

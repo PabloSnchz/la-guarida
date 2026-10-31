@@ -48,8 +48,7 @@ test('estado vacío: el gato «en construcción» existe y la ruta sale de next/
   assert.ok(css.includes(':not(:has(.fav-card))') && css.includes(':not(:has(.category-card))'), 'aparece solo sin tarjetas');
 });
 
-test('solo CSS: app.js no se toca y next/ no agrega scripts nuevos en RG-3', () => {
+test('las tarjetas son solo CSS: ningún script de next/ trata de tarjetas', () => {
   const scripts = [...html.matchAll(/<script src="([^"?]+)/g)].map(m => m[1]);
-  assert.deepEqual(scripts.slice(0, 3), ['next/js/preview.js', 'next/js/kit.js', 'next/js/header.js']);
-  assert.equal(scripts.filter(s => s.startsWith('next/')).length, 3);
+  assert.ok(!scripts.some(s => /card/i.test(s)));
 });
