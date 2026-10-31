@@ -11,11 +11,11 @@ Acá se arma el restyle de La Guarida sin tocar la de todos los días. Propuesta
 |------|-----|--------|
 | RG-1 | Vista previa + `next/js/kit.js` 1.0.0 (reloj común y avisos, todavía sin usar) + `next/css/kit.css` + tests | Hecho 2026-10-31 |
 | RG-2 | Cabecera de dos filas (`next/js/header.js` 1.0.0 + `next/css/header.css`): relojes con íconos de La Bóveda, temporada de la Cámara del Brujo desde `/v2/wizardsvault` (una vez por día, clave `guarida:temporada:v1`, solo `{ end, t }`), consejo de Shiruvana como franja, «⋯» con backup (punto dorado a los 30 días), Link in Bio y Ecosistema; «Lo de siempre» pasa a Favoritos; sin resumen grande ni badges | Hecho 2026-10-31 |
-| RG-3 | Tarjetas de Favoritos (con «Lo de siempre»), Categorías y Lanzador, un color por sección | Pendiente |
+| RG-3 | Tarjetas (`next/css/cards.css` 1.0.0, solo CSS): línea de color arriba de cada panel; Favoritos ámbar (ícono en baldosa), Categorías violeta (borde izquierdo, título violeta claro solo en el theme oficial), Lanzador turquesa (ícono en baldosa); los colores fijos nunca como texto en otros themes; estado vacío con el gato robot `assets/brand/gato-en-construccion-256.webp` | Hecho 2026-10-31 |
 | RG-4 | Widgets: panel «Agregar un widget», cuenta regresiva con selector de fecha | Pendiente |
 | RG-5 | Editor plegado, avisos y confirmación con «Deshacer»; revisión en 19 themes, teclado y celular | Pendiente |
 | RG-6 | `next/` reemplaza a la raíz | Pendiente |
 
 Desde RG-2, `next/index.html` se edita a mano: ya no es una copia de la raíz. Lo único que la raíz puede perder en la vista previa es lo que figura en `QUITADOS` de `tests/next-preview.test.cjs` (hoy: `heroBadges`).
 
-Tests: `node --test tests/*.test.cjs` (`kit.test.cjs`, `next-preview.test.cjs` y `header.test.cjs` son de esta etapa).
+Tests: `node --test tests/*.test.cjs` (`kit.test.cjs`, `next-preview.test.cjs`, `header.test.cjs` y `cards.test.cjs` son de esta etapa).
