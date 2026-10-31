@@ -65,6 +65,36 @@ test('mi cara según el momento, y cada imagen existe en el repo', () => {
     assert.ok(fs.existsSync(path.join(__dirname, '..', s)), s + ' existe');
 });
 
+test('RG-7: las siete poses existen en el repo, cara y retrato', () => {
+  const fs = require('fs');
+  const path = require('path');
+  assert.deepEqual(H.POSES, ['hola', 'pensando', 'explica', 'ojo', 'festeja', 'guino', 'con-gato']);
+  for (const p of H.POSES) for (const s of [H.caraSrc(p), H.retratoSrc(p)])
+    assert.ok(fs.existsSync(path.join(__dirname, '..', s)), s + ' existe');
+});
+
+test('RG-7: el portal cambia de pose según lo que encuentro', () => {
+  assert.equal(H.portalPose('', 0), 'con-gato');
+  assert.equal(H.portalPose('   ', 5), 'con-gato', 'solo espacios: todavía no buscás nada');
+  assert.equal(H.portalPose('wiki', 3), 'pensando');
+  assert.equal(H.portalPose('zzzz', 0), 'explica');
+});
+
+test('RG-7: cada aviso con su cara, y las siete se usan en algún momento', () => {
+  assert.equal(H.avisoPose('info', 'Eliminé el favorito.'), 'guino');
+  assert.equal(H.avisoPose('ok', 'Listo, lo volví a poner.'), 'festeja');
+  assert.equal(H.avisoPose('ok', 'Datos importados correctamente'), 'festeja');
+  assert.equal(H.avisoPose('warn', 'El nombre es obligatorio'), 'ojo');
+  assert.equal(H.avisoPose('error', 'El archivo no tiene el formato correcto'), 'ojo');
+  assert.equal(H.avisoPose('info', 'Extrayendo ícono...'), 'explica');
+  const usadas = new Set([
+    'hola', // barra del portal cerrado (avatarSrc('trigger'))
+    H.portalPose('', 0), H.portalPose('a', 1), H.portalPose('a', 0),
+    H.avisoPose('info', 'Eliminé'), H.avisoPose('ok', ''), H.avisoPose('warn', '')
+  ]);
+  assert.deepEqual([...usadas].sort(), [...H.POSES].sort());
+});
+
 test('los íconos vienen de La Bóveda publicada', () => {
   for (const k of ['local', 'daily', 'weekly'])
     assert.ok(H.ICONS[k].startsWith('https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/'), k);
