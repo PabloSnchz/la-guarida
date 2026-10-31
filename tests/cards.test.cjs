@@ -1,4 +1,4 @@
-// Tests de las tarjetas (next/css/cards.css, RG-3).
+// Tests de las tarjetas (css/cards.css, RG-3).
 // Correr: node --test tests/*.test.cjs
 'use strict';
 const test = require('node:test');
@@ -8,15 +8,15 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8');
-const css = read('next/css/cards.css');
-const html = read('next/index.html');
-const header = read('next/css/header.css');
+const css = read('css/cards.css');
+const html = read('index.html');
+const header = read('css/header.css');
 // Reglas sin comentarios: [selector, cuerpo]
 const rules = [...css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(m => [m[1].trim(), m[2]]);
 
 test('se carga después de styles.css y header.css (de donde salen los colores)', () => {
-  const i = html.indexOf('next/css/cards.css');
-  assert.ok(i > html.indexOf('next/css/header.css') && i > html.indexOf('css/styles.css'));
+  const i = html.indexOf('css/cards.css');
+  assert.ok(i > html.indexOf('css/header.css') && i > html.indexOf('css/styles.css'));
   for (const v of ['--gh-fav', '--gh-cat', '--gh-lan']) assert.ok(header.includes(v + ':'), v + ' definido en header.css');
 });
 
@@ -39,16 +39,16 @@ test('los colores fijos nunca son color de texto, salvo en el theme oficial', ()
   }
 });
 
-test('estado vacío: el gato «en construcción» existe y la ruta sale de next/css/', () => {
+test('estado vacío: el gato «en construcción» existe y la ruta sale de css/', () => {
   const m = css.match(/url\("([^"]+)"\)/);
   assert.ok(m, 'tiene imagen');
-  const file = path.normalize(path.join(ROOT, 'next/css', m[1]));
+  const file = path.normalize(path.join(ROOT, 'css', m[1]));
   assert.equal(path.relative(ROOT, file).split(path.sep).join('/'), 'assets/brand/gato-en-construccion-256.webp');
   assert.ok(fs.existsSync(file), 'el archivo está en el repo');
   assert.ok(css.includes(':not(:has(.fav-card))') && css.includes(':not(:has(.category-card))'), 'aparece solo sin tarjetas');
 });
 
-test('las tarjetas son solo CSS: ningún script de next/ trata de tarjetas', () => {
+test('las tarjetas son solo CSS: ningún script trata de tarjetas', () => {
   const scripts = [...html.matchAll(/<script src="([^"?]+)/g)].map(m => m[1]);
   assert.ok(!scripts.some(s => /card/i.test(s)));
 });

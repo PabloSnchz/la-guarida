@@ -1,9 +1,9 @@
-// Tests de la cabecera compacta (next/js/header.js, RG-2).
+// Tests de la cabecera compacta (js/header.js, RG-2).
 // Correr: node --test tests/*.test.cjs
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const H = require('../next/js/header.js');
+const H = require('../js/header.js');
 
 const DIA = 24 * 60 * 60 * 1000;
 const NOW = Date.UTC(2026, 9, 31, 18, 0); // sábado 31/10/2026 18:00 UTC

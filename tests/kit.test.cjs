@@ -1,11 +1,11 @@
-// Tests de next/js/kit.js 1.0.0 — reloj común y avisos de La Guarida (RG-1).
+// Tests de js/kit.js 1.0.0 — reloj común y avisos de La Guarida (RG-1).
 // Correr: node --test tests/*.test.cjs
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const K = require('../next/js/kit.js');
+const K = require('../js/kit.js');
 
 const T = s => Date.parse(s);
 const MIN = 60000, H = 60 * MIN, D = 24 * H;
@@ -69,6 +69,6 @@ test('reloj en HTML: escapa y marca el dorado', () => {
 });
 
 test('kit.js no usa las ventanitas del navegador ni la red', () => {
-  const src = fs.readFileSync(path.join(__dirname, '../next/js/kit.js'), 'utf8').replace(/^\s*(\/\/|\/?\*).*$/gm, '');
+  const src = fs.readFileSync(path.join(__dirname, '../js/kit.js'), 'utf8').replace(/^\s*(\/\/|\/?\*).*$/gm, '');
   assert.equal(/\balert\(|\bprompt\(|window\.confirm|root\.confirm|fetch\(|XMLHttpRequest|localStorage/.test(src), false);
 });

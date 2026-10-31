@@ -1,11 +1,11 @@
-// Tests del editor, los avisos y «Deshacer» (next/js/editor.js, RG-5).
+// Tests del editor, los avisos y «Deshacer» (js/editor.js, RG-5).
 // Correr: node --test tests/*.test.cjs
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const E = require('../next/js/editor.js');
+const E = require('../js/editor.js');
 
 const ROOT = path.join(__dirname, '..');
 const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8');
@@ -60,17 +60,17 @@ test('«Deshacer» vuelve exactamente a como estaba, sobre el mismo objeto', () 
 
 test('Deshacer dura 10 s y un guardado posterior lo cancela', () => {
   assert.equal(E.DESHACER_MS, 10000);
-  const src = read('next/js/editor.js');
+  const src = read('js/editor.js');
   assert.ok(/if \(!restaurando\) cancelarDeshacer\(\)/.test(src), 'cualquier otro guardado cancela el Deshacer pendiente');
   assert.ok(/confirmOriginal\.apply/.test(src), 'las preguntas que no son de borrado siguen con confirm()');
 });
 
 test('editor plegado: mismos id, lo opcional dentro de «Ícono y emoji»', () => {
-  const html = read('next/index.html');
+  const html = read('index.html');
   const mas = html.slice(html.indexOf('<details class="ge-more">'), html.indexOf('</details>', html.indexOf('<details class="ge-more">')));
   for (const id of ['modalEmoji', 'modalIconUrl', 'modalAutoDetectFaviconBtn', 'modalDownloadFaviconBtn', 'modalExtractIconField'])
     assert.ok(mas.includes('id="' + id + '"'), '#' + id + ' plegado');
   for (const id of ['modalName', 'modalUrl', 'modalCommand', 'modalOpenChrome', 'modalSave'])
     assert.ok(!mas.includes('id="' + id + '"') && html.includes('id="' + id + '"'), '#' + id + ' a la vista');
-  assert.ok(html.indexOf('next/js/editor.js') < html.indexOf('js/data.js'), 'editor.js antes que data.js');
+  assert.ok(html.indexOf('js/editor.js') < html.indexOf('js/data.js'), 'editor.js antes que data.js');
 });

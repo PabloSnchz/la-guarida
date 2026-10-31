@@ -1,11 +1,11 @@
-// Tests de los widgets sin ventanitas del navegador (next/js/widgets-ui.js, RG-4).
+// Tests de los widgets sin ventanitas del navegador (js/widgets-ui.js, RG-4).
 // Correr: node --test tests/*.test.cjs
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const W = require('../next/js/widgets-ui.js');
+const W = require('../js/widgets-ui.js');
 
 const TYPES = { clock: { label: 'Reloj', icon: 'i1' }, counter: { label: 'Contador', icon: 'i2' }, notes: { label: 'Notas', icon: 'i3' } };
 
@@ -63,15 +63,15 @@ test('la fecha del contador es la del día que elegiste, en hora local', () => {
 });
 
 test('sin ventanitas del navegador y sin credenciales en el código nuevo', () => {
-  const src = fs.readFileSync(path.join(__dirname, '../next/js/widgets-ui.js'), 'utf8').replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '');
+  const src = fs.readFileSync(path.join(__dirname, '../js/widgets-ui.js'), 'utf8').replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '');
   assert.ok(!/\b(prompt|alert|confirm)\s*\(/.test(src), 'no usa prompt/alert/confirm');
   assert.ok(!/apiKey|accessToken|clientId|AIza/.test(src), 'no copia claves de widgets.js');
   assert.ok(src.includes("addEventListener('click'") && /}, true\);/.test(src), 'escucha en captura, antes que widgets.js');
 });
 
 test('la fila de temporada del widget queda oculta (la cabecera ya la muestra bien)', () => {
-  const css = fs.readFileSync(path.join(__dirname, '../next/css/widgets.css'), 'utf8');
+  const css = fs.readFileSync(path.join(__dirname, '../css/widgets.css'), 'utf8');
   assert.ok(css.includes('.widget--resets .widget-reset-row:nth-child(3) { display: none; }'));
-  const html = fs.readFileSync(path.join(__dirname, '../next/index.html'), 'utf8');
-  assert.ok(html.indexOf('next/css/widgets.css') > html.indexOf('css/styles.css'));
+  const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
+  assert.ok(html.indexOf('css/widgets.css') > html.indexOf('css/styles.css'));
 });
