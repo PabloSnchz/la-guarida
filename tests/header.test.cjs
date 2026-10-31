@@ -53,6 +53,18 @@ test('relojes: local, diario y semanal con ícono; temporada solo si sigue abier
   assert.ok(!H.clocksHTML(NOW, NOW - 1000).includes('ghClk-season'), 'temporada terminada: no se muestra');
 });
 
+test('mi cara según el momento, y cada imagen existe en el repo', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const P = 'assets/brand/shiruvana/shiruvana-';
+  assert.equal(H.avatarSrc('trigger'), P + 'hola-cara-128.webp');
+  assert.equal(H.avatarSrc('portal'), P + 'pensando-cara-128.webp');
+  assert.equal(H.avatarSrc('consejo', 'La categoría «X» está vacía.'), P + 'explica-cara-128.webp');
+  assert.equal(H.avatarSrc('consejo', 'Tu último backup es de hace 40 días. Hacer backup'), P + 'ojo-cara-128.webp');
+  for (const s of [H.avatarSrc('trigger'), H.avatarSrc('portal'), H.avatarSrc('consejo', ''), H.avatarSrc('consejo', 'backup')])
+    assert.ok(fs.existsSync(path.join(__dirname, '..', s)), s + ' existe');
+});
+
 test('los íconos vienen de La Bóveda publicada', () => {
   for (const k of ['local', 'daily', 'weekly'])
     assert.ok(H.ICONS[k].startsWith('https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/'), k);

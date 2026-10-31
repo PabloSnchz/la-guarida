@@ -1,5 +1,8 @@
 /*!
- * next/js/header.js — Cabecera compacta de La Guarida (1.0.0, 2026-10-31, RG-2)
+ * next/js/header.js — Cabecera compacta de La Guarida (1.1.0, 2026-10-31, RG-2 + RG-3b)
+ *
+ * 1.1.0 (RG-3b): mi cara nueva (assets/brand/shiruvana/*-cara-128.webp) en el portal
+ * cerrado (hola), el portal abierto (pensando) y el consejo (explica; ojo si es del backup).
  *
  * RG-0b, aprobada por Pablo: dos filas finas (marca, pestañas y herramientas;
  * saludo, portal y relojes), mi consejo del día como franja al pie de la cabecera
@@ -16,7 +19,7 @@
 (function (root) {
   'use strict';
 
-  var VERSION = '1.0.0';
+  var VERSION = '1.1.0';
   var DIA = 24 * 60 * 60 * 1000;
   var BACKUP_DIAS = 30;
   var SEASON_KEY = 'guarida:temporada:v1';
@@ -59,6 +62,15 @@
     return 'Último backup: hace ' + d + ' días';
   }
 
+  // Mi cara según el momento (RG-3b, imágenes aprobadas por Pablo el 2026-10-31).
+  // portal cerrado: saludo; portal abierto: pensando; consejo: explicando, o «ojo» si es del backup.
+  var CARA = 'assets/brand/shiruvana/shiruvana-';
+  function avatarSrc(donde, texto) {
+    if (donde === 'consejo') return CARA + (/backup/i.test(texto || '') ? 'ojo' : 'explica') + '-cara-128.webp';
+    if (donde === 'portal') return CARA + 'pensando-cara-128.webp';
+    return CARA + 'hola-cara-128.webp';
+  }
+
   // Relojes de la cabecera en HTML. La temporada solo si todavía no terminó.
   function clocksHTML(now, season) {
     var list = K.clocks(now, season && season > now ? { seasonEnd: season } : {});
@@ -69,7 +81,8 @@
 
   var api = {
     VERSION: VERSION, SEASON_KEY: SEASON_KEY, SEASON_URL: SEASON_URL, ICONS: ICONS,
-    seasonEnd: seasonEnd, seasonFresh: seasonFresh, backupDue: backupDue, backupText: backupText, clocksHTML: clocksHTML
+    seasonEnd: seasonEnd, seasonFresh: seasonFresh, backupDue: backupDue, backupText: backupText, clocksHTML: clocksHTML,
+    avatarSrc: avatarSrc
   };
   if (typeof module !== 'undefined' && module.exports) { module.exports = api; }
   if (!root || !root.document) return;
@@ -114,16 +127,37 @@
     if (slot && node && node.classList && node.classList.contains('gn-toast') && node.parentNode !== slot) slot.appendChild(node);
   }
 
+  // Cambia mi avatar viejo por la cara nueva; si la imagen no carga, vuelve el de antes.
+  function ponerCara(img, src) {
+    if (!img || img.getAttribute('data-cara') === src) return;
+    var antes = img.src;
+    img.onerror = function () { img.onerror = null; if (antes) img.src = antes; };
+    img.setAttribute('data-cara', src);
+    img.src = src;
+  }
+
+  function caras(node) {
+    if (!node || !node.querySelector) return;
+    var t = node.classList && node.classList.contains('gn-toast') ? node : null;
+    if (t) ponerCara(t.querySelector('.gn-toast__avatar'), avatarSrc('consejo', t.textContent));
+    ponerCara(node.querySelector('.gn-portal__avatar'), avatarSrc('portal'));
+  }
+
+  function alAgregar(node) { moverConsejo(node); caras(node); }
+
   function init() {
     pintarRelojes();
     cargarTemporada();
     pintarBackup();
     setInterval(pintarRelojes, 30000);
 
-    Array.prototype.forEach.call(doc.querySelectorAll('.gn-toast'), moverConsejo);
+    // shiruvana.js pone su avatar en su propio init, que corre después de este.
+    setTimeout(function () { ponerCara($('#portalTrigger .gn-avatar-slot'), avatarSrc('trigger')); }, 0);
+
+    Array.prototype.forEach.call(doc.querySelectorAll('.gn-toast, .gn-portal'), alAgregar);
     if (root.MutationObserver) {
       new root.MutationObserver(function (list) {
-        list.forEach(function (m) { Array.prototype.forEach.call(m.addedNodes, moverConsejo); });
+        list.forEach(function (m) { Array.prototype.forEach.call(m.addedNodes, alAgregar); });
       }).observe(doc.body, { childList: true });
     }
 
