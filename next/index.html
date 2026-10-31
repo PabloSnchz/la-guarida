@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <!-- Vista previa del restyle (RG-2 cabecera, RG-3 tarjetas, RG-4 widgets). <base> hace que css/, js/, assets/ y los themes
+  <!-- Vista previa del restyle (RG-2 cabecera, RG-3 tarjetas, RG-4 widgets, RG-5 editor). <base> hace que css/, js/, assets/ y los themes
        sean los de La Guarida de siempre; lo nuevo vive en next/. Se borra en RG-6. -->
   <base href="../">
   <meta name="robots" content="noindex">
@@ -14,10 +14,11 @@
   <link rel="icon" type="image/svg+xml" href="assets/brand/gato-negro.svg">
   <link rel="stylesheet" href="css/styles.css?v=2.1.0">
   <link rel="stylesheet" href="css/themes/gato.css" id="themeStylesheet">
-  <link rel="stylesheet" href="next/css/kit.css?v=1.0.0">
-  <link rel="stylesheet" href="next/css/header.css?v=1.0.0">
+  <link rel="stylesheet" href="next/css/kit.css?v=1.0.1">
+  <link rel="stylesheet" href="next/css/header.css?v=1.0.1">
   <link rel="stylesheet" href="next/css/cards.css?v=1.0.0">
-  <link rel="stylesheet" href="next/css/widgets.css?v=1.0.0">
+  <link rel="stylesheet" href="next/css/widgets.css?v=1.0.1">
+  <link rel="stylesheet" href="next/css/editor.css?v=1.0.0">
 </head>
 <body>
 
@@ -190,29 +191,31 @@
       <label for="modalCommand">Ruta o comando</label>
       <input type="text" id="modalCommand" placeholder="C:\...\app.exe">
     </div>
-    <div class="field" id="modalExtractIconField" style="display:none;">
-      <button id="modalExtractIconBtn" class="btn" type="button" style="width:100%;">📥 Extraer ícono del .exe</button>
-    </div>
-    <div class="field">
-      <label for="modalEmoji">Emoji (opcional)</label>
-      <input type="text" id="modalEmoji" placeholder="🔗">
-    </div>
-    <div class="field">
-      <label for="modalIconUrl">URL del ícono (opcional)</label>
-      <input type="url" id="modalIconUrl" placeholder="https://.../icon.png">
-    </div>
     <div class="field" id="modalOpenChromeField">
       <label style="display:flex;align-items:center;gap:6px;cursor:pointer;text-transform:none;letter-spacing:0;">
         <input type="checkbox" id="modalOpenChrome" style="width:auto;min-height:0;margin:0;cursor:pointer;">
         Abrir en Chrome obligatoriamente
       </label>
     </div>
-    <div class="field">
-      <button id="modalAutoDetectFaviconBtn" class="btn" type="button" style="width:100%;">🔍 Auto-detectar favicon</button>
-    </div>
-    <div class="field">
-      <button id="modalDownloadFaviconBtn" class="btn" type="button" style="width:100%;">📥 Descargar como base64</button>
-    </div>
+    <!-- RG-5: lo opcional, plegado. Los id son los mismos, modal.js no cambia. -->
+    <details class="ge-more">
+      <summary>Ícono y emoji <span>(opcional)</span></summary>
+      <div class="field" id="modalExtractIconField" style="display:none;">
+        <button id="modalExtractIconBtn" class="btn" type="button" style="width:100%;">📥 Extraer ícono del .exe</button>
+      </div>
+      <div class="field">
+        <label for="modalEmoji">Emoji</label>
+        <input type="text" id="modalEmoji" placeholder="🔗">
+      </div>
+      <div class="field">
+        <label for="modalIconUrl">URL del ícono</label>
+        <input type="url" id="modalIconUrl" placeholder="https://.../icon.png">
+      </div>
+      <div class="ge-more__row">
+        <button id="modalAutoDetectFaviconBtn" class="btn" type="button">🔍 Auto-detectar favicon</button>
+        <button id="modalDownloadFaviconBtn" class="btn" type="button">📥 Descargar como base64</button>
+      </div>
+    </details>
     <div class="modal-actions">
       <button id="modalCancel" class="btn" type="button">Cancelar</button>
       <button id="modalSave" class="btn btn--gold" type="button">Guardar</button>
@@ -224,6 +227,7 @@
 <script src="next/js/kit.js?v=1.0.0"></script>
 <script src="next/js/header.js?v=1.1.0"></script>
 <script src="next/js/widgets-ui.js?v=1.0.0"></script>
+<script src="next/js/editor.js?v=1.0.0"></script>
 <script src="js/data.js"></script>
 <script src="js/widgets.js"></script>
 <script src="js/drag-drop.js"></script>
