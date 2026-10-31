@@ -1,0 +1,63 @@
+/* next/css/kit.css — Kit de La Guarida (1.0.0, 2026-10-31, RG-1)
+   Reloj compacto, avisos, paneles y la marca de vista previa.
+   Solo variables del theme activo (los 19 siguen andando); el dorado de
+   «está cerca» es el de La Bóveda. Fondos opacos aunque el theme sea translúcido. */
+
+/* ---- Reloj compacto ---- */
+.gk-clk {
+  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 9px 0 6px;
+  border: 1px solid var(--border); border-radius: 9px; background: var(--bg);
+  color: var(--muted); font-size: .78rem; white-space: nowrap;
+}
+.gk-clk__icon { width: 18px; height: 18px; border-radius: 4px; }
+.gk-clk__value { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
+.gk-clk.is-soon { border-color: #E8B34B; box-shadow: 0 0 12px -6px #E8B34B; }
+.gk-clk.is-soon .gk-clk__value { color: #F2C46B; }
+
+/* ---- Botones del kit ---- */
+.gk-btn {
+  font: inherit; font-size: .8rem; height: 30px; padding: 0 12px; border-radius: 9px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+}
+.gk-btn:hover { border-color: var(--border-hover); }
+.gk-btn:focus-visible { outline: 2px solid var(--border-hover); outline-offset: 2px; }
+.gk-btn--primary { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 700; }
+.gk-btn--danger { background: #D9534F; border-color: #D9534F; color: #fff; }
+.gk-btn--ghost { background: transparent; }
+
+/* ---- Avisos ---- */
+.gk-toasts { position: fixed; right: 16px; bottom: 16px; z-index: 1000; display: grid; gap: 8px; max-width: min(460px, calc(100vw - 32px)); }
+.gk-toast {
+  display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 14px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--panel); color: var(--text); font-size: .85rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45); animation: gkIn .18s ease-out;
+}
+.gk-toast__text { flex: 1; }
+.gk-toast--ok { border-left: 4px solid #4CC38A; }
+.gk-toast--warn { border-left: 4px solid #E8B34B; }
+.gk-toast--error { border-left: 4px solid #F47C7C; }
+.gk-toast--info { border-left: 4px solid var(--accent-2); }
+
+/* ---- Paneles ---- */
+.gk-sheet { position: fixed; inset: 0; z-index: 1001; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .55); }
+.gk-sheet__card {
+  width: min(460px, 100%); border-radius: 14px; border: 1px solid var(--border);
+  background: var(--panel); color: var(--text); box-shadow: 0 20px 50px rgba(0, 0, 0, .5); animation: gkIn .18s ease-out;
+}
+.gk-sheet__head { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.gk-sheet__title { margin: 0; font-size: 1rem; }
+.gk-sheet__head .gk-btn { margin-left: auto; }
+.gk-sheet__body { padding: 14px; font-size: .9rem; color: var(--text); }
+.gk-sheet__foot { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--border); }
+
+/* ---- Marca de vista previa (se va en RG-6) ---- */
+.gk-preview {
+  position: fixed; left: 12px; bottom: 12px; z-index: 999; display: flex; flex-direction: column; line-height: 1.2;
+  padding: 6px 10px; border-radius: 10px; border: 1px solid var(--accent); background: var(--panel);
+  color: var(--text); text-decoration: none; font-size: .72rem; box-shadow: 0 6px 18px rgba(0, 0, 0, .4);
+}
+.gk-preview b { color: var(--accent); font-size: .78rem; }
+.gk-preview span { color: var(--muted); }
+
+@keyframes gkIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .gk-toast, .gk-sheet__card { animation: none; } }
