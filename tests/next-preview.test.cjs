@@ -42,7 +42,7 @@ test('misma estructura que La Guarida de siempre (todos los id salvo los quitado
 });
 
 // Los módulos propios de next/, en orden: van antes que los de la raíz.
-const PROPIOS = ['next/js/preview.js', 'next/js/kit.js', 'next/js/header.js', 'next/js/widgets-ui.js'];
+const PROPIOS = ['next/js/preview.js', 'next/js/kit.js', 'next/js/header.js', 'next/js/widgets-ui.js', 'next/js/editor.js'];
 
 test('carga los mismos módulos, en el mismo orden, después de los de next/', () => {
   const r = scripts(rootHtml);
