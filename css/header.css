@@ -1,4 +1,4 @@
-/* css/header.css — Cabecera compacta de La Guarida (1.0.1, 2026-10-31, RG-2; RG-5: contraste de «Lo de siempre»)
+/* css/header.css — Cabecera compacta de La Guarida (1.1.0, 2026-10-31, RG-2; RG-5: contraste de «Lo de siempre»; RG-7: retrato en el portal y cara en los avisos)
    RG-0b aprobada: dos filas finas (≈ 100 px) en vez de cabecera + resumen grande.
    Línea de La Bóveda (relojes con ícono, dorado de «está cerca», un color por
    sección) pero a la medida de un lanzador. Solo variables del theme activo,
@@ -77,6 +77,17 @@ body {
 #seccionFavoritos .gn-panel__title::before { background: var(--gh-fav); }
 #seccionCategorias .gn-panel__title::before { background: var(--gh-cat); }
 #launcherPanel .gn-panel__title::before { background: var(--gh-lan); }
+
+/* ---- RG-7: mi retrato al costado del portal y mi cara en los avisos ---- */
+.gh-portal-fig {
+  flex: none; width: 150px; height: 240px; margin-right: 16px; object-fit: cover; object-position: top;
+  border-radius: 16px; border: 1px solid var(--border); background: #000;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--gn-host) 40%, transparent), 0 24px 60px rgba(0, 0, 0, .6);
+  pointer-events: none; animation: scaleIn .16s ease-out;
+}
+.gh-portal-fig[hidden] { display: none; }
+.gk-toast__face { flex: none; width: 28px; height: 28px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px var(--gn-host); }
+@media (max-width: 1000px) { .gh-portal-fig { display: none; } }
 
 /* ---- Pantallas más chicas ---- */
 @media (max-width: 1400px) {

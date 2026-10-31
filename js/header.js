@@ -1,6 +1,10 @@
 /*!
- * js/header.js — Cabecera compacta de La Guarida (1.1.0, 2026-10-31, RG-2 + RG-3b)
+ * js/header.js — Cabecera compacta de La Guarida (1.2.0, 2026-10-31, RG-2 + RG-3b + RG-7)
  *
+ * 1.2.0 (RG-7): las siete poses a la vista. Portal abierto: mi retrato al costado
+ * (con el gato mientras espero, pensando si hay resultados, explicando si no hay)
+ * y la misma cara chica en la barra. Avisos: festejo lo que salió bien, guiño al
+ * borrar (con «Deshacer»), ojo en advertencias y errores, explico en lo demás.
  * 1.1.0 (RG-3b): mi cara nueva (assets/brand/shiruvana/*-cara-128.webp) en el portal
  * cerrado (hola), el portal abierto (pensando) y el consejo (explica; ojo si es del backup).
  *
@@ -19,7 +23,7 @@
 (function (root) {
   'use strict';
 
-  var VERSION = '1.1.0';
+  var VERSION = '1.2.0';
   var DIA = 24 * 60 * 60 * 1000;
   var BACKUP_DIAS = 30;
   var SEASON_KEY = 'guarida:temporada:v1';
@@ -71,6 +75,23 @@
     return CARA + 'hola-cara-128.webp';
   }
 
+  // RG-7: una pose para cada momento. Todas existen como cara (128) y retrato (320).
+  var POSES = ['hola', 'pensando', 'explica', 'ojo', 'festeja', 'guino', 'con-gato'];
+  function caraSrc(pose) { return CARA + pose + '-cara-128.webp'; }
+  function retratoSrc(pose) { return CARA + pose + '-320.webp'; }
+  // Portal: sin texto, con el gato; con resultados, pensando; sin resultados, explicando.
+  function portalPose(query, n) {
+    if (!String(query == null ? '' : query).trim()) return 'con-gato';
+    return n > 0 ? 'pensando' : 'explica';
+  }
+  // Avisos del kit: el borrado con «Deshacer» va con guiño; lo que salió bien, festejo.
+  function avisoPose(kind, text) {
+    if (/^Elimin[ée]/.test(String(text || ''))) return 'guino';
+    if (kind === 'ok') return 'festeja';
+    if (kind === 'warn' || kind === 'error') return 'ojo';
+    return 'explica';
+  }
+
   // Relojes de la cabecera en HTML. La temporada solo si todavía no terminó.
   function clocksHTML(now, season) {
     var list = K.clocks(now, season && season > now ? { seasonEnd: season } : {});
@@ -82,7 +103,7 @@
   var api = {
     VERSION: VERSION, SEASON_KEY: SEASON_KEY, SEASON_URL: SEASON_URL, ICONS: ICONS,
     seasonEnd: seasonEnd, seasonFresh: seasonFresh, backupDue: backupDue, backupText: backupText, clocksHTML: clocksHTML,
-    avatarSrc: avatarSrc
+    avatarSrc: avatarSrc, POSES: POSES, caraSrc: caraSrc, retratoSrc: retratoSrc, portalPose: portalPose, avisoPose: avisoPose
   };
   if (typeof module !== 'undefined' && module.exports) { module.exports = api; }
   if (!root || !root.document) return;
@@ -143,7 +164,69 @@
     ponerCara(node.querySelector('.gn-portal__avatar'), avatarSrc('portal'));
   }
 
-  function alAgregar(node) { moverConsejo(node); caras(node); }
+  // ---- RG-7: portal con retrato ----
+  function poseDelPortal(portal) {
+    var input = portal.querySelector('#gnPortalInput');
+    var list = portal.querySelector('#gnPortalList');
+    if (!input || !list) return;
+    var pose = portalPose(input.value, list.querySelectorAll('[data-i]').length);
+    ponerCara(portal.querySelector('.gn-portal__avatar'), caraSrc(pose));
+    var fig = portal.querySelector('.gh-portal-fig');
+    if (fig && fig.getAttribute('data-pose') !== pose) { fig.setAttribute('data-pose', pose); fig.src = retratoSrc(pose); }
+  }
+
+  function prepararPortal(portal) {
+    if (!portal.classList || !portal.classList.contains('gn-portal') || portal.getAttribute('data-gh')) return;
+    portal.setAttribute('data-gh', '1');
+    var dialog = portal.querySelector('.gn-portal__dialog');
+    if (dialog) {
+      var fig = doc.createElement('img');
+      fig.className = 'gh-portal-fig';
+      fig.alt = '';
+      fig.setAttribute('aria-hidden', 'true');
+      fig.width = 150; fig.height = 240;
+      fig.onerror = function () { fig.hidden = true; }; // sin imagen, el portal queda como antes
+      portal.insertBefore(fig, dialog);
+    }
+    var input = portal.querySelector('#gnPortalInput');
+    // shiruvana.js ya registró su «input»: este corre después, con la lista pintada.
+    if (input) input.addEventListener('input', function () { poseDelPortal(portal); });
+    if (root.MutationObserver) {
+      new root.MutationObserver(function () { if (!portal.hidden) poseDelPortal(portal); })
+        .observe(portal, { attributes: true, attributeFilter: ['hidden'] });
+    }
+    poseDelPortal(portal);
+  }
+
+  // ---- RG-7: mi cara en los avisos del kit ----
+  function caraEnAviso(t) {
+    if (!t || !t.classList || !t.classList.contains('gk-toast') || t.querySelector('.gk-toast__face')) return;
+    var kind = (/gk-toast--(\w+)/.exec(t.className) || [])[1] || 'info';
+    var txt = t.querySelector('.gk-toast__text');
+    var img = doc.createElement('img');
+    img.className = 'gk-toast__face';
+    img.alt = '';
+    img.width = 28; img.height = 28;
+    img.onerror = function () { if (img.parentNode) img.parentNode.removeChild(img); };
+    img.src = caraSrc(avisoPose(kind, txt ? txt.textContent : ''));
+    t.insertBefore(img, t.firstChild);
+  }
+
+  function prepararAvisos(region) {
+    if (!region.classList || !region.classList.contains('gk-toasts') || region.getAttribute('data-gh')) return;
+    region.setAttribute('data-gh', '1');
+    Array.prototype.forEach.call(region.children, caraEnAviso);
+    if (root.MutationObserver) {
+      new root.MutationObserver(function (list) {
+        list.forEach(function (m) { Array.prototype.forEach.call(m.addedNodes, caraEnAviso); });
+      }).observe(region, { childList: true });
+    }
+  }
+
+  function alAgregar(node) {
+    moverConsejo(node); caras(node);
+    if (node && node.classList) { prepararPortal(node); prepararAvisos(node); }
+  }
 
   function init() {
     pintarRelojes();
@@ -154,7 +237,7 @@
     // shiruvana.js pone su avatar en su propio init, que corre después de este.
     setTimeout(function () { ponerCara($('#portalTrigger .gn-avatar-slot'), avatarSrc('trigger')); }, 0);
 
-    Array.prototype.forEach.call(doc.querySelectorAll('.gn-toast, .gn-portal'), alAgregar);
+    Array.prototype.forEach.call(doc.querySelectorAll('.gn-toast, .gn-portal, .gk-toasts'), alAgregar);
     if (root.MutationObserver) {
       new root.MutationObserver(function (list) {
         list.forEach(function (m) { Array.prototype.forEach.call(m.addedNodes, alAgregar); });
