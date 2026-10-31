@@ -29,17 +29,42 @@ test('cada recurso relativo de next/ existe en el repo', () => {
   for (const r of refs) assert.ok(fs.existsSync(path.join(ROOT, r)), r + ' existe');
 });
 
-test('misma estructura que La Guarida de siempre (todos los id)', () => {
+// RG-2: los badges del resumen se fueron (los números ya están en cada panel).
+// ui.js los busca con «if (b)», así que sacarlos no rompe nada. Cualquier otro id es obligatorio.
+const QUITADOS = new Set(['heroBadges']);
+
+test('misma estructura que La Guarida de siempre (todos los id salvo los quitados a propósito)', () => {
   const n = new Set(ids(nextHtml));
-  for (const id of ids(rootHtml)) assert.ok(n.has(id), 'next/ tiene #' + id);
+  for (const id of ids(rootHtml)) if (!QUITADOS.has(id)) assert.ok(n.has(id), 'next/ tiene #' + id);
+  for (const id of QUITADOS) assert.ok(!n.has(id), '#' + id + ' ya no está');
+  const dup = ids(nextHtml).filter((id, i, a) => a.indexOf(id) !== i);
+  assert.deepEqual(dup, [], 'ningún id repetido');
 });
 
-test('carga los mismos módulos, en el mismo orden, después del kit', () => {
+test('carga los mismos módulos, en el mismo orden, después del kit y la cabecera', () => {
   const r = scripts(rootHtml);
   const n = scripts(nextHtml);
-  assert.deepEqual(n.slice(0, 2), ['next/js/preview.js', 'next/js/kit.js']);
-  assert.deepEqual(n.slice(2), r);
+  assert.deepEqual(n.slice(0, 3), ['next/js/preview.js', 'next/js/kit.js', 'next/js/header.js']);
+  assert.deepEqual(n.slice(3), r);
   assert.ok(nextHtml.includes('href="next/css/kit.css'), 'carga los estilos del kit');
+  assert.ok(nextHtml.indexOf('next/css/header.css') > nextHtml.indexOf('css/styles.css'), 'header.css va después de styles.css');
+});
+
+test('RG-2: cabecera de dos filas, sin resumen grande', () => {
+  const header = nextHtml.slice(nextHtml.indexOf('<header'), nextHtml.indexOf('</header>'));
+  assert.ok(!/class="hero[\s"]/.test(nextHtml), 'no queda el resumen grande');
+  for (const id of ['heroTitle', 'heroDate', 'portalTrigger', 'ghClocks', 'ghTip', 'ghDot', 'ghBackupInfo', 'inicio'])
+    assert.ok(header.includes('id="' + id + '"'), '#' + id + ' vive en la cabecera');
+  const more = header.slice(header.indexOf('id="ghMoreMenu"'));
+  for (const id of ['exportBtn', 'importBtn']) assert.ok(more.includes('id="' + id + '"'), '#' + id + ' está en «⋯»');
+  assert.ok(more.includes('pablosnchz.github.io/bio/'), 'Link in Bio pasa a «⋯»');
+  assert.ok(!nextHtml.includes('class="bio-badge"'), 'sin el badge suelto');
+});
+
+test('RG-2: «Lo de siempre» es la primera fila de Favoritos', () => {
+  const fav = nextHtml.slice(nextHtml.indexOf('id="seccionFavoritos"'), nextHtml.indexOf('id="seccionCategorias"'));
+  assert.ok(fav.indexOf('id="usualRow"') > 0, 'está dentro de Favoritos');
+  assert.ok(fav.indexOf('id="usualRow"') < fav.indexOf('id="favoritesGrid"'), 'antes de las tarjetas');
 });
 
 test('la vista previa no se indexa y su marca vuelve a la raíz', () => {

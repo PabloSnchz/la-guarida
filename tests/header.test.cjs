@@ -1,0 +1,59 @@
+// Tests de la cabecera compacta (next/js/header.js, RG-2).
+// Correr: node --test tests/*.test.cjs
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const H = require('../next/js/header.js');
+
+const DIA = 24 * 60 * 60 * 1000;
+const NOW = Date.UTC(2026, 9, 31, 18, 0); // sábado 31/10/2026 18:00 UTC
+
+test('fin de temporada: respuesta plana o anidada, y nada si no hay fecha válida', () => {
+  assert.equal(H.seasonEnd({ title: 'T', end: '2026-12-02T17:00:00Z' }), Date.UTC(2026, 11, 2, 17));
+  assert.equal(H.seasonEnd({ season: { end: '2026-12-02T17:00:00Z' } }), Date.UTC(2026, 11, 2, 17));
+  assert.equal(H.seasonEnd(null), null);
+  assert.equal(H.seasonEnd({ title: 'T' }), null);
+  assert.equal(H.seasonEnd({ end: 'mañana' }), null);
+  assert.equal(H.seasonEnd({ end: 1234 }), null);
+});
+
+test('la temporada se pide a la API como mucho una vez por día', () => {
+  assert.equal(H.seasonFresh({ end: 1, t: NOW - DIA + 60000 }, NOW), true);
+  assert.equal(H.seasonFresh({ end: 1, t: NOW - DIA }, NOW), false);
+  assert.equal(H.seasonFresh({ end: 1, t: NOW + 60000 }, NOW), false, 'un reloj adelantado no la congela');
+  assert.equal(H.seasonFresh(null, NOW), false);
+  assert.equal(H.SEASON_KEY, 'guarida:temporada:v1');
+  assert.equal(H.SEASON_URL, 'https://api.guildwars2.com/v2/wizardsvault');
+});
+
+test('punto dorado del backup: más de 30 días, igual que el consejo de Shiruvana', () => {
+  assert.equal(H.backupDue({ lastBackup: NOW - 30 * DIA }, NOW), false);
+  assert.equal(H.backupDue({ lastBackup: NOW - 31 * DIA }, NOW), true);
+  assert.equal(H.backupDue({ firstSeen: NOW - 31 * DIA }, NOW), true, 'nunca hizo backup y ya pasó un mes');
+  assert.equal(H.backupDue({ firstSeen: NOW - 2 * DIA }, NOW), false, 'recién llegado');
+  assert.equal(H.backupDue(null, NOW), false);
+});
+
+test('texto del último backup', () => {
+  assert.equal(H.backupText({}, NOW), 'Todavía no descargaste ningún backup');
+  assert.equal(H.backupText({ lastBackup: NOW - 3600000 }, NOW), 'Último backup: hoy');
+  assert.equal(H.backupText({ lastBackup: NOW - DIA - 1 }, NOW), 'Último backup: ayer');
+  assert.equal(H.backupText({ lastBackup: NOW - 12 * DIA }, NOW), 'Último backup: hace 12 días');
+});
+
+test('relojes: local, diario y semanal con ícono; temporada solo si sigue abierta', () => {
+  const sin = H.clocksHTML(NOW, null);
+  assert.equal((sin.match(/class="gk-clk[ "]/g) || []).length, 3);
+  assert.ok(sin.includes('id="ghClk-daily"') && sin.includes('id="ghClk-weekly"') && sin.includes('id="ghClk-local"'));
+  assert.equal((sin.match(/class="gk-clk__icon"/g) || []).length, 3, 'los tres con ícono');
+  assert.ok(sin.includes(H.ICONS.daily));
+  const con = H.clocksHTML(NOW, NOW + 2 * DIA);
+  assert.ok(con.includes('id="ghClk-season"'));
+  assert.ok(/id="ghClk-season"[^>]*>/.test(con) && con.includes('gk-clk is-soon" id="ghClk-season"'), 'menos de 3 días: dorado');
+  assert.ok(!H.clocksHTML(NOW, NOW - 1000).includes('ghClk-season'), 'temporada terminada: no se muestra');
+});
+
+test('los íconos vienen de La Bóveda publicada', () => {
+  for (const k of ['local', 'daily', 'weekly'])
+    assert.ok(H.ICONS[k].startsWith('https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/'), k);
+});
