@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Propuesta RG-0 — La Guarida con la línea del restyle de la Bóveda</title>
+<style>
+body{font-family:system-ui,Segoe UI,Arial,sans-serif;background:#111;color:#e8e2d4;max-width:1000px;margin:2rem auto;padding:0 1rem;line-height:1.55}
+h1,h2{color:#e0b84c}h1{font-size:1.5rem}h2{font-size:1.15rem;margin-top:2.2rem;border-bottom:1px solid #333;padding-bottom:.3rem}
+h3{font-size:1rem;color:#F4F6FA;margin:1.4rem 0 .4rem}
+table{border-collapse:collapse;width:100%;margin:.6rem 0}th,td{border:1px solid #333;padding:.4rem .55rem;text-align:left;vertical-align:top}th{background:#1c1c1c}
+code{background:#222;padding:0 .25rem;border-radius:3px}small,.cap{color:#9a937f}.cap{font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;margin:.9rem 0 .3rem}
+a{color:#9fc3ff}.rec{color:#8fd18f}.sev{font-weight:700;font-size:.75rem;border-radius:6px;padding:0 .4rem;white-space:nowrap}.a{background:#4d2424;color:#ffb9b9}.m{background:#24324d;color:#b9d0ff}.l{background:#22352c;color:#a9e6c6}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media (max-width:760px){.cols{grid-template-columns:1fr}}
+.stage{background:#0F131C;border:1px solid #2A3142;border-radius:14px;padding:14px 16px;margin:.4rem 0;color:#C9D0DA;font-size:.9rem}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+/* ---- HOY (aproximado de la Guarida actual) ---- */
+.o-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.o-tab{font-size:.85rem;color:#8E96A3;padding:4px 8px;border-radius:6px}.o-tab.on{color:#F4F6FA;background:#232A3A}
+.o-btn{font-size:.8rem;border:1px solid #2E3649;border-radius:8px;padding:4px 9px;color:#F4F6FA;background:#1A1F2B}
+.o-badge{font-size:.78rem;border:1px solid #2E3649;border-radius:999px;padding:2px 9px;color:#8E96A3}.o-badge b{color:#F4F6FA}
+.o-w{border:1px solid #2E3649;border-radius:8px;background:#1A1F2B;padding:10px 12px;max-width:260px}
+.o-wt{display:flex;gap:6px;align-items:center;font-weight:600;color:#F4F6FA;margin-bottom:6px}.o-wt img{width:20px;height:20px;border-radius:4px}
+.o-r{display:flex;justify-content:space-between;font-size:.85rem;padding:2px 0}.o-r b{color:#F4F6FA}
+.prompt{background:#f3f3f3;color:#222;border-radius:6px;padding:12px 14px;font-size:.82rem;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.5);font-family:Segoe UI,Arial,sans-serif}
+.prompt pre{margin:.3rem 0;font-family:inherit;white-space:pre-wrap}.prompt .in{border:1px solid #888;height:20px;margin:6px 0;background:#fff}.prompt .bt{text-align:right}.prompt .bt span{display:inline-block;border:1px solid #999;padding:2px 12px;margin-left:6px;background:#e6e6e6}
+.o-fav{display:inline-flex;flex-direction:column;align-items:center;gap:6px;width:84px;padding:10px 4px;border:1px solid #2E3649;border-radius:8px;background:#1A1F2B;font-size:.75rem;color:#F4F6FA}.o-fav i{width:40px;height:40px;border-radius:8px;background:#232A3A;display:grid;place-items:center;font-style:normal;font-size:1.3rem}
+/* ---- PROPUESTA (línea del restyle de la Bóveda) ---- */
+.p-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid #2A3142}
+.brand{display:flex;gap:8px;align-items:center}.brand img{width:32px;height:32px}.brand b{display:block;color:#F4F6FA}.brand small{font-size:.7rem;color:#8E96A3}
+.tabs{display:flex;gap:2px}.tab{display:flex;gap:7px;align-items:center;padding:8px 11px;color:#8E96A3;font-size:.86rem;border-bottom:2px solid transparent}.tab.on{color:#F4F6FA;font-weight:700;border-bottom-color:#E8A33D}.tab img{width:18px;height:18px;border-radius:4px}
+.tools{margin-left:auto;display:flex;gap:6px}.tb{font-size:.8rem;border:1px solid #2A3142;border-radius:10px;padding:6px 10px;color:#C9D0DA;background:#0B0E15}
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;padding:16px 0 4px}@media (max-width:760px){.hero{grid-template-columns:1fr}}
+.kick{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:#E8A33D;margin:0}.hero h4{margin:.1rem 0 .6rem;font-size:1.5rem;color:#F4F6FA}
+.gk{display:inline-flex;align-items:center;gap:7px;padding:5px 11px 5px 6px;border:1px solid #2A3142;border-radius:10px;background:#0B0E15;color:#A9B1BE;font-size:.8rem;white-space:nowrap}
+.gk img{width:20px;height:20px;border-radius:5px}.gk span{display:flex;flex-direction:column;line-height:1.15}.gk small{font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:#8E96A3}.gk b{color:#F4F6FA;font-weight:700;font-variant-numeric:tabular-nums}
+.gk.soon{border-color:#E8B34B;box-shadow:0 0 14px -6px #E8B34B}.gk.soon b{color:#F2C46B}
+.portal{display:flex;gap:10px;align-items:center;border:1px solid #2A3142;border-radius:12px;background:#141925;padding:10px 12px;color:#A9B1BE;font-size:.85rem}
+.av{width:36px;height:36px;border-radius:50%;flex:none;background:radial-gradient(circle at 35% 35%,#2C9398,#442283);border:2px solid #E8A33D}
+.portal b{color:#F4F6FA}.kbd{margin-left:auto;font-size:.7rem;border:1px solid #3A4256;border-radius:5px;padding:1px 6px}
+.voice{display:flex;gap:10px;align-items:center;margin-top:10px;font-size:.85rem;color:#C9D0DA}.voice .av{width:28px;height:28px;border-width:1px}.voice button{margin-left:auto;font-size:.75rem;border:1px solid #2A3142;background:#0B0E15;color:#C9D0DA;border-radius:8px;padding:3px 8px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}@media (max-width:760px){.stats{grid-template-columns:1fr 1fr}}
+.st{display:grid;grid-template-columns:34px 1fr;column-gap:10px;align-items:center;border:1px solid #2A3142;border-radius:12px;background:#0B0E15;padding:10px 12px;min-width:0}
+.st img{grid-row:1/4;width:34px;height:34px;border-radius:8px;background:#171B26;padding:3px;box-sizing:border-box}
+.st small{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:#8E96A3}.st b{font-size:1.2rem;color:#F4F6FA}.st em{display:block;font-style:normal;font-size:.72rem;color:#8E96A3}
+.card{border:1px solid #2A3142;border-radius:14px;background:#141925;overflow:hidden}
+.ch{display:flex;gap:10px;align-items:center;padding:12px 14px;background:linear-gradient(180deg,rgba(232,163,61,.14),rgba(232,163,61,.03));border-bottom:1px solid rgba(232,163,61,.3)}
+.ch img{width:26px;height:26px;border-radius:6px}.ch h4{margin:0;font-size:1rem;color:#F4F6FA}.ch small{display:block;font-size:.72rem;color:#8E96A3}
+.cnt{margin-left:auto;font-weight:800;color:#F4F6FA;background:#0B0E15;border:1px solid #2A3142;border-radius:10px;padding:3px 9px;font-size:.85rem}
+.cb{padding:12px 14px;background:#0F131C}
+.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.fv{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border:1px solid #2A3142;border-radius:12px;background:#141925;font-size:.76rem;color:#F4F6FA;text-align:center}
+.fv i{width:40px;height:40px;border-radius:10px;background:#171B26;display:grid;place-items:center;font-style:normal;font-size:1.3rem}.fv.hot{border-color:#7B5CFF;box-shadow:0 0 0 1px #7B5CFF}
+.lk{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;padding:7px 4px;border-top:1px solid #1E2433;font-size:.85rem;color:#F4F6FA}.lk:first-child{border-top:0}.lk i{font-style:normal}.lk small{color:#8E96A3}
+.wpick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}@media (max-width:760px){.wpick{grid-template-columns:1fr 1fr}}
+.wp{display:flex;flex-direction:column;gap:6px;border:1px solid #2A3142;border-radius:12px;background:#141925;padding:10px;font-size:.78rem;color:#A9B1BE}.wp img{width:26px;height:26px}.wp b{color:#F4F6FA;font-size:.86rem}.wp.on{border-color:#E8A33D}
+.sheet{border:1px solid #2A3142;border-radius:14px;background:#141925;max-width:440px}
+.sh{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid #2A3142}.sh b{color:#F4F6FA}.sh .x{margin-left:auto;color:#8E96A3}
+.sbody{padding:12px 14px;display:grid;gap:10px}.f label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#8E96A3;margin-bottom:3px}
+.f div{border:1px solid #2A3142;border-radius:8px;background:#0B0E15;padding:7px 9px;color:#F4F6FA;font-size:.85rem}
+.det{border:1px dashed #3A4256;border-radius:8px;padding:7px 9px;font-size:.82rem;color:#A9B1BE}
+.sfoot{display:flex;justify-content:flex-end;gap:8px;padding:10px 14px;border-top:1px solid #2A3142}.btn{border:1px solid #2A3142;border-radius:10px;padding:6px 12px;font-size:.82rem;color:#C9D0DA;background:#0B0E15}.btn.pri{background:#E8A33D;border-color:#E8A33D;color:#1A1300;font-weight:700}
+.toast{display:flex;gap:10px;align-items:center;border:1px solid #F47C7C;border-radius:12px;background:#1C1416;padding:10px 12px;font-size:.84rem;color:#F4F6FA;max-width:460px}.toast .btn{margin-left:auto}
+</style>
+</head>
+<body>
+<h1>Propuesta RG-0 — La Guarida con la línea del restyle de la Bóveda</h1>
+<p><small>Restyle de La Guarida · DEC-028 (yo como anfitriona, sin datos de la Factory) · DEC-024 (mi voz) · 2026-10-31 · Shiruvana. Nada de esto está construido: es para que lo apruebes o lo cambies. Los dibujos son maquetas con números de ejemplo; los íconos son los que ya usan la Bóveda y La Guarida (el de Temporada es provisorio: elijo el oficial en RG-2).</small></p>
+
+<h2>1. Product</h2>
+<p><b>Problema.</b> La Guarida tomó el lenguaje del GDS el 22 de octubre (BL-052), antes del restyle de la Bóveda. Desde entonces la Bóveda fijó una línea propia: cabecera con relojes con ícono, pestañas con ícono y subrayado ámbar, indicadores con ícono oficial, tarjetas con encabezado de color, mi voz en una sola línea y paneles propios en lugar de las ventanas del navegador. La Guarida quedó a mitad de camino: la cabecera y los paneles son nuevos, pero los widgets, el editor y los avisos son los de siempre.</p>
+<p><b>Valor.</b> Es la página que más abrís: la abrís cada vez que arrancás el navegador. Que se vea y se use como la Bóveda hace que el ecosistema se sienta uno solo, y saca las fricciones de todos los días (elegir un widget escribiendo un número, avisos que tapan la pantalla).</p>
+<p><b>Prioridad.</b> Alta en calidad visual y uso diario. No hay funciones nuevas, salvo arreglar lo que hoy está roto (la temporada del widget de reinicios).</p>
+
+<h2>2. Lo que medí en el código</h2>
+<table>
+<tr><th>Hallazgo</th><th>Nivel</th><th>Detalle</th></tr>
+<tr><td>«Season» del widget de reinicios muestra «—»</td><td><span class="sev a">ALTO</span></td><td><code>widgets.js</code> tiene la fecha fija <code>2026-09-15</code> (<code>getSeasonEnd</code>). Ya pasó: el contador muestra «—» desde hace 6 semanas y nadie lo ve. Hay que tomarla de la API (<code>/v2/wizardsvault</code> trae la temporada vigente con su fecha de fin; lo verifico antes de usarlo), como hace la Cámara del Brujo.</td></tr>
+<tr><td>Elegir un widget con <code>prompt()</code></td><td><span class="sev m">MEDIO</span></td><td>«＋ Widget» abre la ventanita del navegador con una lista numerada y hay que escribir el número. Lo mismo para editar la cuenta regresiva (dos ventanitas seguidas, con la fecha en formato AAAA-MM-DD).</td></tr>
+<tr><td>Avisos con <code>alert()</code></td><td><span class="sev m">MEDIO</span></td><td>15 <code>alert()</code> (no se pudo guardar, importar, extraer ícono, nombre o URL obligatorios) y 4 <code>confirm()</code> para borrar frenan la página y no siguen el theme. El de «No se pudo guardar» no explica qué pasa (lo vimos hoy con el almacenamiento lleno).</td></tr>
+<tr><td>Relojes distintos a los de la Bóveda</td><td><span class="sev l">BAJO</span></td><td>Reloj y Reinicios son dos widgets sin íconos por fila; la Bóveda ya tiene el reloj común (UNI, BL-078) con ícono y dorado de «está cerca».</td></tr>
+<tr><td>Editor con todo a la vista</td><td><span class="sev l">BAJO</span></td><td>El mismo panel sirve para favorito, enlace, categoría y app. Muestra a la vez emoji, URL del ícono, «Abrir en Chrome», «Auto-detectar» y «Descargar como base64», aunque casi siempre solo hacen falta nombre y URL.</td></tr>
+<tr><td>Estilos sueltos</td><td><span class="sev l">BAJO</span></td><td>El badge de Link in Bio, el editor y los widgets llevan estilos escritos dentro del HTML (<code>style="…"</code>): no siguen los 19 themes ni se pueden revisar con contraste.</td></tr>
+<tr><td>Tamaños</td><td><span class="sev l">límite</span></td><td><code>styles.css</code> 28,2 KB · <code>widgets.js</code> 22,4 KB · <code>shiruvana.js</code> 31 KB · <code>index.html</code> 12,1 KB. Todo entra en el presupuesto de 40 KB por archivo que usamos en la Bóveda.</td></tr>
+</table>
+
+<h2>3. Cabecera y resumen</h2>
+<p class="cap">Hoy (aproximado)</p>
+<div class="stage">
+<div class="o-head"><b style="color:#F4F6FA">🐈‍⬛ La Guarida</b><span class="o-tab on">Inicio</span><span class="o-tab">Favoritos</span><span class="o-tab">Categorías</span><span class="o-tab">Lanzador</span><span class="o-tab">Widgets</span><span style="margin-left:auto" class="o-btn">🐈‍⬛ Gato Negro ▾</span><span class="o-btn">✏️ Editar</span><span class="o-btn">＋ Agregar</span><span class="o-btn">💾 Backup</span><span class="o-btn">🐾 Ecosistema</span></div>
+<p style="margin:.8rem 0 .2rem;font-size:.72rem;color:#8E96A3">LA GUARIDA · sábado 31 de octubre · 13:55</p>
+<p style="margin:0 0 .5rem;font-size:1.3rem;color:#F4F6FA;font-weight:700">Buenas tardes, Pablo</p>
+<div class="row"><span class="o-badge"><b>14</b> favoritos</span><span class="o-badge"><b>6</b> categorías</span><span class="o-badge"><b>41</b> enlaces</span><span class="o-badge"><b>20</b> apps y juegos</span></div>
+</div>
+<p class="cap">Propuesta</p>
+<div class="stage">
+<div class="p-bar">
+<div class="brand"><img src="https://pablosnchz.github.io/la-guarida/assets/brand/gato-negro.svg" alt=""><span><b>La Guarida</b><small>Lanzador del Gato Negro</small></span></div>
+<div class="tabs"><span class="tab on"><img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/156409.png" alt="">Inicio</span><span class="tab">⭐ Favoritos</span><span class="tab">📁 Categorías</span><span class="tab">🚀 Lanzador</span><span class="tab"><img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/102353.png" alt="">Widgets</span></div>
+<div class="tools"><span class="tb">🎨 Theme</span><span class="tb">✏️ Editar</span><span class="tb">＋ Agregar</span><span class="tb">⋯</span></div>
+</div>
+<div class="hero">
+<div>
+<p class="kick">Sábado 31 de octubre</p>
+<h4>Buenas tardes, Pablo</h4>
+<div class="row">
+<span class="gk"><img src="https://pablosnchz.github.io/gw2-factory-dev/assets/icons/841720.png" alt=""><span><small>Local</small><b>13:55</b></span></span>
+<span class="gk soon"><img src="https://pablosnchz.github.io/gw2-factory-dev/assets/icons/534745.png" alt=""><span><small>Reset diario</small><b>en 8 h 5 min</b></span></span>
+<span class="gk"><img src="https://pablosnchz.github.io/gw2-factory-dev/assets/icons/155064.png" alt=""><span><small>Reset semanal</small><b>en 1 d 17 h</b></span></span>
+<span class="gk"><img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/534745.png" alt=""><span><small>Temporada</small><b>en 34 d</b></span></span>
+</div>
+</div>
+<div>
+<div class="portal"><span class="av"></span><span><b>¿A dónde vamos?</b><br>Buscá un favorito, un enlace o una app…</span><span class="kbd">Ctrl K</span></div>
+<div class="voice"><span class="av"></span><span>«GW2 Wiki» y «Wiki GW2» llevan a la misma página.</span><button>Mostrar</button><button>Ahora no</button></div>
+</div>
+</div>
+<div class="stats">
+<div class="st"><img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/156409.png" alt=""><small>Favoritos</small><b>14</b><em>tus accesos de un clic</em></div>
+<div class="st"><img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/102353.png" alt=""><small>Enlaces</small><b>41</b><em>en 6 categorías</em></div>
+<div class="st"><img src="https://pablosnchz.github.io/gw2-factory-dev/assets/icons/Welcome/156107.png" alt=""><small>Lanzador</small><b>20</b><em>8 juegos · 12 apps</em></div>
+<div class="st"><img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/155911.png" alt=""><small>Último backup</small><b>hace 12 d</b><em>Descargar ahora</em></div>
+</div>
+</div>
+<ul>
+<li><b>Relojes en la cabecera</b> con el reloj común de la Bóveda (ícono, dorado cuando falta poco). Salen de los widgets: el reloj y los reinicios ya no ocupan dos tarjetas. La temporada vuelve a funcionar, leída de la API.</li>
+<li><b>Mi consejo del día pasa a una línea</b> debajo del portal, como en la Bóveda, en lugar de un aviso flotante. Sigue siendo uno por día, nunca en modo edición, con «Ahora no».</li>
+<li><b>Indicadores con ícono</b> en lugar de las pastillas de texto. El cuarto es el último backup: hoy es tu única copia si el navegador se limpia.</li>
+<li><b>Herramientas</b>: Backup, Ecosistema y Link in Bio pasan al menú «⋯» para que la barra respire. El theme queda a mano.</li>
+</ul>
+
+<h2>4. Favoritos, categorías y lanzador</h2>
+<div class="cols">
+<div><p class="cap">Hoy (aproximado)</p><div class="stage"><div class="row"><span class="o-fav"><i>⚔️</i>GW2</span><span class="o-fav"><i>🐈‍⬛</i>Bóveda</span><span class="o-fav"><i>📺</i>Twitch</span><span class="o-fav"><i>🧭</i>Panel</span></div></div></div>
+<div><p class="cap">Propuesta</p>
+<div class="card"><div class="ch"><img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/156409.png" alt=""><span><h4>Favoritos</h4><small>Tus accesos de un clic</small></span><span class="cnt">14</span></div>
+<div class="cb"><div class="fg"><span class="fv"><i>⚔️</i>GW2</span><span class="fv hot"><i>🐈‍⬛</i>Bóveda</span><span class="fv"><i>📺</i>Twitch</span><span class="fv"><i>🧭</i>Panel</span></div></div></div>
+</div>
+</div>
+<div class="cols" style="margin-top:12px">
+<div class="card"><div class="ch"><span style="font-size:1.3rem">📁</span><span><h4>Guild Wars 2</h4><small>Categoría</small></span><span class="cnt">9</span></div>
+<div class="cb"><div class="lk"><i>📖</i>Wiki en español<small>↗</small></div><div class="lk"><i>📊</i>gw2efficiency<small>↗</small></div><div class="lk"><i>🗺️</i>Mapa de metas<small>↗</small></div></div></div>
+<div class="card"><div class="ch"><span style="font-size:1.3rem">🚀</span><span><h4>Lanzador</h4><small>Juegos y programas de tu PC</small></span><span class="cnt">20</span></div>
+<div class="cb"><div class="lk"><i>⚔️</i>Guild Wars 2<small>Juego</small></div><div class="lk"><i>🗺️</i>Blish HUD<small>Juego</small></div><div class="lk"><i>💬</i>Discord<small>App</small></div></div></div>
+</div>
+<p><small>Cada sección es una tarjeta con encabezado de color, contador en su caja y el contenido sobre un fondo más oscuro, como Raids y Logros en la Bóveda. El hover y el foco usan el arcano del theme. Los íconos de tus favoritos no cambian.</small></p>
+
+<h2>5. Widgets: un panel en lugar de ventanitas</h2>
+<div class="cols">
+<div><p class="cap">Hoy</p><div class="stage" style="display:grid;gap:10px">
+<div class="o-w"><div class="o-wt"><img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/534745.png" alt="">Resets GW2</div><div class="o-r">Daily<b>8h 5m</b></div><div class="o-r">Weekly<b>1d 17h 35m</b></div><div class="o-r">Season<b>—</b></div></div>
+<div class="prompt"><pre>Elegí un widget (número):
+
+1. Reloj
+2. Saludo
+3. Notas
+4. Contador
+5. Resets GW2
+6. Noticias GW2
+7. Twitch
+8. YouTube</pre><div class="in"></div><div class="bt"><span>Aceptar</span><span>Cancelar</span></div></div>
+</div></div>
+<div><p class="cap">Propuesta</p><div class="stage">
+<div class="sheet" style="max-width:none"><div class="sh"><b>Agregar un widget</b><span class="x">✕</span></div>
+<div class="sbody"><div class="wpick">
+<div class="wp"><img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/102353.png" alt=""><b>Notas</b>Texto libre</div>
+<div class="wp on"><img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/155911.png" alt=""><b>Cuenta regresiva</b>Días a una fecha</div>
+<div class="wp"><img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/222580.png" alt=""><b>Noticias GW2</b>Las últimas 4</div>
+<div class="wp"><img src="https://raw.githubusercontent.com/PabloSnchz/gw2-wallet-ligero/main/assets/icons/Welcome/twitchlogo.png" alt=""><b>Twitch</b>Tu canal en vivo</div>
+</div>
+<div class="f"><label>Título</label><div>Lanzamiento de la expansión</div></div>
+<div class="f"><label>Fecha</label><div>📅 25/12/2026</div></div>
+</div>
+<div class="sfoot"><span class="btn">Cancelar</span><span class="btn pri">Agregar</span></div></div>
+</div></div>
+</div>
+<ul>
+<li>Las tarjetas muestran qué hace cada widget. La cuenta regresiva usa el selector de fecha del navegador, sin formatos para escribir.</li>
+<li>Reloj, Saludo y Reinicios salen de la lista porque ya están en la cabecera. Si tenés alguno agregado, lo saco solo de la pantalla: tus datos quedan como están y un backup viejo sigue funcionando.</li>
+<li>Cada widget es una tarjeta como las de la sección 4, con su ícono, que ya no está escrito dentro del HTML.</li>
+</ul>
+
+<h2>6. Editor y avisos</h2>
+<div class="cols">
+<div><p class="cap">Editor de favorito · propuesta</p>
+<div class="sheet"><div class="sh"><span>⭐</span><b>Agregar favorito</b><span class="x">✕</span></div>
+<div class="sbody"><div class="f"><label>Nombre</label><div>Centro de decisiones</div></div><div class="f"><label>Dirección</label><div>https://pablosnchz.github.io/gw2-factory-dashboard/</div></div>
+<div class="det">▸ Ícono y apertura <small>(emoji, ícono propio, auto-detectar, abrir en Chrome)</small></div></div>
+<div class="sfoot"><span class="btn">Cancelar</span><span class="btn pri">Guardar</span></div></div>
+<p><small>Nombre y dirección arriba; lo demás, plegado. Para apps y juegos el editor pide la ruta en lugar de la dirección, como hoy.</small></p></div>
+<div><p class="cap">Avisos · propuesta</p>
+<div class="toast"><span>⚠️</span><span><b>No pude guardar.</b> El almacenamiento del navegador está lleno (5,0 de 5 MB). Tus cambios siguen en pantalla: descargá un backup antes de cerrar.</span><span class="btn">Backup</span></div>
+<p><small>Los 15 <code>alert()</code> pasan a avisos con el estilo de la Guarida: no frenan la página y dicen qué hacer. «¿Eliminar…?» pasa a un panel de confirmación con «Deshacer», como la Tienda de la Cámara del Brujo.</small></p></div>
+</div>
+
+<h2>7. Architecture</h2>
+<ul>
+<li><b>Sin cambios en tus datos.</b> Misma clave (<code>la_guarida_data_v1</code>), mismo formato y backups compatibles en las dos direcciones. Los widgets de reloj y reinicios que ya tenés quedan guardados y solo se dejan de dibujar.</li>
+<li><b>Archivos</b>:
+<ul>
+<li><code>css/styles.css</code> 3.0.0: las secciones nuevas solo con variables del theme, así siguen andando los 19.</li>
+<li><code>js/kit.js</code> (nuevo, chico): el reloj común (copia de la lógica de la Bóveda con su número de versión) y un sistema de avisos y paneles que reemplaza <code>alert()</code>, <code>confirm()</code> y <code>prompt()</code>.</li>
+<li><code>widgets.js</code> y <code>modal.js</code> pasan a usarlo.</li>
+<li><code>app.js</code>, <code>shiruvana.js</code> y <code>data.js</code> casi no cambian.</li>
+</ul></li>
+<li><b>Íconos</b>: los copio a <code>assets/icons/</code> de la Guarida. No los tomo de DEV ni de producción de la Bóveda, para que nada de la Guarida dependa de esos repos.</li>
+<li><b>Temporada</b>: una sola lectura a la API pública de GW2 por día, guardada en una clave chica con tope. Es la lección de hoy (LES-043).</li>
+<li><b>Sin DEV, con vista previa.</b> La Guarida no tiene DEV: hoy cada cambio sale directo. Propongo armar la versión nueva en <code>la-guarida/next/</code>. Es la misma página publicada en otra carpeta y lee tus mismos datos, así que la probás con lo tuyo de verdad sin tocar la de todos los días. Cuando la apruebes, reemplaza a la actual con un solo cambio.</li>
+<li><b>Tests</b>: los de <code>shiruvana</code> y <code>ui</code> siguen, y sumo uno de <code>kit.js</code> (reloj, «está cerca» y avisos). Otro test vigila que no vuelvan <code>alert(</code>, <code>prompt(</code> ni estilos dentro del HTML.</li>
+<li><b>Descarto</b> rehacer la Guarida desde cero: se pierde lo que ya funciona (portal, «Lo de siempre», arrastrar y soltar) y no agrega nada.</li>
+</ul>
+
+<h2>8. Decisiones</h2>
+<table>
+<tr><th>#</th><th>Pregunta</th><th>Mi recomendación</th></tr>
+<tr><td>D1</td><td>¿Relojes en la cabecera en lugar de los widgets de reloj y reinicios?</td><td class="rec">Sí: Local, Reset diario, Reset semanal y Temporada, con el reloj común de la Bóveda.</td></tr>
+<tr><td>D2</td><td>¿Mi consejo del día como línea debajo del portal en lugar de aviso flotante?</td><td class="rec">Sí: es como hablo en la Bóveda (una línea) y no tapa nada.</td></tr>
+<tr><td>D3</td><td>¿Backup, Ecosistema y Link in Bio en el menú «⋯»?</td><td class="rec">Sí, y el último backup a la vista como indicador.</td></tr>
+<tr><td>D4</td><td>¿Vista previa en <code>/la-guarida/next/</code> antes de reemplazar?</td><td class="rec">Sí: es lo más parecido a DEV que puede tener la Guarida sin mudarla.</td></tr>
+<tr><td>D5</td><td>¿Algo que quieras sumar o sacar? (por ejemplo, el widget de YouTube)</td><td class="rec">Lo dejo como está salvo que me digas.</td></tr>
+</table>
+
+<h2>9. Micro-ciclos</h2>
+<table>
+<tr><th>MC</th><th>Qué</th><th>Dónde</th></tr>
+<tr><td>RG-1</td><td>Copia en <code>next/</code> + <code>kit.js</code> (reloj y avisos) + íconos + tests. La Guarida de todos los días no cambia.</td><td><code>next/</code></td></tr>
+<tr><td>RG-2</td><td>Cabecera, relojes, temporada desde la API, indicadores y mi línea (D1 a D3).</td><td><code>next/</code></td></tr>
+<tr><td>RG-3</td><td>Tarjetas de Favoritos, Categorías y Lanzador.</td><td><code>next/</code></td></tr>
+<tr><td>RG-4</td><td>Widgets: panel «Agregar un widget», cuenta regresiva con fecha y tarjetas.</td><td><code>next/</code></td></tr>
+<tr><td>RG-5</td><td>Editor plegado, avisos y confirmación con «Deshacer». Revisión en los 19 themes, teclado y celular.</td><td><code>next/</code></td></tr>
+<tr><td>RG-6</td><td>Con tu aprobación: <code>next/</code> pasa a ser La Guarida, borro la carpeta y actualizo el README.</td><td>raíz</td></tr>
+</table>
+<p>Después de cada MC te paso el enlace a <code>next/</code> y espero tu validación antes de seguir.</p>
+<p><b>Riesgo:</b> BAJO. Todo se arma al costado (<code>next/</code>), sin tocar tus datos. Lo único compartido es la clave de datos: <code>next/</code> la lee y la escribe igual que hoy, así que un favorito que agregues ahí aparece en la Guarida de siempre. Es lo que querés para probar con lo tuyo de verdad.</p>
+</body>
+</html>
