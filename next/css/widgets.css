@@ -1,4 +1,4 @@
-/* next/css/widgets.css — Widgets de La Guarida (1.0.0, 2026-10-31, RG-4)
+/* next/css/widgets.css — Widgets de La Guarida (1.0.1, 2026-10-31, RG-4; RG-5: contraste del error)
    Panel «Agregar un widget», panel de la cuenta regresiva y retoques del panel Widgets.
    Solo variables del theme activo. */
 
@@ -30,8 +30,8 @@
   color-scheme: dark light;
 }
 .gw-field input:focus { outline: none; border-color: var(--border-hover); }
-/* Rojo mezclado con el color de texto del theme: se lee en themes oscuros y claros */
-.gw-error { min-height: 1em; font-size: .8125rem; color: color-mix(in srgb, #D94A4A 70%, var(--text)); }
+/* El rojo va en la barra; el texto, con el color del theme (RG-5: el rojo solo no llegaba a 4,5:1 en One Dark) */
+.gw-error { min-height: 1em; padding-left: 8px; border-left: 3px solid #D94A4A; font-size: .8125rem; color: var(--text); }
 .gw-error:empty { display: none; }
 
 /* ---- Panel Widgets ---- */

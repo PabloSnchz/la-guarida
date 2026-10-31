@@ -1,4 +1,4 @@
-/* next/css/header.css — Cabecera compacta de La Guarida (1.0.0, 2026-10-31, RG-2)
+/* next/css/header.css — Cabecera compacta de La Guarida (1.0.1, 2026-10-31, RG-2; RG-5: contraste de «Lo de siempre»)
    RG-0b aprobada: dos filas finas (≈ 100 px) en vez de cabecera + resumen grande.
    Línea de La Bóveda (relojes con ícono, dorado de «está cerca», un color por
    sección) pero a la medida de un lanzador. Solo variables del theme activo,
@@ -65,7 +65,8 @@ body {
 
 /* ---- «Lo de siempre» ahora es la primera fila de Favoritos ---- */
 #seccionFavoritos .gn-usual { margin: -4px 0 12px; }
-#seccionFavoritos .gn-usual__label { color: color-mix(in srgb, var(--gh-fav) 60%, var(--text)); }
+/* 45 % de ámbar: llega a 4,5:1 en los 19 themes (con 60 % Notion daba 3,4:1) */
+#seccionFavoritos .gn-usual__label { color: color-mix(in srgb, var(--gh-fav) 45%, var(--text)); }
 
 /* Un color por sección en el título de cada panel */
 #seccionFavoritos .gn-panel__title::before,
