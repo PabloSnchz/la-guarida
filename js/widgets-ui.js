@@ -1,6 +1,9 @@
 /*!
- * js/widgets-ui.js — Widgets de La Guarida sin ventanitas del navegador (1.0.0, 2026-10-31, RG-4)
+ * js/widgets-ui.js — Widgets de La Guarida sin ventanitas del navegador (1.1.0, 2026-10-31, RG-4 + RG-8)
  *
+ * 1.1.0 (RG-8): quitar widgets. widgets.js nunca tuvo cómo borrarlos. En modo edición
+ * cada widget muestra ✕ (igual que favoritos y enlaces); al tocarlo se quita al instante
+ * y el aviso ofrece «Deshacer» 10 s. Si después guardás otra cosa, el Deshacer se cancela.
  * js/widgets.js no se toca (lo sigue usando La Guarida de siempre). Acá:
  *  1. «＋ Widget» abre un panel con los widgets disponibles (ícono, nombre y para qué sirve)
  *     en lugar del prompt() con números.
@@ -16,7 +19,8 @@
 (function (root) {
   'use strict';
 
-  var VERSION = '1.0.0';
+  var VERSION = '1.1.0';
+  var DESHACER_MS = 10000;
   var DIA = 24 * 60 * 60 * 1000;
 
   // Para qué sirve cada uno (los nombres e íconos salen de widgets.js).
@@ -71,6 +75,35 @@
     return w;
   }
 
+  // Quita el k-ésimo widget DIBUJADO. widgets.js no dibuja los tipos que no conoce,
+  // así que esos no cuentan para el índice. Devuelve { widget, side, index } o null.
+  function removeAt(state, k, known) {
+    var s = state || {};
+    var lados = [['widgets_left', s.widgets_left || []], ['widgets_right', s.widgets_right || []]];
+    var n = -1;
+    for (var j = 0; j < lados.length; j++) {
+      var list = lados[j][1];
+      for (var i = 0; i < list.length; i++) {
+        if (!list[i] || (known && !known[list[i].type])) continue;
+        if (++n === k) {
+          var w = list.splice(i, 1)[0];
+          list.forEach(function (x, idx) { if (x) x.position = idx; });
+          return { widget: w, side: lados[j][0], index: i };
+        }
+      }
+    }
+    return null;
+  }
+
+  // Lo vuelve a poner donde estaba.
+  function putBack(state, removed) {
+    if (!state || !removed) return;
+    if (!state[removed.side]) state[removed.side] = [];
+    var list = state[removed.side];
+    list.splice(Math.min(removed.index, list.length), 0, removed.widget);
+    list.forEach(function (x, idx) { if (x) x.position = idx; });
+  }
+
   // Valida lo que se escribió en el panel del contador.
   function validCounter(title, date) {
     var t = String(title == null ? '' : title).trim() || 'Cuenta regresiva';
@@ -96,7 +129,8 @@
 
   var api = {
     VERSION: VERSION, DESC: DESC, defaultConfig: defaultConfig, pickerItems: pickerItems, combined: combined,
-    nthOfType: nthOfType, addWidget: addWidget, validCounter: validCounter, counterView: counterView
+    nthOfType: nthOfType, addWidget: addWidget, validCounter: validCounter, counterView: counterView,
+    DESHACER_MS: DESHACER_MS, removeAt: removeAt, putBack: putBack
   };
   if (typeof module !== 'undefined' && module.exports) { module.exports = api; }
   if (!root || !root.document) return;
@@ -205,10 +239,73 @@
     });
   }
 
+  // ---- 4. Quitar widgets (RG-8) ----
+  function tipos() { return (root.Widgets && root.Widgets.WIDGET_TYPES) || {}; }
+
+  function ponerBotones() {
+    var types = tipos();
+    var shown = combined(state()).filter(function (w) { return w && types[w.type]; });
+    Array.prototype.forEach.call(doc.querySelectorAll('#widgetsLeft .widget'), function (node, k) {
+      if (node.querySelector(':scope > .edit-actions')) return;
+      var w = shown[k];
+      var nombre = (w && types[w.type] && types[w.type].label) || 'widget';
+      var box = el('div', 'edit-actions gw-del');
+      var b = el('button', 'del-btn', '✕');
+      b.type = 'button';
+      b.setAttribute('data-gw-del', '');
+      b.title = 'Quitar ' + nombre;
+      b.setAttribute('aria-label', 'Quitar el widget ' + nombre);
+      box.appendChild(b);
+      node.appendChild(box);
+    });
+  }
+
+  var deshacer = null;
+  var reponiendo = false;
+  function cancelarDeshacer() { if (deshacer) { deshacer.close(); deshacer = null; } }
+
+  function quitar(node) {
+    var K = kit();
+    var nodes = Array.prototype.slice.call(doc.querySelectorAll('#widgetsLeft .widget'));
+    var types = tipos();
+    var r = removeAt(state(), nodes.indexOf(node), types);
+    if (!r) return;
+    cancelarDeshacer();
+    guardarYDibujar();
+    if (!K) return;
+    var nombre = (types[r.widget.type] && types[r.widget.type].label) || 'widget';
+    deshacer = K.notify('Eliminé el widget «' + nombre + '».', {
+      kind: 'info', timeout: DESHACER_MS,
+      action: { label: 'Deshacer', fn: function () {
+        deshacer = null;
+        reponiendo = true;
+        putBack(state(), r);
+        guardarYDibujar();
+        reponiendo = false;
+        K.notify('Listo, volví a poner «' + nombre + '».', { kind: 'ok' });
+      } }
+    });
+  }
+
+  // Cualquier otro guardado cancela el Deshacer (así nunca pisa algo posterior).
+  function vigilarGuardado() {
+    var D = root.Data;
+    if (!D || !D.save || D.save.__gw) return;
+    var save = D.save;
+    D.save = function () { if (!reponiendo && deshacer) cancelarDeshacer(); return save.apply(D, arguments); };
+    D.save.__gw = true;
+  }
+
   function init() {
     doc.addEventListener('click', function (ev) {
       var t = ev.target;
       if (!t || !t.closest || !t.closest('#widgetsLeft')) return;
+      var del = t.closest('[data-gw-del]');
+      if (del) {
+        ev.preventDefault(); ev.stopPropagation();
+        quitar(del.closest('.widget'));
+        return;
+      }
       if (t.closest('.add-widget-btn')) {
         ev.preventDefault(); ev.stopPropagation();
         abrirCatalogo();
@@ -225,6 +322,12 @@
     var box = $('#widgetsLeft');
     if (box && root.MutationObserver) new root.MutationObserver(corregirContadores).observe(box, { childList: true });
     corregirContadores();
+    // Twitch y YouTube rehacen su tarjeta al cargar: por eso miro también adentro.
+    // ponerBotones solo agrega donde falta, así que no se repite sin fin.
+    if (box && root.MutationObserver) new root.MutationObserver(ponerBotones).observe(box, { childList: true, subtree: true });
+    ponerBotones();
+    // data.js carga después que este archivo: espero a que exista Data.save.
+    setTimeout(vigilarGuardado, 0);
   }
 
   root.GuaridaWidgets = { version: VERSION, api: api, abrirCatalogo: abrirCatalogo };

@@ -1,4 +1,4 @@
-/* css/widgets.css — Widgets de La Guarida (1.0.1, 2026-10-31, RG-4; RG-5: contraste del error)
+/* css/widgets.css — Widgets de La Guarida (1.1.0, 2026-10-31, RG-4; RG-5: contraste del error; RG-8: ✕ para quitar)
    Panel «Agregar un widget», panel de la cuenta regresiva y retoques del panel Widgets.
    Solo variables del theme activo. */
 
@@ -39,3 +39,7 @@
 #widgetsLeft .widget--resets .widget-reset-row:nth-child(3) { display: none; }
 #widgetsLeft .widget--counter:hover { border-color: var(--border-hover); }
 #widgetsLeft .add-widget-btn { min-height: 40px; }
+
+/* RG-8: ✕ para quitar un widget, solo en modo edición (la regla .edit-mode .edit-actions es de styles.css) */
+#widgetsLeft .widget .gw-del { top: 8px; right: 8px; z-index: 2; }
+#widgetsLeft .widget .gw-del .del-btn { width: 26px; height: 26px; font-size: .75rem; }
