@@ -43,6 +43,45 @@ test('agregar un widget lo pone al final de la izquierda con su configuración',
   assert.deepEqual(w, { type: 'notes', position: 1, config: { text: '' } });
 });
 
+test('RG-8: quitar el widget que tocaste, aunque haya tipos que no se dibujan', () => {
+  const known = { clock: 1, notes: 1, counter: 1 };
+  const st = {
+    widgets_left: [{ type: 'clock', position: 0 }, { type: 'viejo', position: 1 }, { type: 'notes', position: 2 }],
+    widgets_right: [{ type: 'counter', position: 0, config: { title: 'B' } }]
+  };
+  const r = W.removeAt(st, 1, known); // el 2.º dibujado: notes (el «viejo» no se dibuja)
+  assert.equal(r.widget.type, 'notes');
+  assert.equal(r.side, 'widgets_left');
+  assert.deepEqual(st.widgets_left.map(w => w.type), ['clock', 'viejo']);
+  assert.deepEqual(st.widgets_left.map(w => w.position), [0, 1], 'posiciones renumeradas');
+  const r2 = W.removeAt(st, 1, known); // ahora el 2.º dibujado es el contador de la derecha
+  assert.equal(r2.widget.config.title, 'B');
+  assert.equal(r2.side, 'widgets_right');
+  assert.equal(W.removeAt(st, 5, known), null);
+  assert.equal(W.removeAt({}, 0, known), null);
+  const st2 = { widgets_left: [{ type: 'clock', position: 0 }, { type: 'notes', position: 1 }, { type: 'counter', position: 2 }] };
+  W.removeAt(st2, 0, known);
+  assert.deepEqual(st2.widgets_left.map(w => w.position), [0, 1], 'quitar el primero corre a los demás');
+});
+
+test('RG-8: «Deshacer» lo vuelve a poner en el mismo lugar', () => {
+  const st = { widgets_left: [{ type: 'clock' }, { type: 'notes' }, { type: 'counter' }] };
+  const r = W.removeAt(st, 1);
+  W.putBack(st, r);
+  assert.deepEqual(st.widgets_left.map(w => w.type), ['clock', 'notes', 'counter']);
+  assert.deepEqual(st.widgets_left.map(w => w.position), [0, 1, 2]);
+  assert.equal(W.DESHACER_MS, 10000);
+});
+
+test('RG-8: el ✕ se ve solo en modo edición y el aviso lleva el guiño', () => {
+  const src = fs.readFileSync(path.join(__dirname, '../js/widgets-ui.js'), 'utf8');
+  assert.ok(src.includes("el('div', 'edit-actions gw-del')"), 'usa .edit-actions, que styles.css muestra solo con .edit-mode');
+  assert.ok(src.includes("'Eliminé el widget «'"), 'empieza con «Eliminé»: header.js le pone el guiño');
+  assert.ok(/subtree: true/.test(src), 'vuelve a poner el ✕ cuando Twitch o YouTube rehacen su tarjeta');
+  const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
+  assert.ok(html.includes('Para quitar uno, entrá en ✏️ Editar y tocá su ✕.'));
+});
+
 test('validación del contador', () => {
   assert.deepEqual(W.validCounter('  Cumple  ', '2026-12-25'), { ok: true, config: { title: 'Cumple', date: '2026-12-25' } });
   assert.deepEqual(W.validCounter('', ''), { ok: true, config: { title: 'Cuenta regresiva', date: '' } }, 'sin fecha se puede guardar');
