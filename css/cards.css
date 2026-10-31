@@ -1,0 +1,72 @@
+/* css/cards.css — Tarjetas de La Guarida (1.0.0, 2026-10-31, RG-3)
+   Un color por sección (aprobado por Pablo en RG-0b): ámbar Favoritos, violeta
+   Categorías, turquesa Lanzador. Los colores fijos van en bordes, brillos y puntos,
+   nunca como color de texto (en los themes claros no llegarían a 4,5:1); el texto
+   sigue saliendo del theme activo. Solo CSS: app.js no cambia.
+   Las variables --gh-fav/--gh-cat/--gh-lan vienen de css/header.css. */
+
+/* ---- Paneles: una línea de color arriba ---- */
+#seccionFavoritos, #seccionCategorias, #launcherPanel { position: relative; overflow: hidden; }
+#seccionFavoritos::before, #seccionCategorias::before, #launcherPanel::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; opacity: .85;
+}
+#seccionFavoritos::before { background: linear-gradient(90deg, var(--gh-fav), transparent 70%); }
+#seccionCategorias::before { background: linear-gradient(90deg, var(--gh-cat), transparent 70%); }
+#launcherPanel::before { background: linear-gradient(90deg, var(--gh-lan), transparent 70%); }
+
+/* ---- Favoritos (ámbar) ---- */
+#seccionFavoritos .fav-card { padding: 16px 8px 12px; }
+#seccionFavoritos .fav-card .fav-icon,
+#seccionFavoritos .fav-card .fav-emoji {
+  display: grid; place-items: center; width: 44px; height: 44px; padding: 6px; border-radius: 12px;
+  background: var(--panel); box-shadow: inset 0 0 0 1px var(--border);
+}
+#seccionFavoritos .fav-card:hover { border-color: var(--gh-fav); box-shadow: 0 6px 20px -10px var(--gh-fav); }
+#seccionFavoritos .fav-card:hover .fav-icon,
+#seccionFavoritos .fav-card:hover .fav-emoji { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gh-fav) 60%, var(--border)); }
+#seccionFavoritos .gn-usual__chip:hover { border-color: var(--gh-fav); }
+
+/* ---- Categorías (violeta) ---- */
+#seccionCategorias .category-card { border-left: 3px solid color-mix(in srgb, var(--gh-cat) 70%, var(--border)); }
+#seccionCategorias .category-card:hover { border-color: color-mix(in srgb, var(--gh-cat) 45%, var(--border)); border-left-color: var(--gh-cat); }
+#seccionCategorias .category-header { padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+/* El título va con el color del theme; en el theme oficial, violeta claro (contraste ≥ 7:1 sobre el panel) */
+body[data-theme="gato"] #seccionCategorias .category-title { color: #C9BBFF; }
+#seccionCategorias .category-link:hover { border-color: color-mix(in srgb, var(--gh-cat) 55%, var(--border)); }
+
+/* ---- Lanzador (turquesa) ---- */
+#launcherPanel .launcher-section-title::before {
+  content: ""; display: inline-block; width: 6px; height: 6px; margin: 0 6px 1px 0; border-radius: 50%;
+  background: var(--gh-lan); vertical-align: middle;
+}
+#launcherPanel .launcher-item { min-height: 42px; border-radius: 10px; }
+#launcherPanel .launcher-icon {
+  display: grid; place-items: center; width: 30px; height: 30px; flex-shrink: 0; border-radius: 8px;
+  background: var(--panel); box-shadow: inset 0 0 0 1px var(--border);
+}
+#launcherPanel .launcher-item:hover { border-color: var(--gh-lan); box-shadow: 0 6px 20px -10px var(--gh-lan); }
+
+/* ---- Botones «+ …» de cada sección ---- */
+#seccionFavoritos .add-btn:hover { border-color: var(--gh-fav); }
+#seccionCategorias .add-btn:hover { border-color: var(--gh-cat); }
+#launcherPanel .add-btn:hover { border-color: var(--gh-lan); }
+
+/* ---- Estados vacíos: el gato robot «en construcción» ---- */
+.favorites-grid:not(:has(.fav-card))::before,
+.categories-grid:not(:has(.category-card))::before {
+  content: ""; grid-column: 1 / -1; justify-self: center; width: 96px; height: 96px;
+  background: url("../assets/brand/gato-en-construccion-256.webp") center / contain no-repeat;
+  opacity: .9;
+}
+.favorites-grid:not(:has(.fav-card))::after,
+.categories-grid:not(:has(.category-card))::after {
+  grid-column: 1 / -1; justify-self: center; margin-top: -4px; font-size: .8125rem; color: var(--gn-muted); text-align: center;
+}
+.favorites-grid:not(:has(.fav-card))::after { content: "Todavía no hay favoritos. Soltá un enlace acá o tocá «+ Favorito»."; order: -1; }
+.categories-grid:not(:has(.category-card))::after { content: "Todavía no hay categorías. Creá una con «+ Categoría»."; order: -1; }
+.favorites-grid:not(:has(.fav-card))::before,
+.categories-grid:not(:has(.category-card))::before { order: -2; }
+
+@media (prefers-reduced-motion: reduce) {
+  #seccionFavoritos .fav-card:hover, #launcherPanel .launcher-item:hover { transform: none; }
+}

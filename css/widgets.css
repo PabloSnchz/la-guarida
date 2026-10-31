@@ -1,0 +1,41 @@
+/* css/widgets.css — Widgets de La Guarida (1.0.1, 2026-10-31, RG-4; RG-5: contraste del error)
+   Panel «Agregar un widget», panel de la cuenta regresiva y retoques del panel Widgets.
+   Solo variables del theme activo. */
+
+/* ---- Panel «Agregar un widget» ---- */
+.gk-sheet__card:has(.gw-pick) { width: min(560px, 100%); }
+.gw-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; max-height: 60vh; overflow: auto; }
+.gw-pick__item {
+  position: relative; display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px 10px;
+  background: var(--panel-alt); border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); font: inherit; text-align: left; cursor: pointer;
+}
+.gw-pick__item:hover, .gw-pick__item:focus-visible { border-color: var(--border-hover); }
+.gw-pick__icon { width: 28px; height: 28px; flex-shrink: 0; border-radius: 6px; object-fit: contain; }
+.gw-pick__txt { display: grid; gap: 1px; min-width: 0; }
+.gw-pick__txt b { font-size: .875rem; }
+.gw-pick__txt span { font-size: .75rem; color: var(--gn-muted); }
+.gw-pick__count {
+  position: absolute; top: 6px; right: 8px; padding: 0 6px; border-radius: 999px;
+  background: var(--panel); color: var(--gn-muted); font-size: .6875rem;
+}
+
+/* ---- Panel de la cuenta regresiva ---- */
+.gw-form { display: grid; gap: 12px; }
+.gw-field { display: grid; gap: 4px; }
+.gw-field span { font: 600 .75rem/1rem var(--font); letter-spacing: .04em; text-transform: uppercase; color: var(--gn-muted); }
+.gw-field input {
+  min-height: 40px; padding: 8px 12px; border-radius: 8px;
+  background: var(--panel-alt); color: var(--text); border: 1px solid var(--border); font: 400 .9375rem/1.4 var(--font);
+  color-scheme: dark light;
+}
+.gw-field input:focus { outline: none; border-color: var(--border-hover); }
+/* El rojo va en la barra; el texto, con el color del theme (RG-5: el rojo solo no llegaba a 4,5:1 en One Dark) */
+.gw-error { min-height: 1em; padding-left: 8px; border-left: 3px solid #D94A4A; font-size: .8125rem; color: var(--text); }
+.gw-error:empty { display: none; }
+
+/* ---- Panel Widgets ---- */
+/* La temporada ya está en la cabecera, leída de la API; el widget la tenía fija en 2026-09-15 y mostraba «—». */
+#widgetsLeft .widget--resets .widget-reset-row:nth-child(3) { display: none; }
+#widgetsLeft .widget--counter:hover { border-color: var(--border-hover); }
+#widgetsLeft .add-widget-btn { min-height: 40px; }

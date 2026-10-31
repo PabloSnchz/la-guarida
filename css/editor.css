@@ -1,0 +1,24 @@
+/* css/editor.css — Editor de La Guarida (1.0.0, 2026-10-31, RG-5)
+   Lo opcional (ícono y emoji) plegado; lo que se usa siempre (nombre, dirección,
+   abrir en Chrome) a la vista. Solo variables del theme activo. */
+
+.ge-more { margin: 4px 0 0; border: 1px solid var(--border); border-radius: 10px; background: var(--panel-alt); }
+.ge-more > summary {
+  display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; cursor: pointer; list-style: none;
+  font: 600 .8125rem/1 var(--font); color: var(--text);
+}
+.ge-more > summary::-webkit-details-marker { display: none; }
+.ge-more > summary::before { content: "▸"; color: var(--gn-muted); transition: transform var(--transition-speed) ease; }
+.ge-more[open] > summary::before { transform: rotate(90deg); }
+.ge-more > summary span { font-weight: 400; color: var(--gn-muted); }
+.ge-more > summary:focus-visible { outline: 2px solid var(--accent-2); outline-offset: -2px; border-radius: 10px; }
+.ge-more > .field, .ge-more__row { padding: 0 12px; }
+.ge-more .field input { background: var(--panel); }
+.ge-more__row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-bottom: 12px; }
+.ge-more__row .btn { width: 100%; padding: 0 10px; font-size: .8125rem; }
+/* modal.js oculta estos botones para categorías y lanzador: si se van los dos, la fila no deja hueco */
+.ge-more__row:not(:has(.btn:not([style*="display: none"]))) { display: none; }
+
+@media (max-width: 480px) {
+  .ge-more__row { grid-template-columns: 1fr; }
+}
