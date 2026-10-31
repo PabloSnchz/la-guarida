@@ -5,33 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0F1117">
   <title>🐈‍⬛ La Guarida — Página de Inicio</title>
-  <!-- Identidad Gato Negro. Diseño 2.1 (BL-052, DEC-028): el lenguaje visual
-       del Gato Design System; La Guarida sigue siendo un lanzador personal. -->
+  <!-- Identidad Gato Negro. Diseño 3.0 (restyle RG, 2026-10-31): la línea de La Bóveda
+       a la medida de un lanzador personal. Estructura en css/styles.css 2.1; lo nuevo en
+       kit, header, cards, widgets y editor. -->
   <link rel="icon" type="image/svg+xml" href="assets/brand/gato-negro.svg">
   <link rel="stylesheet" href="css/styles.css?v=2.1.0">
   <link rel="stylesheet" href="css/themes/gato.css" id="themeStylesheet">
+  <link rel="stylesheet" href="css/kit.css?v=1.0.1">
+  <link rel="stylesheet" href="css/header.css?v=1.0.1">
+  <link rel="stylesheet" href="css/cards.css?v=1.0.0">
+  <link rel="stylesheet" href="css/widgets.css?v=1.0.1">
+  <link rel="stylesheet" href="css/editor.css?v=1.0.0">
 </head>
 <body>
 
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
-<!-- CABECERA: marca, navegación de La Guarida y herramientas -->
-<header class="app-header">
-  <div class="app-bar">
+<!-- CABECERA (RG-2): dos filas finas. 1) marca, secciones y herramientas.
+     2) saludo, portal de Shiruvana y relojes. Debajo, la franja del consejo del día
+     (solo cuando hay uno). El backup vive en «⋯» con un punto dorado si conviene hacer uno. -->
+<header class="app-header gh">
+  <div class="app-bar gh-bar">
     <a class="brand" href="./" aria-label="La Guarida, inicio">
-      <img class="brand__logo" src="assets/brand/gato-negro.svg" alt="" width="36" height="36">
+      <img class="brand__logo" src="assets/brand/gato-negro.svg" alt="" width="30" height="30">
       <span class="brand__text">
         <span class="brand__name">La Guarida</span>
-        <span class="brand__sub">Lanzador del Gato Negro</span>
       </span>
     </a>
 
     <nav class="app-nav" aria-label="Secciones">
-      <a class="app-tab" href="#inicio" data-nav="inicio" aria-current="true">Inicio</a>
-      <a class="app-tab" href="#seccionFavoritos" data-nav="seccionFavoritos">Favoritos</a>
-      <a class="app-tab" href="#seccionCategorias" data-nav="seccionCategorias">Categorías</a>
-      <a class="app-tab" href="#launcherPanel" data-nav="launcherPanel">Lanzador</a>
-      <a class="app-tab" href="#seccionWidgets" data-nav="seccionWidgets">Widgets</a>
+      <a class="app-tab gh-tab gh-tab--fav" href="#seccionFavoritos" data-nav="seccionFavoritos">Favoritos</a>
+      <a class="app-tab gh-tab gh-tab--cat" href="#seccionCategorias" data-nav="seccionCategorias">Categorías</a>
+      <a class="app-tab gh-tab gh-tab--lan" href="#launcherPanel" data-nav="launcherPanel">Lanzador</a>
+      <a class="app-tab gh-tab" href="#seccionWidgets" data-nav="seccionWidgets">Widgets</a>
     </nav>
 
     <div class="app-tools">
@@ -61,69 +67,51 @@
       <button id="editModeBtn" class="app-btn" type="button" title="Modo edición">✏️ Editar</button>
 
       <details class="gn-menu">
-        <summary class="app-btn">＋ Agregar</summary>
+        <summary class="app-btn gh-icon-btn" title="Agregar" aria-label="Agregar">＋</summary>
         <div class="gn-menu__panel">
           <button id="addFavoriteBtn" class="gn-menu__item" type="button">⭐ Favorito</button>
           <button id="addCategoryBtn" class="gn-menu__item" type="button">📁 Categoría</button>
         </div>
       </details>
 
-      <details class="gn-menu">
-        <summary class="app-btn">💾 Backup</summary>
-        <div class="gn-menu__panel">
+      <details class="gn-menu gn-menu--end" id="ghMoreMenu">
+        <summary class="app-btn gh-icon-btn" id="ghMore" title="Más opciones" aria-label="Más opciones">⋯<span class="gh-dot" id="ghDot" hidden></span></summary>
+        <div class="gn-menu__panel gh-more">
+          <p class="gn-menu__group">Backup</p>
+          <p class="gh-more__info" id="ghBackupInfo"></p>
           <button id="exportBtn" class="gn-menu__item" type="button">⬇️ Descargar backup</button>
           <button id="importBtn" class="gn-menu__item" type="button">📂 Restaurar desde archivo</button>
-        </div>
-      </details>
-      <input type="file" id="importFile" accept=".json" hidden>
-
-      <details class="gn-menu gn-menu--end">
-        <summary class="app-btn">🐾 Ecosistema</summary>
-        <div class="gn-menu__panel">
           <p class="gn-menu__group">Gato Negro</p>
           <a class="gn-menu__item" href="https://pablosnchz.github.io/gw2-wallet-ligero/" target="_blank" rel="noopener" data-portal="boveda" data-emoji="🐈‍⬛">🐈‍⬛ La Bóveda del Gato Negro</a>
           <a class="gn-menu__item" href="https://pablosnchz.github.io/gw2-factory-dashboard/" target="_blank" rel="noopener" data-portal="panel" data-emoji="🧭">🧭 Centro de decisiones</a>
+          <a class="gn-menu__item" href="https://pablosnchz.github.io/bio/" target="_blank" rel="noopener" data-portal="bio" data-emoji="🔗" data-label="Link in Bio"><img class="gh-bio" src="https://raw.githubusercontent.com/PabloSnchz/bio/main/assets/profile.png" alt="" width="18" height="18"> Link in Bio · Pablin Schez</a>
           <p class="gn-menu__group">Guild Wars 2</p>
           <a class="gn-menu__item" href="https://wiki-es.guildwars2.com/wiki/P%C3%A1gina_principal" target="_blank" rel="noopener" data-portal="wiki" data-emoji="📖" data-label="Wiki GW2 (español)">📖 Wiki GW2</a>
           <a class="gn-menu__item" href="https://en-forum.guildwars2.com/" target="_blank" rel="noopener" data-portal="foros" data-emoji="💬" data-label="Foros GW2">💬 Foros</a>
           <a class="gn-menu__item" href="https://account.arena.net/applications" target="_blank" rel="noopener" data-portal="anet" data-emoji="🔑" data-label="ANet Keys (API keys)">🔑 ANet Keys</a>
         </div>
       </details>
-
-      <!-- Badge Link in Bio: colores oficiales de Gato Negro, fijos (no siguen el theme) -->
-      <a class="bio-badge" href="https://pablosnchz.github.io/bio/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;border-radius:4px;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;height:26px;">
-        <span style="background-color:#232A3A;color:#F4F6FA;padding:0 10px;font-size:10px;font-weight:600;display:flex;align-items:center;gap:6px;letter-spacing:0.3px;white-space:nowrap;height:100%;">
-          <img src="https://raw.githubusercontent.com/PabloSnchz/bio/main/assets/profile.png" alt="Foto" style="width:18px;height:18px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.3);">
-          Link in Bio
-        </span>
-        <span style="background-color:#5A3DDB;color:#FFFFFF;padding:0 12px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;white-space:nowrap;height:100%;">
-          Pablin Schez
-        </span>
-      </a>
+      <input type="file" id="importFile" accept=".json" hidden>
     </div>
   </div>
+
+  <div class="gh-row" id="inicio">
+    <div class="gh-hello">
+      <h1 id="heroTitle" class="gh-hello__title">Hola, Pablo</h1>
+      <p class="gh-hello__date" id="heroDate"></p>
+    </div>
+    <button type="button" id="portalTrigger" class="gn-portal-trigger gh-portal" aria-haspopup="dialog" aria-keyshortcuts="Control+K /">
+      <img class="gn-avatar-slot gn-portal-trigger__avatar" alt="" width="28" height="28">
+      <span class="gn-portal-trigger__text"><strong>¿A dónde vamos?</strong> <span>Buscá un favorito, un enlace o una app…</span></span>
+      <span class="gn-portal-trigger__keys" aria-hidden="true"><kbd class="gn-kbd">Ctrl</kbd><kbd class="gn-kbd">K</kbd></span>
+    </button>
+    <div class="gh-clocks" id="ghClocks" aria-label="Relojes de Guild Wars 2"></div>
+  </div>
+
+  <div class="gh-tip" id="ghTip"></div>
 </header>
 
 <main id="contenido" class="app-main">
-  <!-- RESUMEN: saludo, fecha, tus números y el portal de Shiruvana (DEC-028) -->
-  <section class="hero" id="inicio" aria-labelledby="heroTitle">
-    <div class="hero__intro">
-      <p class="kicker">La Guarida · <span id="heroDate"></span></p>
-      <h1 id="heroTitle" class="hero__title">Hola, Pablo</h1>
-      <div id="heroBadges" class="hero__badges"></div>
-    </div>
-    <div class="hero__host">
-      <button type="button" id="portalTrigger" class="gn-portal-trigger" aria-haspopup="dialog" aria-keyshortcuts="Control+K /">
-        <img class="gn-avatar-slot gn-portal-trigger__avatar" alt="" width="40" height="40">
-        <span class="gn-portal-trigger__text"><strong>¿A dónde vamos?</strong> <span>Buscá un favorito, un enlace o una app…</span></span>
-        <span class="gn-portal-trigger__keys" aria-hidden="true"><kbd class="gn-kbd">Ctrl</kbd><kbd class="gn-kbd">K</kbd></span>
-      </button>
-      <div id="usualRow" class="gn-usual" hidden>
-        <span class="gn-usual__label">Lo de siempre a esta hora</span>
-        <div id="usualChips" class="gn-usual__chips"></div>
-      </div>
-    </div>
-  </section>
 
   <div class="layout-row">
     <!-- WIDGETS -->
@@ -146,6 +134,10 @@
           <span id="favCount" class="gn-count"></span>
         </div>
         <p class="gn-panel__desc">Tus accesos de un clic. Soltá un enlace acá para agregarlo; en modo edición, arrastrá para ordenar.</p>
+        <div id="usualRow" class="gn-usual" hidden>
+          <span class="gn-usual__label">Lo de siempre a esta hora</span>
+          <div id="usualChips" class="gn-usual__chips"></div>
+        </div>
         <div class="favorites-grid" id="favoritesGrid"></div>
       </section>
 
@@ -196,29 +188,31 @@
       <label for="modalCommand">Ruta o comando</label>
       <input type="text" id="modalCommand" placeholder="C:\...\app.exe">
     </div>
-    <div class="field" id="modalExtractIconField" style="display:none;">
-      <button id="modalExtractIconBtn" class="btn" type="button" style="width:100%;">📥 Extraer ícono del .exe</button>
-    </div>
-    <div class="field">
-      <label for="modalEmoji">Emoji (opcional)</label>
-      <input type="text" id="modalEmoji" placeholder="🔗">
-    </div>
-    <div class="field">
-      <label for="modalIconUrl">URL del ícono (opcional)</label>
-      <input type="url" id="modalIconUrl" placeholder="https://.../icon.png">
-    </div>
     <div class="field" id="modalOpenChromeField">
       <label style="display:flex;align-items:center;gap:6px;cursor:pointer;text-transform:none;letter-spacing:0;">
         <input type="checkbox" id="modalOpenChrome" style="width:auto;min-height:0;margin:0;cursor:pointer;">
         Abrir en Chrome obligatoriamente
       </label>
     </div>
-    <div class="field">
-      <button id="modalAutoDetectFaviconBtn" class="btn" type="button" style="width:100%;">🔍 Auto-detectar favicon</button>
-    </div>
-    <div class="field">
-      <button id="modalDownloadFaviconBtn" class="btn" type="button" style="width:100%;">📥 Descargar como base64</button>
-    </div>
+    <!-- RG-5: lo opcional, plegado. Los id son los mismos, modal.js no cambia. -->
+    <details class="ge-more">
+      <summary>Ícono y emoji <span>(opcional)</span></summary>
+      <div class="field" id="modalExtractIconField" style="display:none;">
+        <button id="modalExtractIconBtn" class="btn" type="button" style="width:100%;">📥 Extraer ícono del .exe</button>
+      </div>
+      <div class="field">
+        <label for="modalEmoji">Emoji</label>
+        <input type="text" id="modalEmoji" placeholder="🔗">
+      </div>
+      <div class="field">
+        <label for="modalIconUrl">URL del ícono</label>
+        <input type="url" id="modalIconUrl" placeholder="https://.../icon.png">
+      </div>
+      <div class="ge-more__row">
+        <button id="modalAutoDetectFaviconBtn" class="btn" type="button">🔍 Auto-detectar favicon</button>
+        <button id="modalDownloadFaviconBtn" class="btn" type="button">📥 Descargar como base64</button>
+      </div>
+    </details>
     <div class="modal-actions">
       <button id="modalCancel" class="btn" type="button">Cancelar</button>
       <button id="modalSave" class="btn btn--gold" type="button">Guardar</button>
@@ -226,6 +220,10 @@
   </div>
 </div>
 
+<script src="js/kit.js?v=1.0.0"></script>
+<script src="js/header.js?v=1.1.0"></script>
+<script src="js/widgets-ui.js?v=1.0.0"></script>
+<script src="js/editor.js?v=1.0.0"></script>
 <script src="js/data.js"></script>
 <script src="js/widgets.js"></script>
 <script src="js/drag-drop.js"></script>
