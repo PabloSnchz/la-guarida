@@ -19,7 +19,7 @@ Página de inicio personal del Gato Negro — lanzador híbrido que combina link
 - 🔎 **Portal «¿A dónde vamos?»**: barra en la cabecera; también se abre con **Ctrl+K** o **/**. Busca en favoritos, enlaces, apps, juegos, atajos (Wiki, Foros, ANet Keys, La Bóveda, Centro de decisiones, Link in Bio) y acciones (theme, modo edición, agregar, backup). Encuentra aunque escribas con errores o sin acentos; ↑ ↓ para moverse, Enter abre, Esc cierra.
 - ⏱️ **Lo de siempre**: hasta 5 accesos que más abrís en esta franja del día (mañana, tarde o noche), como primera fila de Favoritos. Aparece con 10 aperturas o más.
 - 🧹 **Consejos de orden**: una franja fina debajo de la cabecera, como mucho una por día, sobre enlaces repetidos, categorías vacías o un backup viejo. Cada uno trae su botón para resolverlo y «Ahora no» lo silencia 30 días. Nunca aparece mientras editás.
-- 🙂 **Su cara cambia según el momento**: saluda en la barra del portal, piensa mientras buscás, explica en los consejos y avisa con la mirada cuando conviene hacer un backup.
+- 🙂 **Siete poses según el momento** (RG-7): saluda en la barra del portal; con el portal abierto aparece su retrato al costado (con el gato mientras espera, pensando si encuentra algo, explicando si no); explica en los consejos y mira con atención cuando conviene un backup; en los avisos festeja lo que salió bien, guiña al borrar (con «Deshacer») y mira con atención en las advertencias.
 
 ### Sistema de temas
 
@@ -80,14 +80,14 @@ Cada tema incluye:
 | Un color por sección | Ámbar Favoritos, violeta Categorías, turquesa Lanzador: línea arriba de cada panel, bordes y brillos. Nunca como color de texto fuera del tema Gato Negro |
 | Secciones vacías | El gato robot «en construcción» con un texto que explica qué hacer |
 | Editor | Nombre, dirección y «Abrir en Chrome» a la vista; ícono y emoji plegados. El foco va al nombre, Enter guarda, Esc cierra |
-| Avisos | Abajo a la derecha, sin ventanas del navegador; borrar ofrece «Deshacer» 10 s |
+| Avisos | Abajo a la derecha, sin ventanas del navegador, con la cara de Shiruvana; borrar ofrece «Deshacer» 10 s |
 | Accesibilidad | Foco visible, «Saltar al contenido», todo usable con teclado, movimiento reducido. Contraste mínimo 4,5:1 de todo lo nuevo, medido en los 19 temas por `tests/themes-contraste.test.cjs` |
 
 Los colores salen siempre de las variables del tema activo, así que los 19 temas siguen funcionando. Menús, portal, paneles y avisos son opacos aunque el tema use paneles translúcidos.
 
 La grilla se adapta: en pantallas anchas, widgets | favoritos y categorías | lanzador; debajo de 1400 px, favoritos y categorías arriba y widgets y lanzador abajo; en el celular, todo en una columna.
 
-El restyle se armó en una vista previa (`next/`) paso a paso, cada uno validado por Pablo: RG-1 kit, RG-2 cabecera, RG-3 tarjetas, RG-3b caras de Shiruvana, RG-4 widgets, RG-5 editor, avisos y revisión de temas, RG-6 reemplazo de la raíz. Propuestas en `docs/propuestas/propuesta-restyle-rg0.html` y `rg0b.html`. `next/` quedó solo como redirección a la raíz.
+El restyle se armó en una vista previa (`next/`) paso a paso, cada uno validado por Pablo: RG-1 kit, RG-2 cabecera, RG-3 tarjetas, RG-3b caras de Shiruvana, RG-4 widgets, RG-5 editor, avisos y revisión de temas, RG-6 reemplazo de la raíz. Después, RG-7 puso a la vista las siete poses. Propuestas en `docs/propuestas/propuesta-restyle-rg0.html` y `rg0b.html`. `next/` quedó solo como redirección a la raíz.
 
 ## 🐈‍⬛ Shiruvana en La Guarida
 
@@ -95,8 +95,9 @@ En el Centro de decisiones Shiruvana es la operadora: informa y pide decisiones.
 
 | Regla | Detalle |
 |-------|---------|
-| Dónde | La barra del portal y la franja del consejo (como mucho uno por día) |
-| Imagen | La figura ilustrada de Shiruvana, aprobada por Pablo el 2026-10-31: 7 poses en `assets/brand/shiruvana/` (hola, pensando, explica, ojo, festeja, guiño, con el gato), cada una en retrato 320/640 px y cara 128/256 px |
+| Dónde | La barra del portal, el portal abierto (retrato al costado desde 1000 px de ancho), la franja del consejo (como mucho uno por día) y los avisos |
+| Imagen | La figura ilustrada de Shiruvana, aprobada por Pablo el 2026-10-31 como su imagen en todo el ecosistema: 7 poses en `assets/brand/shiruvana/`, cada una en retrato 320/640 px y cara 128/256 px |
+| Cada pose | hola: barra del portal · con el gato: portal abierto sin búsqueda · pensando: portal con resultados · explica: portal sin resultados, consejos y avisos informativos · ojo: consejo de backup, advertencias y errores · festeja: avisos de algo que salió bien · guiño: borrado con «Deshacer» |
 | Nunca | Datos de la Factory (decisiones, validaciones, backlog, estado, tareas). Tampoco en favoritos, categorías, lanzador, widgets ni en el editor |
 | Cómo abre | Hace clic en el elemento real de la pantalla: respeta Chrome forzado, el protocolo `launch:` y el modo edición |
 | Red | Ninguna: busca solo en tu Guarida |
@@ -109,13 +110,13 @@ En el Centro de decisiones Shiruvana es la operadora: informa y pide decisiones.
 | `index.html` | Cabecera de dos filas y grilla de widgets, favoritos, categorías y lanzador |
 | `css/styles.css` | Estructura y componentes sobre las variables del tema (2.1) |
 | `css/kit.css` | Relojes compactos, avisos y paneles |
-| `css/header.css` | Cabecera de dos filas, «⋯», franja del consejo y colores por sección |
+| `css/header.css` | Cabecera de dos filas, «⋯», franja del consejo, colores por sección, retrato del portal y cara en los avisos |
 | `css/cards.css` | Tarjetas con un color por sección y secciones vacías |
 | `css/widgets.css` | Panel «Agregar un widget» y contador |
 | `css/editor.css` | Editor con «Ícono y emoji» plegado |
 | `css/themes/` | 19 archivos CSS con variables por tema |
 | `js/kit.js` | Reloj común (diario, semanal, temporada) y avisos/paneles propios |
-| `js/header.js` | Relojes, temporada desde la API, punto de backup, franja del consejo y caras de Shiruvana |
+| `js/header.js` | Relojes, temporada desde la API, punto de backup, franja del consejo y las siete poses de Shiruvana |
 | `js/widgets-ui.js` | Panel «Agregar un widget» y contador con selector de fecha |
 | `js/editor.js` | Borrar con «Deshacer», avisos en lugar de ventanas del navegador y teclado en el editor |
 | `js/data.js` | Estado, persistencia, favicons, defaults |
