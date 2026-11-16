@@ -68,6 +68,19 @@ test('cabecera de dos filas, «⋯» con backup y «Lo de siempre» en Favoritos
   assert.ok(fav.indexOf('id="usualRow"') > 0 && fav.indexOf('id="usualRow"') < fav.indexOf('id="favoritesGrid"'));
 });
 
+test('BL-089: el ecosistema Gato Negro completo en «⋯», también el sitio de Shiruvana', () => {
+  const more = html.slice(html.indexOf('id="ghMoreMenu"'), html.indexOf('</details>', html.indexOf('id="ghMoreMenu"')));
+  const gato = more.slice(more.indexOf('>Gato Negro<'), more.indexOf('>Guild Wars 2<'));
+  const portales = [...gato.matchAll(/data-portal="([^"]+)"/g)].map(m => m[1]);
+  assert.deepEqual(portales, ['boveda', 'panel', 'shiruvana', 'bio']);
+  const a = /<a [^>]*data-portal="shiruvana"[^>]*>/.exec(gato)[0];
+  assert.ok(a.includes('href="https://pablosnchz.github.io/shiruvana/"'));
+  assert.ok(a.includes('target="_blank"') && a.includes('rel="noopener"'));
+  assert.ok(/data-label="[^"]*Shiruvana[^"]*"/.test(a), 'el portal la encuentra por su nombre');
+  const img = /<a [^>]*data-portal="shiruvana"[^>]*>\s*<img [^>]*src="([^"]+)"/.exec(gato);
+  assert.ok(img && fs.existsSync(path.join(ROOT, img[1])), 'con mi cara, que existe en el repo');
+});
+
 test('next/ solo queda como redirección a la raíz', () => {
   const n = read('next/index.html');
   assert.ok(n.includes('<meta http-equiv="refresh" content="0; url=../">'));
