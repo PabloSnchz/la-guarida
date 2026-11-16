@@ -16,7 +16,7 @@ Página de inicio personal del Gato Negro — lanzador híbrido que combina link
 
 ### Shiruvana, tu anfitriona
 
-- 🔎 **Portal «¿A dónde vamos?»**: barra en la cabecera; también se abre con **Ctrl+K** o **/**. Busca en favoritos, enlaces, apps, juegos, atajos (Wiki, Foros, ANet Keys, La Bóveda, Centro de decisiones, Link in Bio) y acciones (theme, modo edición, agregar, backup). Encuentra aunque escribas con errores o sin acentos; ↑ ↓ para moverse, Enter abre, Esc cierra.
+- 🔎 **Portal «¿A dónde vamos?»**: barra en la cabecera; también se abre con **Ctrl+K** o **/**. Busca en favoritos, enlaces, apps, juegos, atajos (Wiki, Foros, ANet Keys, La Bóveda, Centro de decisiones, el sitio de Shiruvana, Link in Bio) y acciones (theme, modo edición, agregar, backup). Encuentra aunque escribas con errores o sin acentos; ↑ ↓ para moverse, Enter abre, Esc cierra.
 - ⏱️ **Lo de siempre**: hasta 5 accesos que más abrís en esta franja del día (mañana, tarde o noche), como primera fila de Favoritos. Aparece con 10 aperturas o más.
 - 🧹 **Consejos de orden**: una franja fina debajo de la cabecera, como mucho una por día, sobre enlaces repetidos, categorías vacías o un backup viejo. Cada uno trae su botón para resolverlo y «Ahora no» lo silencia 30 días. Nunca aparece mientras editás.
 - 🙂 **Siete poses según el momento** (RG-7): saluda en la barra del portal; con el portal abierto aparece su retrato al costado (con el gato mientras espera, pensando si encuentra algo, explicando si no); explica en los consejos y mira con atención cuando conviene un backup; en los avisos festeja lo que salió bien, guiña al borrar (con «Deshacer») y mira con atención en las advertencias.
@@ -73,7 +73,7 @@ Cada tema incluye:
 
 | Pieza | Detalle |
 |-------|---------|
-| Cabecera | Dos filas finas (≈ 100 px). Fila 1: marca, secciones (Favoritos, Categorías, Lanzador, Widgets), theme, Editar, «＋» y «⋯» (backup con la fecha del último, La Bóveda, Centro de decisiones, Link in Bio y enlaces de GW2). Fila 2: saludo, portal de Shiruvana y relojes |
+| Cabecera | Dos filas finas (≈ 100 px). Fila 1: marca, secciones (Favoritos, Categorías, Lanzador, Widgets), theme, Editar, «＋» y «⋯» (backup con la fecha del último, La Bóveda, Centro de decisiones, el sitio de Shiruvana, Link in Bio y enlaces de GW2). Fila 2: saludo, portal de Shiruvana y relojes |
 | Relojes | Local, reinicio diario (00:00 UTC), semanal (lunes 07:30 UTC) y fin de la temporada de la Cámara del Brujo, con los íconos de La Bóveda. Se ponen dorados cuando falta poco: menos de 1 h el diario, menos de 24 h el semanal, menos de 3 días la temporada |
 | Temporada | Se lee de `/v2/wizardsvault` (API pública de GW2) como mucho una vez por día; si no hay fecha, ese reloj no aparece |
 | Backup | Punto dorado en «⋯» cuando pasan más de 30 días sin backup |
@@ -306,6 +306,7 @@ Windows Registry Editor Version 5.00
 |----------|--------|
 | Bóveda del Gato Negro | [WebApp GW2](https://pablosnchz.github.io/gw2-wallet-ligero/) |
 | Centro de decisiones | [Gato Negro Factory](https://pablosnchz.github.io/gw2-factory-dashboard/) |
+| Shiruvana | [Quién soy](https://pablosnchz.github.io/shiruvana/) |
 | Link in Bio | [Bio](https://pablosnchz.github.io/bio/) |
 | Métricas GA4 | [Dashboard](https://pablosnchz.github.io/gw2-metrics-dashboard/) |
 | Traffic Stats | [Histórico](https://pablosnchz.github.io/github-repo-traffic-stats/) |
