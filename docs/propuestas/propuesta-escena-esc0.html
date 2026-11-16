@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ESC-0 · La Guarida con la estética de la función · Propuesta</title>
+<meta name="robots" content="noindex">
+<!-- BL-091 ESC-0 (2026-11-16). Maqueta: no toca La Guarida real ni sus datos.
+     Las caras salen de la-guarida; el gato y mis poses de cuerpo entero, del repo shiruvana
+     (solo en la maqueta: al implementar se copian a la-guarida). -->
+<style>
+  :root {
+    --bg: #0F1117; --panel: #1A1F2B; --panel-alt: #232A3A; --border: #2E3649; --border-hover: #7B5CFF;
+    --accent: #F2B94B; --accent-2: #A896FF; --text: #F4F6FA; --muted: #8E96A3; --teal: #2EC4B6; --violeta: #5A3DDB;
+    --r: 12px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: #07080C; color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  button { font: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ================= barra de la propuesta (no es parte de La Guarida) ================= */
+  .pr { position: sticky; top: 0; z-index: 100; background: #05060A; border-bottom: 1px solid #262B38; padding: 10px 16px; display: grid; gap: 8px; }
+  .pr-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+  .pr h1 { margin: 0; font-size: 1rem; }
+  .pr h1 span { color: var(--accent); }
+  .pr-top p { margin: 0; color: var(--muted); font-size: .85rem; flex: 1; min-width: 240px; }
+  .pr-dec { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+  .pr-d { display: flex; align-items: center; gap: 6px; font-size: .82rem; }
+  .pr-d b { color: var(--accent); font-size: .78rem; }
+  .pr-d .lbl { color: var(--muted); }
+  .seg { display: inline-flex; border: 1px solid #2E3649; border-radius: 999px; overflow: hidden; }
+  .seg button { border: 0; background: transparent; color: var(--muted); padding: 4px 10px; cursor: pointer; font-size: .8rem; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: #111; font-weight: 700; }
+  .seg button .rec { font-size: .65rem; margin-left: 4px; opacity: .8; }
+  .pr-sim { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pr-sim button { border: 1px solid #2E3649; background: #11141C; color: var(--text); border-radius: 8px; padding: 4px 10px; font-size: .78rem; cursor: pointer; }
+  .pr-sim button:hover { border-color: var(--border-hover); }
+
+  .lienzo { padding: 18px 0 40px; display: flex; justify-content: center; }
+  .marco { width: 100%; max-width: 1920px; transition: max-width .3s; }
+  .marco.movil { max-width: 390px; border: 1px solid #2E3649; border-radius: 24px; overflow: hidden; }
+
+  /* ================= La Guarida, con la escena ================= */
+  .gv { position: relative; isolation: isolate; min-height: 900px; overflow: hidden; background: var(--bg); }
+  .marco.movil .gv { min-height: 820px; }
+
+  /* fondo: tres opciones (D1) */
+  .gv-fondo { position: absolute; inset: 0; z-index: -2; }
+  .gv[data-fondo="taller"] .gv-fondo {
+    background:
+      radial-gradient(45% 50% at 85% 85%, rgba(168,150,255,.18), transparent 70%),
+      radial-gradient(35% 35% at 8% 10%, rgba(242,185,75,.10), transparent 70%),
+      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 100% 48px,
+      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 48px 100%,
+      var(--bg);
+  }
+  .gv[data-fondo="noche"] .gv-fondo {
+    background:
+      radial-gradient(45% 50% at 85% 85%, rgba(46,196,182,.12), transparent 70%),
+      radial-gradient(35% 35% at 15% 20%, rgba(168,150,255,.14), transparent 70%),
+      #0A0B10;
+  }
+  .gv[data-fondo="liso"] .gv-fondo { background: var(--bg); }
+  .gv-chispas { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+  .gv[data-fondo="liso"] .gv-chispas { display: none; }
+  .gv-chispas i {
+    position: absolute; bottom: -10px; width: 3px; height: 3px; border-radius: 50%; opacity: 0;
+    background: var(--accent); box-shadow: 0 0 8px var(--accent);
+    left: calc(3% + var(--i) * 7%); animation: chispa calc(8s + var(--i) * .5s) linear calc(var(--i) * -1s) infinite;
+  }
+  .gv-chispas i:nth-child(3n) { background: var(--accent-2); box-shadow: 0 0 8px var(--accent-2); }
+
+  /* cabecera: fila 1 con los capítulos en cápsula */
+  .gv-bar { display: flex; align-items: center; gap: 16px; padding: 12px 22px; }
+  .gv-marca { display: flex; align-items: center; gap: 8px; font-weight: 700; white-space: nowrap; }
+  .gv-marca .logo { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: #000; box-shadow: 0 0 0 2px var(--accent); font-size: 16px; }
+  .gv-caps {
+    display: flex; gap: 2px; margin: 0 auto; padding: 4px; border-radius: 999px;
+    border: 1px solid var(--border); background: rgba(26,31,43,.72); backdrop-filter: blur(8px);
+  }
+  .gv-caps a { padding: 6px 14px; border-radius: 999px; color: var(--muted); text-decoration: none; font-size: .85rem; white-space: nowrap; }
+  .gv-caps a:hover { color: var(--text); }
+  .gv-caps a.on { background: var(--accent); color: #111; font-weight: 700; }
+  .gv-tools { display: flex; gap: 6px; }
+  .gv-tools span { border: 1px solid var(--border); background: rgba(26,31,43,.8); border-radius: 10px; padding: 6px 10px; font-size: .82rem; white-space: nowrap; }
+
+  /* fila 2: saludo, portal y relojes */
+  .gv-row { display: grid; grid-template-columns: auto minmax(260px, 560px) 1fr; align-items: center; gap: 18px; padding: 4px 22px 14px; }
+  .gv-hola h2 { margin: 0; font-size: 1.5rem; }
+  .gv-hola p { margin: 0; color: var(--muted); font-size: .85rem; }
+  .gv-portal { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--border); background: rgba(26,31,43,.85); cursor: pointer; color: var(--text); text-align: left; }
+  .gv-portal img { width: 28px; height: 28px; border-radius: 50%; box-shadow: 0 0 0 2px var(--accent); }
+  .gv-portal span { color: var(--muted); font-size: .85rem; flex: 1; }
+  .gv-portal kbd { font: inherit; font-size: .72rem; border: 1px solid var(--border); border-radius: 5px; padding: 0 5px; color: var(--muted); }
+  .gv-relojes { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+  .gv-reloj { display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 10px; border: 1px solid var(--border); background: rgba(26,31,43,.8); font-size: .78rem; }
+  .gv-reloj b { color: var(--accent); font-variant-numeric: tabular-nums; }
+  .gv-reloj.cerca b { color: #FFD27A; text-shadow: 0 0 10px rgba(242,185,75,.6); }
+
+  /* consejo en franja (D2 = franja) */
+  .gv-franja { display: none; margin: 0 22px 14px; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 14px; border: 1px solid var(--border); background: rgba(26,31,43,.9); position: relative; }
+  .gv[data-habla="franja"] .gv-franja { display: flex; }
+  .gv-franja .cara { width: 34px; height: 34px; border-radius: 50%; box-shadow: 0 0 0 2px var(--accent); }
+  .gv-franja p { margin: 0; font-size: .88rem; flex: 1; }
+  .gv-franja .gato-mini { width: 54px; margin: -26px 0 -8px; cursor: pointer; }
+
+  /* paneles: translúcidos sobre el escenario, con su color de sección */
+  .gv-main { display: grid; grid-template-columns: 260px 1fr 240px; gap: 16px; padding: 0 22px 120px; align-items: start; }
+  .pn { border-radius: var(--r); border: 1px solid var(--border); background: rgba(26,31,43,.86); backdrop-filter: blur(4px); padding: 14px; animation: sube .5s calc(var(--i, 0) * .08s) both; }
+  .pn h3 { margin: 0 0 2px; font-size: .95rem; display: flex; align-items: center; gap: 8px; }
+  .pn h3 small { margin-left: auto; color: var(--muted); font-weight: 400; font-size: .75rem; }
+  .pn > p { margin: 0 0 10px; color: var(--muted); font-size: .78rem; }
+  .pn.fav { border-top: 3px solid var(--accent); }
+  .pn.cat { border-top: 3px solid var(--accent-2); }
+  .pn.lan { border-top: 3px solid var(--teal); }
+  .pn.wid { border-top: 3px solid var(--border-hover); }
+  .centro { display: grid; gap: 16px; }
+  .favs { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+  .fv { display: grid; justify-items: center; gap: 6px; padding: 12px 6px; border-radius: 10px; background: var(--panel-alt); border: 1px solid transparent; font-size: .8rem; text-align: center; }
+  .fv:hover { border-color: var(--border-hover); box-shadow: 0 0 0 1px #7B5CFF, 0 4px 12px rgba(123,92,255,.25); }
+  .fv i { font-style: normal; font-size: 22px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; background: rgba(255,255,255,.05); }
+  .usual { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: .78rem; color: var(--muted); flex-wrap: wrap; }
+  .usual span { border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; color: var(--text); }
+  .cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+  .ct { padding: 10px 12px; border-radius: 10px; background: var(--panel-alt); }
+  .ct b { display: block; font-size: .85rem; margin-bottom: 4px; }
+  .ct span { display: block; color: var(--muted); font-size: .78rem; }
+  .wg { padding: 10px; border-radius: 10px; background: var(--panel-alt); margin-bottom: 8px; font-size: .8rem; }
+  .wg b { display: block; font-size: 1.3rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .lg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .lg div { display: grid; justify-items: center; gap: 4px; padding: 10px 4px; border-radius: 10px; background: var(--panel-alt); font-size: .72rem; text-align: center; }
+  .lg i { font-style: normal; font-size: 20px; }
+  .vacio { display: grid; grid-template-columns: 110px 1fr; align-items: end; gap: 10px; min-height: 150px; }
+  .vacio p { margin: 0 0 16px; color: var(--muted); font-size: .82rem; }
+
+  /* mis poses fundidas: sin z-index en el contenedor para que lighten mezcle con el fondo */
+  .pose { display: block; mix-blend-mode: lighten; -webkit-mask-image: linear-gradient(to top, transparent 0, #000 12%); mask-image: linear-gradient(to top, transparent 0, #000 12%); }
+  .vacio .pose { width: 110px; height: auto; }
+  /* D3 = siempre: mi figura a un costado del lanzador */
+  .costado { display: none; height: 360px; width: auto; margin: 12px auto 0; }
+  .gv[data-cuerpo="siempre"] .costado { display: block; }
+  .gv[data-cuerpo="siempre"] .vacio .pose { display: none; }
+  .gv[data-cuerpo="siempre"] .vacio { grid-template-columns: 1fr; min-height: 0; }
+
+  /* mi globo con el gato encima (D2 = esquina) */
+  .globo {
+    position: absolute; right: 22px; bottom: 22px; z-index: 5; width: min(380px, calc(100% - 44px));
+    display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 18px;
+    border: 1px solid var(--border); background: rgba(26,31,43,.94); box-shadow: 0 12px 40px rgba(0,0,0,.5); backdrop-filter: blur(6px);
+    animation: sube .4s both;
+  }
+  .gv[data-habla="franja"] .globo { display: none; }
+  .globo .cara { width: 44px; height: 44px; border-radius: 50%; box-shadow: 0 0 0 2px var(--accent); background: #000; flex: none; }
+  .globo .dice { min-width: 0; flex: 1; }
+  .globo .nombre { margin: 0; font-size: .7rem; letter-spacing: .18em; color: var(--accent); font-weight: 700; }
+  .globo .texto { margin: 2px 0 0; font-size: .9rem; }
+  .globo .cerrar { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 0 2px; }
+  .gato { position: absolute; bottom: calc(100% - 12px); right: 16px; width: 92px; border: 0; padding: 0; background: none; cursor: pointer; filter: drop-shadow(0 6px 10px rgba(0,0,0,.5)); }
+  .gato img { display: block; width: 100%; height: auto; }
+  .gato.salta img { animation: salta .6s ease both; }
+  .gato-dice { position: absolute; bottom: calc(100% + 34px); right: 118px; padding: 5px 11px; border-radius: 12px; background: var(--accent); color: #111; font-weight: 600; font-size: .8rem; white-space: nowrap; }
+  .gato-dice:empty { display: none; }
+  /* plegado: solo la cara y el gato */
+  .globo.plegado { width: auto; padding: 8px; border-radius: 999px; }
+  .globo.plegado .dice, .globo.plegado .cerrar { display: none; }
+  .globo.plegado .gato { right: -10px; width: 64px; }
+  .globo.plegado .gato-dice { right: 60px; }
+
+  /* buscador abierto con mi pose pensando */
+  .busca { position: absolute; inset: 0; z-index: 20; display: none; place-items: start center; padding-top: 110px; background: rgba(7,8,12,.72); }
+  .busca.abierto { display: grid; }
+  .busca-caja { position: relative; display: grid; grid-template-columns: 1fr 200px; width: min(780px, calc(100% - 32px)); border-radius: 18px; border: 1px solid var(--border); background: rgba(26,31,43,.97); overflow: hidden; }
+  .busca-caja .izq { padding: 16px; }
+  .busca-caja input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-hover); background: #0F1117; color: var(--text); font: inherit; }
+  .busca-caja ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 4px; }
+  .busca-caja li { padding: 8px 10px; border-radius: 8px; background: var(--panel-alt); font-size: .85rem; }
+  .busca-caja .der { position: relative; min-height: 300px; background: radial-gradient(60% 60% at 50% 80%, rgba(168,150,255,.2), transparent 70%); }
+  .busca-caja .der .pose { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); height: 300px; width: auto; }
+
+  /* bienvenida del día (D4) */
+  .bienvenida { position: absolute; inset: 0; z-index: 30; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 18px; background: #000; cursor: pointer; }
+  .bienvenida.si { display: flex; animation: apaga .8s 2.4s ease both; }
+  .bienvenida .ojos { display: flex; gap: 46px; }
+  .bienvenida .ojos i { width: 46px; height: 22px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 26px var(--accent), 0 0 60px rgba(242,185,75,.5); animation: parpadeo 1.2s .2s ease both; }
+  .bienvenida p { margin: 0; font-size: 1.6rem; font-weight: 800; opacity: 0; animation: sube .6s 1.1s both; }
+  .bienvenida small { color: var(--muted); opacity: 0; animation: sube .6s 1.4s both; }
+
+  /* celular */
+  .marco.movil .gv-bar { flex-wrap: wrap; gap: 10px; padding: 10px 12px; }
+  .marco.movil .gv-marca b { display: none; }
+  .marco.movil .gv-caps { order: 3; width: 100%; margin: 0; overflow-x: auto; }
+  .marco.movil .gv-tools { margin-left: auto; }
+  .marco.movil .gv-tools span:first-child { display: none; }
+  .marco.movil .gv-row { grid-template-columns: 1fr; padding: 4px 12px 12px; gap: 10px; }
+  .marco.movil .gv-relojes { justify-content: flex-start; }
+  .marco.movil .gv-main { grid-template-columns: 1fr; padding: 0 12px 140px; }
+  .marco.movil .costado { display: none; }
+  .marco.movil .globo { right: 12px; left: 12px; bottom: 12px; width: auto; }
+  .marco.movil .globo.plegado { left: auto; }
+  .marco.movil .busca-caja { grid-template-columns: 1fr; }
+  .marco.movil .busca-caja .der { display: none; }
+  .marco.movil .gv-franja { margin: 0 12px 12px; }
+
+  .notas { max-width: 980px; margin: 0 auto 60px; padding: 0 16px; color: #C9CED8; font-size: .9rem; }
+  .notas h2 { font-size: 1.1rem; color: var(--text); }
+  .notas li { margin-bottom: 6px; }
+  .notas b { color: var(--text); }
+
+  @keyframes chispa { 0% { transform: translateY(0); opacity: 0; } 10% { opacity: .6; } 80% { opacity: .4; } 100% { transform: translateY(-105vh); opacity: 0; } }
+  @keyframes sube { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @keyframes salta { 0%, 100% { transform: none; } 40% { transform: translateY(-12px) rotate(-4deg); } }
+  @keyframes apaga { to { opacity: 0; visibility: hidden; } }
+  @keyframes parpadeo { 0% { transform: scaleY(0); } 40% { transform: scaleY(1); } 55% { transform: scaleY(.1); } 70%, 100% { transform: scaleY(1); } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } .gv-chispas { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="pr" role="region" aria-label="Controles de la propuesta">
+  <div class="pr-top">
+    <h1><span>ESC-0</span> · La Guarida con la estética de la función</h1>
+    <p>Maqueta: no toca tu Guarida ni tus datos. Elegí cada decisión y mirá el cambio al instante; lo que recomiendo está marcado con ★.</p>
+    <div class="seg" role="group" aria-label="Ancho" id="anchos">
+      <button type="button" data-ancho="pc" aria-pressed="true">Compu</button>
+      <button type="button" data-ancho="movil" aria-pressed="false">Celular</button>
+    </div>
+  </div>
+  <div class="pr-dec">
+    <div class="pr-d"><b>D1</b><span class="lbl">Fondo</span>
+      <div class="seg" role="group" aria-label="D1 Fondo" data-d="fondo">
+        <button type="button" data-v="taller" aria-pressed="true">Taller<span class="rec">★</span></button>
+        <button type="button" data-v="noche" aria-pressed="false">Noche</button>
+        <button type="button" data-v="liso" aria-pressed="false">Liso, como hoy</button>
+      </div>
+    </div>
+    <div class="pr-d"><b>D2</b><span class="lbl">Dónde te hablo</span>
+      <div class="seg" role="group" aria-label="D2 Dónde te hablo" data-d="habla">
+        <button type="button" data-v="esquina" aria-pressed="true">Globo en la esquina<span class="rec">★</span></button>
+        <button type="button" data-v="franja" aria-pressed="false">En la franja del consejo</button>
+      </div>
+    </div>
+    <div class="pr-d"><b>D3</b><span class="lbl">Mi cuerpo entero</span>
+      <div class="seg" role="group" aria-label="D3 Mi cuerpo entero" data-d="cuerpo">
+        <button type="button" data-v="momentos" aria-pressed="true">En momentos<span class="rec">★</span></button>
+        <button type="button" data-v="siempre" aria-pressed="false">Siempre al costado</button>
+      </div>
+    </div>
+    <div class="pr-d"><b>D4</b><span class="lbl">Bienvenida del día</span>
+      <div class="seg" role="group" aria-label="D4 Bienvenida del día" data-d="bienvenida">
+        <button type="button" data-v="si" aria-pressed="true">Sí<span class="rec">★</span></button>
+        <button type="button" data-v="no" aria-pressed="false">No</button>
+      </div>
+    </div>
+  </div>
+  <div class="pr-sim" role="group" aria-label="Probar">
+    <button type="button" data-sim="bienvenida">▶ Ver la bienvenida</button>
+    <button type="button" data-sim="guardar">⭐ Guardé un favorito</button>
+    <button type="button" data-sim="backup">⚠️ Conviene un backup</button>
+    <button type="button" data-sim="buscar">🔎 Abrir el buscador</button>
+    <button type="button" data-sim="plegar">⇲ Plegar o desplegar mi globo</button>
+  </div>
+</div>
+
+<div class="lienzo">
+  <div class="marco" id="marco">
+    <div class="gv" id="gv" data-fondo="taller" data-habla="esquina" data-cuerpo="momentos">
+      <div class="gv-fondo" aria-hidden="true"></div>
+      <div class="gv-chispas" id="chispas" aria-hidden="true"></div>
+
+      <header>
+        <div class="gv-bar">
+          <div class="gv-marca"><span class="logo" aria-hidden="true">🐈‍⬛</span><b>La Guarida</b></div>
+          <nav class="gv-caps" aria-label="Secciones">
+            <a href="#f" class="on">Favoritos</a><a href="#c">Categorías</a><a href="#l">Lanzador</a><a href="#w">Widgets</a>
+          </nav>
+          <div class="gv-tools"><span>🐈‍⬛ Gato Negro ▾</span><span>✏️ Editar</span><span>＋</span><span>⋯</span></div>
+        </div>
+        <div class="gv-row">
+          <div class="gv-hola"><h2>Hola, Pablo</h2><p>Lunes 16 de noviembre</p></div>
+          <button type="button" class="gv-portal" data-sim="buscar">
+            <img src="../../assets/brand/shiruvana/shiruvana-hola-cara-128.webp" alt="" width="28" height="28">
+            <span><strong>¿A dónde vamos?</strong> Buscá un favorito, un enlace o una app…</span><kbd>Ctrl K</kbd>
+          </button>
+          <div class="gv-relojes" aria-label="Relojes de Guild Wars 2">
+            <div class="gv-reloj">☀️ Diario <b>3 h 46 m</b></div>
+            <div class="gv-reloj cerca">🗓️ Semanal <b>1 h 15 m</b></div>
+            <div class="gv-reloj">🏆 Temporada <b>12 d</b></div>
+            <div class="gv-reloj">🕐 Tyria <b>20:14</b></div>
+          </div>
+        </div>
+        <div class="gv-franja" id="franja">
+          <img class="cara" id="franjaCara" src="../../assets/brand/shiruvana/shiruvana-explica-cara-128.webp" alt="" width="34" height="34">
+          <p id="franjaTexto">Hoy cierra la semanal en una hora: si te falta la Cámara del Brujo, es ahora.</p>
+          <img class="gato-mini" id="franjaGato" src="https://pablosnchz.github.io/shiruvana/assets/gato/gato-sentado.webp" alt="El gato robot, sentado" width="54" height="54">
+        </div>
+      </header>
+
+      <main class="gv-main">
+        <section class="pn wid" style="--i:1" id="w">
+          <h3>Widgets <small>3</small></h3>
+          <p>Hora, reinicios y noticias de Tyria.</p>
+          <div class="wg">Hora local<b>20:14</b></div>
+          <div class="wg">Reinicio diario<b>3:46:12</b></div>
+          <div class="wg">Noticias de Tyria · Parche del martes: equilibrio de élites y nuevo festival.</div>
+        </section>
+
+        <div class="centro">
+          <section class="pn fav" style="--i:2" id="f">
+            <h3>Favoritos <small>8</small></h3>
+            <p>Tus accesos de un clic.</p>
+            <div class="usual">Lo de siempre a esta hora <span>🐈‍⬛ La Bóveda</span><span>📺 YouTube</span></div>
+            <div class="favs">
+              <div class="fv"><i>🐈‍⬛</i>La Bóveda</div><div class="fv"><i>🧭</i>Centro de decisiones</div>
+              <div class="fv"><i>🐙</i>GitHub</div><div class="fv"><i>📺</i>YouTube</div>
+              <div class="fv"><i>📧</i>Gmail</div><div class="fv"><i>🟣</i>Twitch</div>
+              <div class="fv"><i>📖</i>Wiki GW2</div><div class="fv"><i>🎵</i>Spotify</div>
+            </div>
+          </section>
+          <section class="pn cat" style="--i:3" id="c">
+            <h3>Categorías <small>3</small></h3>
+            <p>Enlaces agrupados por tema.</p>
+            <div class="cats">
+              <div class="ct"><b>⚔️ Guild Wars 2</b><span>Snow Crows · gw2efficiency · Wiki</span></div>
+              <div class="ct"><b>💼 Trabajo</b><span>Correo · Calendario · Drive</span></div>
+              <div class="ct"><b>🎧 Música</b><span>Spotify · Radio · Listas</span></div>
+            </div>
+          </section>
+        </div>
+
+        <section class="pn lan" style="--i:4" id="l">
+          <h3>Lanzador <small>3</small></h3>
+          <p>Abrí juegos y programas de tu PC.</p>
+          <div class="lg"><div><i>⚔️</i>Guild Wars 2</div><div><i>🚂</i>Steam</div><div><i>💬</i>Discord</div></div>
+          <div class="vacio">
+            <img class="pose" src="https://pablosnchz.github.io/shiruvana/assets/shiruvana/cuerpo-sentada.webp" alt="Shiruvana sentada, con el gato robot en miniatura" width="640" height="954">
+            <p>Apps: todavía no agregaste ninguna. Tocá ＋ y te la dejo a un clic.</p>
+          </div>
+          <img class="pose costado" src="https://pablosnchz.github.io/shiruvana/assets/shiruvana/cuerpo-saluda.webp" alt="Shiruvana de cuerpo entero, saludando" width="640" height="954">
+        </section>
+      </main>
+
+      <div class="globo" id="globo" role="status" aria-live="polite">
+        <button type="button" class="gato" id="gato" aria-label="Tocar al gato robot"><img id="gatoImg" src="https://pablosnchz.github.io/shiruvana/assets/gato/gato-sentado.webp" alt="El gato robot, sentado" width="320" height="320"></button>
+        <span class="gato-dice" id="gatoDice"></span>
+        <img class="cara" id="cara" src="../../assets/brand/shiruvana/shiruvana-explica-cara-128.webp" alt="" width="44" height="44">
+        <div class="dice">
+          <p class="nombre">SHIRUVANA</p>
+          <p class="texto" id="texto">Hoy cierra la semanal en una hora: si te falta la Cámara del Brujo, es ahora.</p>
+        </div>
+        <button type="button" class="cerrar" data-sim="plegar" aria-label="Plegar">⇲</button>
+      </div>
+
+      <div class="busca" id="busca">
+        <div class="busca-caja" role="dialog" aria-label="Buscador">
+          <div class="izq">
+            <input type="text" value="bov" aria-label="Buscar">
+            <ul><li>🐈‍⬛ La Bóveda del Gato Negro</li><li>🧭 Centro de decisiones</li><li>📖 Wiki GW2 · Bóveda del Brujo</li></ul>
+            <p style="margin:10px 0 0;color:var(--muted);font-size:.78rem">Esc cierra · Enter abre</p>
+          </div>
+          <div class="der"><img class="pose" src="https://pablosnchz.github.io/shiruvana/assets/shiruvana/cuerpo-pensando.webp" alt="Shiruvana pensando, con una tablet" width="640" height="954"></div>
+        </div>
+      </div>
+
+      <div class="bienvenida" id="bienvenida" aria-hidden="true">
+        <div class="ojos"><i></i><i></i></div>
+        <p>Buenas noches, Pablo</p>
+        <small>La Guarida está lista. Tocá para pasar.</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="notas">
+  <h2>Qué cambia y qué no</h2>
+  <ul>
+    <li><b>Solo con el theme Gato Negro.</b> Los otros 18 themes quedan exactamente como hoy (y sus pruebas de contraste también).</li>
+    <li><b>D1 Fondo.</b> «Taller» es el de mi sitio: cuadrícula tenue, luces ámbar y violeta y chispas que suben. Los paneles pasan a ser translúcidos para que se vea, con el mismo contraste.</li>
+    <li><b>D2 Dónde te hablo.</b> El consejo del día deja de ser una franja y pasa a mi globo, con el gato sentado encima. Se pliega a la cara y el gato si molesta, y recuerda cómo lo dejaste. El gato reacciona: festeja cuando guardás algo, habla si lo tocás.</li>
+    <li><b>D3 Mi cuerpo entero.</b> Recomiendo «en momentos»: estados vacíos, el buscador abierto y la bienvenida. «Siempre al costado» me suma presencia pero le quita lugar al lanzador.</li>
+    <li><b>D4 Bienvenida del día.</b> La primera vez que abrís La Guarida cada día: los ojos del gato y un saludo de 2 segundos. Se pasa con un toque, no vuelve a aparecer ese día y con «reducir movimiento» no se muestra.</li>
+    <li><b>La cabecera</b> toma la cápsula de capítulos de mi sitio; nada cambia de lugar ni de nombre, y tus datos, favoritos y atajos (Ctrl K) siguen igual.</li>
+    <li><b>Imágenes:</b> para implementarlo tenés que subir a la-guarida 3 imágenes del gato y 3 poses mías que ya están en el repo shiruvana. Te paso la lista exacta en ESC-1.</li>
+  </ul>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  var C = '../../assets/brand/shiruvana/shiruvana-';
+  var G = 'https://pablosnchz.github.io/shiruvana/assets/gato/gato-';
+  var $ = function (id) { return document.getElementById(id); };
+  var gv = $('gv'), marco = $('marco'), globo = $('globo'), texto = $('texto'), cara = $('cara');
+  var gatoImg = $('gatoImg'), gatoDice = $('gatoDice'), busca = $('busca'), bienvenida = $('bienvenida');
+  var franjaTexto = $('franjaTexto'), franjaCara = $('franjaCara');
+  var reducido = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var conBienvenida = true, toques = 0, t1 = null, t2 = null;
+  var FRASES = ['Prrr… bip.', 'Miau. Compilando.', 'Ojo ámbar, sistema estable.', 'Bip bip. Todo verde.'];
+
+  for (var k = 0; k < 14; k++) { var i = document.createElement('i'); i.style.setProperty('--i', k); $('chispas').appendChild(i); }
+
+  function marcar(grupo, boton) {
+    Array.prototype.forEach.call(grupo.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String(b === boton)); });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-d]'), function (grupo) {
+    grupo.addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b) return;
+      marcar(grupo, b);
+      var d = grupo.getAttribute('data-d'), v = b.getAttribute('data-v');
+      if (d === 'bienvenida') { conBienvenida = v === 'si'; if (conBienvenida) bienvenidaVer(); return; }
+      gv.setAttribute('data-' + d, v);
+    });
+  });
+  $('anchos').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    marcar($('anchos'), b);
+    marco.classList.toggle('movil', b.getAttribute('data-ancho') === 'movil');
+  });
+
+  function decir(t, c) {
+    texto.textContent = t; franjaTexto.textContent = t;
+    cara.src = C + c + '-cara-128.webp'; franjaCara.src = C + c + '-cara-128.webp';
+    globo.classList.remove('plegado');
+  }
+  function gato(pose, frase) {
+    gatoImg.src = G + pose + '.webp';
+    gatoDice.textContent = frase || '';
+    var btn = $('gato'); btn.classList.remove('salta'); void btn.offsetWidth; if (pose === 'festeja') btn.classList.add('salta');
+    clearTimeout(t1);
+    t1 = setTimeout(function () { gatoImg.src = G + 'sentado.webp'; gatoDice.textContent = ''; }, 1800);
+  }
+  function tocar() { toques++; gato('festeja', toques === 5 ? 'Basta, que estoy trabajando.' : FRASES[(toques > 5 ? toques - 2 : toques - 1) % FRASES.length]); }
+  $('gato').addEventListener('click', tocar);
+  $('franjaGato').addEventListener('click', tocar);
+
+  function bienvenidaVer() {
+    if (!conBienvenida || reducido) return;
+    bienvenida.classList.remove('si'); void bienvenida.offsetWidth; bienvenida.classList.add('si');
+    clearTimeout(t2); t2 = setTimeout(function () { bienvenida.classList.remove('si'); }, 3300);
+  }
+  bienvenida.addEventListener('click', function () { bienvenida.classList.remove('si'); });
+
+  var SIM = {
+    bienvenida: function () { if (!conBienvenida) { decir('La bienvenida está apagada (D4 = No).', 'explica'); return; } bienvenidaVer(); },
+    guardar: function () { decir('Listo, guardé «Spotify» en Favoritos.', 'festeja'); gato('festeja', '¡Bip!'); },
+    backup: function () { decir('Hace 9 días que no hacés un backup. Te lo dejo en ⋯ → Descargar backup.', 'ojo'); gato('sentado'); },
+    buscar: function () { busca.classList.add('abierto'); busca.querySelector('input').focus(); },
+    plegar: function () { globo.classList.toggle('plegado'); }
+  };
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-sim]'); if (b) SIM[b.getAttribute('data-sim')]();
+  });
+  busca.addEventListener('click', function (ev) { if (ev.target === busca) busca.classList.remove('abierto'); });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') busca.classList.remove('abierto');
+    if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'k') { ev.preventDefault(); SIM.buscar(); }
+  });
+
+  bienvenidaVer();
+})();
+</script>
+</body>
+</html>
