@@ -1,7 +1,8 @@
 // Tests del cableado de js/escena.js (BL-091 ESC-2) con un DOM falso mínimo: el consejo
 // pasa a mi globo con Gato Negro y vuelve a la franja con otro theme, el plegado se recuerda
 // y un consejo nuevo abre el globo (ESC-2); el gato reacciona a guardar, al backup y a los
-// avisos, y en el buscador estoy de cuerpo entero (ESC-3). Sin dependencias: corre con node --test.
+// avisos, y en el buscador estoy de cuerpo entero (ESC-3); la bienvenida del día (ESC-4).
+// Sin dependencias: corre con node --test.
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -39,6 +40,7 @@ class El {
   set hidden(v) { if (v) this.attrs.hidden = ''; else delete this.attrs.hidden; notify(this, 'attributes', 'hidden'); }
   setAttribute(k, v) { if (k === 'class') this.className = v; else this.attrs[k] = String(v); notify(this, 'attributes', k); }
   getAttribute(k) { return k in this.attrs ? this.attrs[k] : null; }
+  removeChild(c) { this.children.splice(this.children.indexOf(c), 1); c.parentNode = null; notify(this, 'childList'); return c; }
   appendChild(c) { if (c.parentNode) { const p = c.parentNode; p.children.splice(p.children.indexOf(c), 1); notify(p, 'childList'); } c.parentNode = this; this.children.push(c); notify(this, 'childList', null, [c]); return c; }
   insertBefore(c, ref) { this.appendChild(c); const i = this.children.indexOf(ref); this.children.splice(this.children.indexOf(c), 1); this.children.splice(i, 0, c); return c; }
   closest(sel) { for (let n = this; n && n.matches; n = n.parentNode) if (n.matches(sel)) return n; return null; }
@@ -129,7 +131,7 @@ assert.ok(globo.classList.contains('con-consejo'));
 // Plego a mano y se guarda
 globo.querySelector('.esc-plegar').click(); flush();
 assert.ok(globo.classList.contains('is-plegado'));
-assert.equal(store['guarida:escena:v1'], '{"plegado":true}');
+assert.equal(JSON.parse(store['guarida:escena:v1']).plegado, true);
 assert.equal(globo.querySelector('.esc-plegar').getAttribute('aria-expanded'), 'false');
 
 // Cambio a otro theme: vuelve a la franja
@@ -148,7 +150,7 @@ assert.equal(globo.classList.contains('con-consejo'), false, 'sin consejo vuelve
 toast.textContent = 'La categoría «X» está vacía.'; toast.hidden = false; flush();
 assert.ok(globo.classList.contains('con-consejo'));
 assert.equal(globo.classList.contains('is-plegado'), false, 'el consejo lo abre');
-assert.equal(store['guarida:escena:v1'], '{"plegado":true}', 'lo guardado sigue');
+assert.equal(JSON.parse(store['guarida:escena:v1']).plegado, true, 'lo guardado sigue');
 
 // El gato
 const gb = globo.querySelector('.esc-gato');
@@ -232,4 +234,57 @@ test('ESC-3: el gato reacciona y yo en el buscador', async () => {
   // No se duplica si el buscador se vuelve a agregar
   body3.appendChild(portal); flush();
   assert.equal(portal.querySelectorAll('.esc-portal-pose').length, 1);
+});
+
+test('ESC-4: la bienvenida del día', () => {
+  const guardado = {};
+  const ls = { getItem: k => (k in guardado ? guardado[k] : null), setItem: (k, v) => { guardado[k] = String(v); } };
+  function abrir(theme, reducido) {
+    const h = new El('html'); const b = h.appendChild(new El('body'));
+    const teclas = [];
+    const d = { readyState: 'complete', body: b, createElement: t => new El(t), querySelector: s => h.querySelector(s), querySelectorAll: s => h.querySelectorAll(s),
+      addEventListener: (t, f) => { if (t === 'keydown') teclas.push(f); },
+      removeEventListener: (t, f) => { const i = teclas.indexOf(f); if (i >= 0) teclas.splice(i, 1); } };
+    b.setAttribute('data-theme', theme);
+    const timers = [];
+    vm.runInNewContext(code, { window: { document: d, MutationObserver: MO, localStorage: ls, matchMedia: () => ({ matches: !!reducido }) },
+      setTimeout: (f, t) => { timers.push({ f, t }); return timers.length; }, clearTimeout() {}, JSON, Date, Math, String, Array, Object });
+    flush();
+    return { d, b, teclas, timers };
+  }
+
+  // Otro theme o «reducir movimiento»: nada, y no la gasta
+  assert.equal(abrir('nord').d.querySelector('.esc-bienvenida'), null);
+  assert.equal(abrir('gato', true).d.querySelector('.esc-bienvenida'), null);
+  assert.equal(guardado['guarida:escena:v1'], undefined, 'no la marca como vista');
+
+  // La primera vez del día: aparece, con los ojos y el saludo
+  const a = abrir('gato');
+  const capa = a.d.querySelector('.esc-bienvenida');
+  assert.ok(capa, 'aparece');
+  assert.equal(capa.getAttribute('aria-hidden'), 'true');
+  assert.equal(capa.querySelectorAll('.esc-ojos i').length, 2);
+  assert.match(capa.textContent, /, Pablo/);
+  const visto = JSON.parse(guardado['guarida:escena:v1']);
+  assert.equal(visto.bienvenida, (() => { const n = new Date(); return n.getFullYear() + '-' + (n.getMonth() + 1) + '-' + n.getDate(); })());
+  assert.ok(a.timers.some(t => t.t === 3200), 'se va sola');
+  assert.equal(a.teclas.length, 1);
+  // Una tecla la saca y suelta el oyente
+  a.teclas[0]({ key: 'a' });
+  assert.equal(a.d.querySelector('.esc-bienvenida'), null);
+  assert.equal(a.teclas.length, 0);
+
+  // El mismo día, no vuelve
+  assert.equal(abrir('gato').d.querySelector('.esc-bienvenida'), null, 'una por día');
+
+  // No pisa el plegado: plego, y la bienvenida de otro día lo conserva
+  guardado['guarida:escena:v1'] = JSON.stringify({ plegado: true, bienvenida: '2000-1-1' });
+  const c = abrir('gato');
+  const capa2 = c.d.querySelector('.esc-bienvenida');
+  assert.ok(capa2);
+  assert.equal(JSON.parse(guardado['guarida:escena:v1']).plegado, true, 'el plegado sigue');
+  assert.ok(c.d.querySelector('.esc-globo').classList.contains('is-plegado'));
+  capa2.click();
+  assert.equal(c.d.querySelector('.esc-bienvenida'), null, 'un toque la saca');
+  assert.equal(c.teclas.length, 0);
 });
