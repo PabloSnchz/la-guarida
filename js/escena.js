@@ -1,6 +1,16 @@
 /*!
- * js/escena.js — «GN Escena» en La Guarida (1.3.0, 2026-11-17, BL-091 ESC-4)
+ * js/escena.js — «GN Escena» en La Guarida (1.4.0, 2026-11-17, BL-091 ESC-5)
  *
+ * 1.4.0 (ESC-5, restyle «universo Shiruvana»): mis poses sin fondo y la barra del día.
+ *  - Mis poses de cuerpo entero tienen fondo negro. Ahora las recorto en el navegador
+ *    (canvas): lo negro que toca el borde y los huecos negros grandes quedan
+ *    transparentes, con el borde suavizado. Mientras no están listas no se ven (nunca un
+ *    rectángulo negro). Quedan en body como --esc-p-<pose> (con la clase esc-p-<pose>)
+ *    para css/universo.css y css/escena.css, y en el buscador como src de mi pose.
+ *  - --esc-dia: cuánto va del día (0–100 %), para la barra ámbar del saludo, como la
+ *    barra EVOLVING de mi sitio. Se actualiza cada minuto.
+ *  - body.esc-listo a los 2 s: las tarjetas entran de a una solo al abrir, no cada vez
+ *    que app.js vuelve a dibujar.
  * 1.3.0 (ESC-4): la bienvenida del día. La primera vez que abrís La Guarida cada día
  * (con el theme Gato Negro y sin «reducir movimiento»): pantalla negra, los ojos ámbar
  * del gato que se abren y el saludo de la hora. Dura unos 3 s y se pasa con un toque o
@@ -29,7 +39,7 @@
 (function (root) {
   'use strict';
 
-  var VERSION = '1.3.0';
+  var VERSION = '1.4.0';
   var CHISPAS = 14;
   var KEY = 'guarida:escena:v1';
   var CARA = 'assets/brand/shiruvana/shiruvana-';
@@ -37,6 +47,9 @@
   var GATO = 'assets/brand/gato/gato-';
   var FRASES = ['Prrr… bip.', 'Miau. Compilando.', 'Ojo ámbar: sistema estable.', 'Bip bip. Todo en orden.'];
   var QUEJA = 'Basta, que estoy trabajando.';
+  var POSES = ['sentada', 'saluda', 'pensando'];
+  var UMBRAL = 14;     // «negro»: el canal más alto por debajo de esto
+  var HUECO = 0.004;   // huecos negros encerrados más grandes que esta fracción también son fondo
 
   // Cómo reacciona el gato a lo que pasa en La Guarida (null: no reacciona).
   var REACCIONES = {
@@ -106,6 +119,70 @@
   // Mi pose en el buscador: saludo con el buscador vacío, pienso cuando escribís.
   function posePortal(query) { return String(query == null ? '' : query).trim() ? 'pensando' : 'saluda'; }
 
+  // ---- ESC-5: recorte del fondo negro (puro: trabaja sobre los píxeles RGBA) ----
+  // Lo negro conectado al borde es fondo; los huecos negros encerrados grandes (entre el
+  // brazo y el cuerpo) también; los chicos (pupilas, contornos) no. Después el borde se
+  // achica un píxel y se suaviza. Escribe el alfa en data y devuelve cuántos píxeles son fondo.
+  function recorte(data, w, h, umbral, hueco) {
+    var T = umbral == null ? UMBRAL : umbral, H = hueco == null ? HUECO : hueco;
+    var n = w * h, est = new Uint8Array(n), pila = new Int32Array(n), top = 0, i, p;
+    for (i = 0; i < n; i++) { p = i * 4; if (Math.max(data[p], data[p + 1], data[p + 2]) < T) est[i] = 1; }
+    function meter(j, marca) { if (est[j] === 1) { est[j] = marca; pila[top++] = j; } }
+    function expandir(marca, junta) {
+      var c = 0;
+      while (top > 0) {
+        var j = pila[--top], x = j % w; c++;
+        if (junta) junta.push(j);
+        if (x > 0) meter(j - 1, marca);
+        if (x < w - 1) meter(j + 1, marca);
+        if (j >= w) meter(j - w, marca);
+        if (j < n - w) meter(j + w, marca);
+      }
+      return c;
+    }
+    // 1) el fondo que toca el borde (2)
+    for (i = 0; i < w; i++) { meter(i, 2); meter(n - w + i, 2); }
+    for (i = 0; i < h; i++) { meter(i * w, 2); meter(i * w + w - 1, 2); }
+    expandir(2);
+    // 2) huecos encerrados: grandes → fondo (2); chicos → parte de la figura (3)
+    var lim = H * n;
+    for (i = 0; i < n; i++) {
+      if (est[i] !== 1) continue;
+      var junta = [];
+      meter(i, 3);
+      if (expandir(3, junta) > lim) for (var k = 0; k < junta.length; k++) est[junta[k]] = 2;
+    }
+    // 3) alfa: figura 255, fondo 0; achico un píxel y suavizo dos veces
+    var a = new Uint8Array(n), fondo = 0;
+    for (i = 0; i < n; i++) { if (est[i] === 2) fondo++; else a[i] = 255; }
+    a = vecinos(a, w, h, true);
+    a = vecinos(vecinos(a, w, h, false), w, h, false);
+    for (i = 0; i < n; i++) { p = i * 4 + 3; if (a[i] < data[p]) data[p] = a[i]; }
+    return fondo;
+  }
+
+  // 3×3 alrededor de cada píxel: el mínimo (achica) o el promedio (suaviza).
+  function vecinos(a, w, h, minimo) {
+    var out = new Uint8Array(a.length);
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        var m = 255, s = 0, c = 0;
+        for (var dy = -1; dy <= 1; dy++) {
+          var yy = y + dy; if (yy < 0 || yy >= h) continue;
+          for (var dx = -1; dx <= 1; dx++) {
+            var xx = x + dx; if (xx < 0 || xx >= w) continue;
+            var v = a[yy * w + xx]; if (v < m) m = v; s += v; c++;
+          }
+        }
+        out[y * w + x] = minimo ? m : Math.round(s / c);
+      }
+    }
+    return out;
+  }
+
+  // Cuánto va del día, en %, con un decimal (para la barra del saludo).
+  function avanceDia(date) { return Math.round((date.getHours() * 60 + date.getMinutes()) / 1440 * 1000) / 10; }
+
   function globoHTML(linea) {
     return '<button type="button" class="esc-gato" aria-label="Tocar al gato robot">' +
         '<img src="' + GATO + 'sentado.webp" alt="" width="320" height="320"></button>' +
@@ -124,7 +201,8 @@
     chispasHTML: chispasHTML, dondeConsejo: dondeConsejo, plegadoInicial: plegadoInicial,
     lineaDelDia: lineaDelDia, fraseGato: fraseGato, globoHTML: globoHTML,
     saludo: saludo, diaKey: diaKey, tocaBienvenida: tocaBienvenida, bienvenidaHTML: bienvenidaHTML, BIENVENIDA_MS: 3200,
-    reaccion: reaccion, tipoAviso: tipoAviso, posePortal: posePortal
+    reaccion: reaccion, tipoAviso: tipoAviso, posePortal: posePortal,
+    POSES: POSES, UMBRAL: UMBRAL, HUECO: HUECO, recorte: recorte, avanceDia: avanceDia
   };
   if (typeof module !== 'undefined' && module.exports) { module.exports = api; }
   if (!root || !root.document) return;
@@ -142,6 +220,48 @@
   }
 
   var globo = null, toques = 0, tGato = null;
+
+  // ---- ESC-5: mis poses sin fondo (una vez por imagen; null si no se puede) ----
+  var recortes = {};
+  function sinFondo(url) {
+    if (recortes[url]) return recortes[url];
+    recortes[url] = new Promise(function (listo) {
+      var Img = root.Image, URLs = root.URL, cv = doc.createElement('canvas');
+      if (!Img || !URLs || !URLs.createObjectURL || !cv || !cv.getContext || !cv.toBlob) { listo(null); return; }
+      var im = new Img();
+      im.onload = function () {
+        try {
+          var w = im.naturalWidth || im.width, h = im.naturalHeight || im.height;
+          cv.width = w; cv.height = h;
+          var cx = cv.getContext('2d');
+          cx.drawImage(im, 0, 0);
+          var d = cx.getImageData(0, 0, w, h);
+          recorte(d.data, w, h);
+          cx.putImageData(d, 0, 0);
+          cv.toBlob(function (b) { listo(b ? URLs.createObjectURL(b) : null); }, 'image/png');
+        } catch (e) { listo(null); }
+      };
+      im.onerror = function () { listo(null); };
+      im.src = url;
+    });
+    return recortes[url];
+  }
+
+  function posesSinFondo() {
+    var st = doc.body.style;
+    if (doc.body.getAttribute('data-theme') !== 'gato' || !st || !st.setProperty) return;
+    POSES.forEach(function (p) {
+      sinFondo(CUERPO + p + '.webp').then(function (u) {
+        if (!u) return;
+        st.setProperty('--esc-p-' + p, 'url("' + u + '")');
+        doc.body.classList.add('esc-p-' + p);
+      });
+    });
+  }
+
+  function marcarDia() {
+    if (doc.body.style && doc.body.style.setProperty) doc.body.style.setProperty('--esc-dia', avanceDia(new Date()) + '%');
+  }
 
   function plegar(si, guardar) {
     if (!globo) return;
@@ -222,12 +342,18 @@
     fig.alt = '';
     fig.setAttribute('aria-hidden', 'true');
     fig.width = 201; fig.height = 300;
+    fig.hidden = true; // aparece cuando la pose ya no tiene fondo
     fig.onerror = function () { fig.hidden = true; }; // sin imagen, el buscador queda como antes
     portal.insertBefore(fig, dialog);
     var input = portal.querySelector('#gnPortalInput');
     function pose() {
       var p = posePortal(input ? input.value : '');
-      if (fig.getAttribute('data-pose') !== p) { fig.setAttribute('data-pose', p); fig.src = CUERPO + p + '.webp'; }
+      if (fig.getAttribute('data-pose') === p) return;
+      fig.setAttribute('data-pose', p);
+      sinFondo(CUERPO + p + '.webp').then(function (u) {
+        if (fig.getAttribute('data-pose') !== p) return; // ya cambió de pose
+        if (u) { fig.src = u; fig.hidden = false; } else fig.hidden = true;
+      });
     }
     if (input) input.addEventListener('input', pose);
     new root.MutationObserver(function () { if (!portal.hidden) pose(); }).observe(portal, { attributes: true, attributeFilter: ['hidden'] });
@@ -271,6 +397,11 @@
     crearGlobo();
     ubicar();
     bienvenida();
+    // ESC-5: el recorte corre detrás de la bienvenida; las tarjetas entran solo al abrir
+    setTimeout(posesSinFondo, 200);
+    setTimeout(function () { doc.body.classList.add('esc-listo'); }, 2000);
+    marcarDia();
+    if (root.setInterval) root.setInterval(marcarDia, 60000);
 
     // Guardar en el editor: si después del clic el editor se cerró, se guardó.
     doc.addEventListener('click', function (ev) {
@@ -283,7 +414,7 @@
 
     if (!root.MutationObserver) return;
     // Cambio de theme: app.js escribe data-theme en <body>.
-    new root.MutationObserver(ubicar).observe(doc.body, { attributes: true, attributeFilter: ['data-theme'] });
+    new root.MutationObserver(function () { ubicar(); posesSinFondo(); }).observe(doc.body, { attributes: true, attributeFilter: ['data-theme'] });
     // El consejo aparece a los 6 s (shiruvana.js) y header.js lo deja en #ghTip.
     var tip = $('#ghTip');
     if (tip) new root.MutationObserver(ubicar).observe(tip, { childList: true });
