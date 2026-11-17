@@ -1,6 +1,7 @@
 // Tests de la escena (BL-091): la estética de mi sitio, solo con el theme Gato Negro.
 // ESC-1 fondo, cápsula y paneles; ESC-2 mi globo con el gato y el consejo adentro;
-// ESC-3 el gato reacciona y yo de cuerpo entero en los estados vacíos y en el buscador.
+// ESC-3 el gato reacciona y yo de cuerpo entero en los estados vacíos y en el buscador;
+// ESC-4 la bienvenida del día.
 // Correr: node --test tests/*.test.cjs
 'use strict';
 const test = require('node:test');
@@ -52,7 +53,7 @@ test('solo cambia el theme Gato Negro: toda regla cuelga de body[data-theme="gat
       sueltas.push(s);
     }
   }
-  assert.deepEqual(sueltas, ['.esc-chispas', '.esc-globo', '.esc-portal-pose'], 'lo único suelto es esconder lo nuevo');
+  assert.deepEqual(sueltas, ['.esc-chispas', '.esc-globo', '.esc-portal-pose', '.esc-bienvenida'], 'lo único suelto es esconder lo nuevo');
 });
 
 test('la cabecera no gana backdrop-filter, filter ni transform (los menús fixed del celular siguen en su lugar)', () => {
@@ -97,6 +98,7 @@ test('«reducir movimiento»: sin chispas, entradas ni saltos del gato', () => {
   assert.match(m[1], /\.esc-globo \{ animation: none; \}/);
   assert.match(m[1], /\.esc-gato\.is-salta img \{ animation: none; \}/);
   assert.match(m[1], /\.esc-portal-pose \{ animation: none; \}/);
+  assert.match(m[1], /\.esc-bienvenida \{ display: none; \}/);
 });
 
 // ---- ESC-2: el globo ----
@@ -177,13 +179,14 @@ test('contraste del globo: texto, mi nombre y lo que dice el gato', () => {
   assert.ok(cr(hex(/color: (#[0-9A-Fa-f]{6})/.exec(d)[1]), hex(/background: (#[0-9A-Fa-f]{6})/.exec(d)[1])) >= 7);
 });
 
-test('escena.js no sale a la red, guarda solo { plegado } en su clave y no repite el globo', () => {
+test('escena.js no sale a la red, guarda solo { plegado, bienvenida } en su clave y no repite el globo', () => {
   const codigo = js.replace(/\/\*[\s\S]*?\*\//g, '');
   assert.ok(!/fetch|XMLHttpRequest|sessionStorage|cookie/.test(codigo));
   assert.equal(E.KEY, 'guarida:escena:v1');
   assert.deepEqual([...codigo.matchAll(/localStorage\.(\w+)\(/g)].map(m => m[1]).sort(), ['getItem', 'setItem']);
   assert.match(codigo, /localStorage\.setItem\(KEY, JSON\.stringify\(v\)\)/);
-  assert.deepEqual([...codigo.matchAll(/store\(([^)]*)\)/g)].map(m => m[1]).filter(a => a !== 'v'), ['{ plegado: si }']);
+  assert.deepEqual([...codigo.matchAll(/store\(([^)]*)\)/g)].map(m => m[1]).filter(a => a !== 'v'), ['g'], 'store solo desde anotar');
+  assert.deepEqual([...codigo.matchAll(/anotar\((\{[^)]*\})\)/g)].map(m => m[1]), ['{ plegado: si }', '{ bienvenida: hoy }']);
   assert.match(codigo, /if \(\$\('\.esc-globo'\)\) return;/);
   assert.match(codigo, /if \(!\$\('\.esc-chispas'\)\)/);
   assert.match(codigo, /setAttribute\('aria-hidden', 'true'\)/);
@@ -268,6 +271,39 @@ test('el gato escucha sin tocar a nadie: «Guardar» con el editor cerrado, el b
   assert.match(codigo, /region\.getAttribute\('data-esc'\)\) return;/, 'escucha la región una sola vez');
   assert.match(codigo, /querySelectorAll\('\.gk-toasts, \.gn-portal'\)/);
   assert.ok(!/GNKit\.notify\s*=|root\.alert\s*=|root\.confirm\s*=/.test(codigo), 'no pisa nada del kit ni del editor');
+});
+
+// ---- ESC-4: la bienvenida del día ----
+test('la bienvenida toca una vez por día, solo con Gato Negro y sin «reducir movimiento»', () => {
+  const hoy = E.diaKey(new Date(2026, 10, 17, 9, 0));
+  assert.equal(hoy, '2026-11-17');
+  assert.equal(E.diaKey(new Date(2026, 0, 5, 23, 59)), '2026-1-5');
+  assert.equal(E.tocaBienvenida(null, hoy, 'gato', false), true, 'la primera vez');
+  assert.equal(E.tocaBienvenida({ plegado: true }, hoy, 'gato', false), true);
+  assert.equal(E.tocaBienvenida({ bienvenida: '2026-11-16' }, hoy, 'gato', false), true, 'otro día');
+  assert.equal(E.tocaBienvenida({ bienvenida: hoy }, hoy, 'gato', false), false, 'hoy ya la viste');
+  assert.equal(E.tocaBienvenida(null, hoy, 'nord', false), false, 'otro theme');
+  assert.equal(E.tocaBienvenida(null, hoy, 'gato', true), false, 'reducir movimiento');
+  assert.ok(E.BIENVENIDA_MS >= 2500 && E.BIENVENIDA_MS <= 4000, 'unos 3 s');
+});
+
+test('la bienvenida: ojos, saludo de la hora y cómo pasarla; encima de todo y con buen contraste', () => {
+  const h = E.bienvenidaHTML(new Date(2026, 10, 17, 21, 0));
+  assert.match(h, /<div class="esc-ojos"><i><\/i><i><\/i><\/div>/);
+  assert.match(h, /Buenas noches, Pablo/);
+  assert.match(h, /Tocá para pasar/);
+  assert.equal(E.saludo(new Date(2026, 10, 17, 8, 0)), 'Buen día');
+  const b = regla('body[data-theme="gato"] .esc-bienvenida').body;
+  assert.ok(+/z-index: (\d+)/.exec(b)[1] > 10002, 'por encima de los avisos del kit');
+  assert.match(b, /position: fixed; inset: 0;/);
+  assert.match(b, /animation: escApaga \.9s ease 2\.2s both;/, 'se apaga sola');
+  const p = regla('body[data-theme="gato"] .esc-bv-pasar').body;
+  assert.ok(cr(hex(/color: (#[0-9A-Fa-f]{6})/.exec(p)[1]), hex('#000000')) >= 7);
+  const codigo = js.replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.match(codigo, /capa\.addEventListener\('click', cerrar\);/);
+  assert.match(codigo, /doc\.addEventListener\('keydown', cerrar, true\);/);
+  assert.match(codigo, /doc\.removeEventListener\('keydown', cerrar, true\);/, 'no deja oyentes colgados');
+  assert.match(codigo, /setAttribute\('aria-hidden', 'true'\); \/\/ el saludo ya está en el h1/);
 });
 
 test('index.html carga la escena al final y con versión', () => {
