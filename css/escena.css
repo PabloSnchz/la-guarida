@@ -1,4 +1,4 @@
-/* css/escena.css — «GN Escena» en La Guarida (1.3.0, 2026-11-17, BL-091 ESC-4)
+/* css/escena.css — «GN Escena» en La Guarida (1.4.0, 2026-11-17, BL-091 ESC-5)
    La estética de mi sitio (pablosnchz.github.io/shiruvana) llevada a La Guarida, con
    lo que Pablo eligió en la maqueta ESC-0 (todas las ★):
    - fondo «Taller»: cuadrícula tenue, luz ámbar arriba a la izquierda y violeta abajo
@@ -10,7 +10,10 @@
      encima; adentro va el consejo del día. Se pliega a la cara y el gato;
    - 1.2.0 (ESC-3): yo de cuerpo entero cuando una sección está vacía y en el buscador
      (Ctrl K), fundida con el fondo como en mi sitio;
-   - 1.3.0 (ESC-4): la bienvenida del día, los ojos del gato y el saludo (unos 3 s).
+   - 1.3.0 (ESC-4): la bienvenida del día, los ojos del gato y el saludo (unos 3 s);
+   - 1.4.0 (ESC-5): la paleta exacta de mi sitio y mis poses SIN fondo: ya no se funden
+     con mix-blend (en el buscador dejaba un rectángulo negro); usan los recortes que hace
+     js/escena.js (--esc-p-<pose>). El resto del restyle vive en css/universo.css.
    SOLO con el theme Gato Negro: cada regla cuelga de body[data-theme="gato"] (lo único
    suelto es esconder lo nuevo) y los otros 18 themes quedan exactamente como estaban.
    Sin backdrop-filter ni transform en la cabecera: los menús de «⋯» usan position: fixed
@@ -21,8 +24,8 @@
 body[data-theme="gato"]::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
-    radial-gradient(45% 50% at 85% 85%, rgba(168, 150, 255, .16), transparent 70%),
-    radial-gradient(35% 35% at 8% 10%, rgba(242, 185, 75, .09), transparent 70%),
+    radial-gradient(55% 60% at 82% 70%, rgba(155, 130, 255, .18), transparent 70%),
+    radial-gradient(40% 40% at 10% 12%, rgba(232, 179, 75, .1), transparent 70%),
     linear-gradient(rgba(255, 255, 255, .03) 1px, transparent 1px) 0 0 / 100% 48px,
     linear-gradient(90deg, rgba(255, 255, 255, .03) 1px, transparent 1px) 0 0 / 48px 100%;
 }
@@ -32,18 +35,18 @@ body[data-theme="gato"]::before {
 body[data-theme="gato"] .esc-chispas { display: block; position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
 body[data-theme="gato"] .esc-chispas i {
   position: absolute; bottom: -10px; left: calc(3% + var(--i) * 7%); width: 3px; height: 3px; border-radius: 50%; opacity: 0;
-  background: #F2B94B; box-shadow: 0 0 8px #F2B94B;
+  background: #E8B34B; box-shadow: 0 0 8px #E8B34B;
   animation: escChispa calc(9s + var(--i) * .5s) linear calc(var(--i) * -1.1s) infinite;
 }
-body[data-theme="gato"] .esc-chispas i:nth-child(3n) { background: #A896FF; box-shadow: 0 0 8px #A896FF; }
+body[data-theme="gato"] .esc-chispas i:nth-child(3n) { background: #9B82FF; box-shadow: 0 0 8px #9B82FF; }
 
 /* ---- Cabecera: deja ver el escenario, opaca a la vista ---- */
-body[data-theme="gato"] .app-header { background: rgba(15, 17, 23, .9); }
+body[data-theme="gato"] .app-header { background: rgba(11, 11, 16, .92); }
 
 /* ---- Secciones en cápsula ---- */
 body[data-theme="gato"] .app-nav {
   justify-self: center; flex-wrap: nowrap; gap: 2px; padding: 4px; max-width: 100%; overflow-x: auto; scrollbar-width: none;
-  border: 1px solid var(--border); border-radius: 999px; background: rgba(26, 31, 43, .8);
+  border: 1px solid var(--border); border-radius: 999px; background: rgba(21, 21, 29, .8);
 }
 body[data-theme="gato"] .app-nav::-webkit-scrollbar { display: none; }
 body[data-theme="gato"] .app-tab {
@@ -51,15 +54,15 @@ body[data-theme="gato"] .app-tab {
   transition: color var(--transition-speed) ease, background var(--transition-speed) ease;
 }
 body[data-theme="gato"] .app-tab:hover { color: var(--text); background: rgba(255, 255, 255, .06); }
-/* #111 sobre el ámbar: 10,4:1 */
-body[data-theme="gato"] .app-tab[aria-current="true"] { background: #F2B94B; color: #111111; font-weight: 650; }
+/* #111 sobre el ámbar: 10:1 */
+body[data-theme="gato"] .app-tab[aria-current="true"] { background: #E8B34B; color: #111111; font-weight: 700; }
 
 /* ---- Paneles sobre el escenario ---- */
 body[data-theme="gato"] .gn-panel {
-  background: rgba(26, 31, 43, .9); border-top: 3px solid var(--esc-color, var(--border));
+  background: rgba(21, 21, 29, .9); border-top: 3px solid var(--esc-color, var(--border));
   animation: escSube .5s ease-out calc(var(--esc-orden, 0) * 80ms) both;
 }
-body[data-theme="gato"] #seccionWidgets { --esc-color: #7B5CFF; --esc-orden: 1; }
+body[data-theme="gato"] #seccionWidgets { --esc-color: #9B82FF; --esc-orden: 1; }
 body[data-theme="gato"] #seccionFavoritos { --esc-color: #E8B34B; --esc-orden: 2; }
 body[data-theme="gato"] #seccionCategorias { --esc-color: #9B82FF; --esc-orden: 3; }
 body[data-theme="gato"] #launcherPanel { --esc-color: #2EC4B6; --esc-orden: 4; }
@@ -70,7 +73,7 @@ body[data-theme="gato"] #launcherPanel { --esc-color: #2EC4B6; --esc-orden: 4; }
 body[data-theme="gato"] .esc-globo {
   position: fixed; right: 20px; bottom: 20px; z-index: 7000; width: min(400px, calc(100vw - 40px));
   display: flex; align-items: flex-start; gap: 12px; padding: 14px 14px 14px 16px;
-  border: 1px solid var(--border); border-radius: 18px; background: rgba(26, 31, 43, .97);
+  border: 1px solid var(--border); border-radius: 18px; background: rgba(21, 21, 29, .97);
   box-shadow: 0 12px 40px rgba(0, 0, 0, .5); color: var(--text);
   animation: escSube .4s ease-out .3s both;
 }
@@ -79,11 +82,11 @@ body[data-theme="gato"]:has(details.gn-menu[open]) .esc-globo { display: none; }
 /* Que el globo no tape lo último de la página */
 body[data-theme="gato"] .app-main { padding-bottom: 150px; }
 body[data-theme="gato"] .esc-cara {
-  flex: none; width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: #000; box-shadow: 0 0 0 2px #F2B94B;
+  flex: none; width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: #000; box-shadow: 0 0 0 2px #E8B34B;
 }
 body[data-theme="gato"] .esc-dice { flex: 1; min-width: 0; }
 /* Ámbar sobre el globo: 9,4:1 */
-body[data-theme="gato"] .esc-nombre { margin: 0; font-size: .7rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: #F2B94B; }
+body[data-theme="gato"] .esc-nombre { margin: 0; font-size: .7rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: #E8B34B; }
 body[data-theme="gato"] .esc-texto { margin: 2px 0 0; font-size: .9rem; line-height: 1.45; }
 body[data-theme="gato"] .esc-plegar {
   flex: none; width: 28px; height: 28px; border: 1px solid transparent; border-radius: 8px; background: none;
@@ -102,7 +105,7 @@ body[data-theme="gato"] .esc-gato.is-salta img { animation: escSalta .6s ease bo
 /* #111 sobre el ámbar: 10,4:1 */
 body[data-theme="gato"] .esc-gato-dice {
   position: absolute; right: 136px; bottom: calc(100% + 30px); padding: 5px 11px; border-radius: 12px;
-  background: #F2B94B; color: #111111; font-size: .8rem; font-weight: 650; white-space: nowrap; pointer-events: none;
+  background: #E8B34B; color: #111111; font-size: .8rem; font-weight: 650; white-space: nowrap; pointer-events: none;
 }
 body[data-theme="gato"] .esc-gato-dice:empty { display: none; }
 
@@ -114,8 +117,8 @@ body[data-theme="gato"] .esc-slot .gn-toast {
   position: static; width: auto; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; animation: none;
 }
 body[data-theme="gato"] .esc-slot .gn-toast[hidden] { display: none; }
-body[data-theme="gato"] .esc-slot .gn-toast__avatar { width: 44px; height: 44px; box-shadow: 0 0 0 2px #F2B94B; }
-body[data-theme="gato"] .esc-slot .gn-toast__who { letter-spacing: .04em; color: #F2B94B; }
+body[data-theme="gato"] .esc-slot .gn-toast__avatar { width: 44px; height: 44px; box-shadow: 0 0 0 2px #E8B34B; }
+body[data-theme="gato"] .esc-slot .gn-toast__who { letter-spacing: .04em; color: #E8B34B; }
 
 /* Plegado: solo la cara y el gato */
 body[data-theme="gato"] .esc-globo.is-plegado { width: auto; padding: 8px; border-radius: 999px; align-items: center; }
@@ -125,35 +128,35 @@ body[data-theme="gato"] .esc-globo.is-plegado .esc-gato { right: 30px; width: 64
 body[data-theme="gato"] .esc-globo.is-plegado .esc-gato-dice { right: 0; }
 
 /* ---- ESC-3: yo de cuerpo entero en los estados vacíos ----
-   La pose va de fondo con mix-blend lighten (su negro se funde con el panel) y un
-   degradé del color del panel abajo, que la apoya sin corte. El texto dice qué hacer. */
+   1.4.0: la pose va sin fondo (el recorte de js/escena.js, --esc-p-<pose>); hasta que
+   está lista, solo el texto. El texto dice qué hacer. */
 body[data-theme="gato"] #favoritesGrid:not(:has(.fav-card))::before,
 body[data-theme="gato"] #categoriesGrid:not(:has(.category-card))::before,
 body[data-theme="gato"] .launcher-grid:not(:has(.launcher-item))::before {
   grid-column: 1 / -1; display: flex; align-items: flex-end; min-height: 170px; padding: 0 8px 18px 140px;
-  background-repeat: no-repeat; background-position: left bottom, 8px bottom; background-size: 100% 28px, auto 170px;
-  mix-blend-mode: lighten; color: var(--gn-muted); font-size: .85rem; line-height: 1.45;
+  background-repeat: no-repeat; background-position: 8px bottom; background-size: auto 170px;
+  color: var(--gn-muted); font-size: .85rem; line-height: 1.45;
 }
 body[data-theme="gato"] #favoritesGrid:not(:has(.fav-card))::before {
   content: "Todavía no tenés favoritos. Soltá un enlace acá o tocá «+ Favorito» y te lo dejo a un clic.";
-  background-image: linear-gradient(to top, #191D28, transparent), url("../assets/brand/shiruvana/cuerpo-sentada.webp");
+  background-image: var(--esc-p-sentada, none);
 }
 body[data-theme="gato"] #categoriesGrid:not(:has(.category-card))::before {
   content: "Todavía no armaste categorías. Con «+ Categoría» agrupamos tus enlaces por tema.";
-  background-image: linear-gradient(to top, #191D28, transparent), url("../assets/brand/shiruvana/cuerpo-saluda.webp");
+  background-image: var(--esc-p-saluda, none);
 }
 body[data-theme="gato"] .launcher-grid:not(:has(.launcher-item))::before {
-  min-height: 130px; padding-left: 104px; background-size: 100% 22px, auto 130px;
+  min-height: 130px; padding-left: 104px; background-size: auto 130px;
   content: "Nada por acá todavía. Tocá «+» y lo dejo a un clic.";
-  background-image: linear-gradient(to top, #191D28, transparent), url("../assets/brand/shiruvana/cuerpo-pensando.webp");
+  background-image: var(--esc-p-pensando, none);
 }
 
 /* ---- ESC-3: yo en el buscador, en lugar del retrato ---- */
 .esc-portal-pose { display: none; }
 body[data-theme="gato"] .gh-portal-fig { display: none; }
 body[data-theme="gato"] .esc-portal-pose {
-  display: block; flex: none; align-self: flex-start; width: auto; height: 300px; margin-right: 8px; pointer-events: none;
-  mix-blend-mode: lighten; -webkit-mask-image: linear-gradient(to top, transparent 0, #000 14%); mask-image: linear-gradient(to top, transparent 0, #000 14%);
+  display: block; flex: none; align-self: flex-start; width: auto; height: 320px; margin: -10px 4px 0 0; pointer-events: none;
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .55)) drop-shadow(0 0 22px rgba(155, 130, 255, .25));
   animation: escSube .3s ease-out both;
 }
 body[data-theme="gato"] .esc-portal-pose[hidden] { display: none; }
@@ -169,8 +172,8 @@ body[data-theme="gato"] .esc-bienvenida {
 }
 body[data-theme="gato"] .esc-ojos { display: flex; gap: 46px; }
 body[data-theme="gato"] .esc-ojos i {
-  width: 46px; height: 22px; border-radius: 50%; background: #F2B94B;
-  box-shadow: 0 0 26px #F2B94B, 0 0 60px rgba(242, 185, 75, .5); animation: escParpadeo 1.2s ease .2s both;
+  width: 46px; height: 22px; border-radius: 50%; background: #E8B34B;
+  box-shadow: 0 0 26px #E8B34B, 0 0 60px rgba(232, 179, 75, .5); animation: escParpadeo 1.2s ease .2s both;
 }
 body[data-theme="gato"] .esc-bv-saludo { margin: 0; font-size: 1.6rem; font-weight: 800; animation: escSube .6s ease-out 1s both; }
 /* Gris claro sobre negro: 9,9:1 */
