@@ -1,5 +1,6 @@
 // Tests de la escena (BL-091): la estética de mi sitio, solo con el theme Gato Negro.
-// ESC-1 fondo, cápsula y paneles; ESC-2 mi globo con el gato y el consejo adentro.
+// ESC-1 fondo, cápsula y paneles; ESC-2 mi globo con el gato y el consejo adentro;
+// ESC-3 el gato reacciona y yo de cuerpo entero en los estados vacíos y en el buscador.
 // Correr: node --test tests/*.test.cjs
 'use strict';
 const test = require('node:test');
@@ -51,7 +52,7 @@ test('solo cambia el theme Gato Negro: toda regla cuelga de body[data-theme="gat
       sueltas.push(s);
     }
   }
-  assert.deepEqual(sueltas, ['.esc-chispas', '.esc-globo'], 'lo único suelto es esconder lo nuevo');
+  assert.deepEqual(sueltas, ['.esc-chispas', '.esc-globo', '.esc-portal-pose'], 'lo único suelto es esconder lo nuevo');
 });
 
 test('la cabecera no gana backdrop-filter, filter ni transform (los menús fixed del celular siguen en su lugar)', () => {
@@ -95,6 +96,7 @@ test('«reducir movimiento»: sin chispas, entradas ni saltos del gato', () => {
   assert.match(m[1], /\.gn-panel \{ animation: none; \}/);
   assert.match(m[1], /\.esc-globo \{ animation: none; \}/);
   assert.match(m[1], /\.esc-gato\.is-salta img \{ animation: none; \}/);
+  assert.match(m[1], /\.esc-portal-pose \{ animation: none; \}/);
 });
 
 // ---- ESC-2: el globo ----
@@ -194,6 +196,78 @@ test('el consejo sigue al theme y a shiruvana.js: observo data-theme, #ghTip y e
   assert.match(codigo, /attributeFilter: \['hidden'\], subtree: true/);
   assert.match(codigo, /if \(hay && !antes\) plegar\(false, false\);/, 'un consejo nuevo abre el globo sin pisar lo guardado');
   assert.match(codigo, /if \(t && dest && t\.parentNode !== dest\) dest\.appendChild\(t\);/, 'sin mover de más (no hay bucle con #ghTip)');
+});
+
+// ---- ESC-3: el gato reacciona y yo de cuerpo entero ----
+test('el gato reacciona: festeja lo que salió bien, camina inquieto con advertencias y errores', () => {
+  assert.deepEqual(E.reaccion('guardado'), { pose: 'festeja', frase: '¡Guardado!' });
+  assert.deepEqual(E.reaccion('backup'), { pose: 'festeja', frase: 'Backup a salvo.' });
+  assert.equal(E.reaccion('ok').pose, 'festeja');
+  assert.equal(E.reaccion('warn').pose, 'camina');
+  assert.equal(E.reaccion('error').pose, 'camina');
+  for (const x of ['info', '', undefined, 'toString', 'constructor', '__proto__']) assert.equal(E.reaccion(x), null, String(x));
+  assert.equal(E.reaccion('info'), null, 'los avisos de borrado («Deshacer») son info: el gato no festeja un borrado');
+  for (const r of Object.values(E.REACCIONES)) {
+    assert.ok(fs.existsSync(path.join(ROOT, 'assets/brand/gato/gato-' + r.pose + '.webp')), r.pose);
+    assert.ok(r.frase.length > 0 && r.frase.length <= 30, 'frase corta: ' + r.frase);
+  }
+});
+
+test('tipo de aviso del kit por su clase', () => {
+  assert.equal(E.tipoAviso('gk-toast gk-toast--ok'), 'ok');
+  assert.equal(E.tipoAviso('gk-toast gk-toast--warn'), 'warn');
+  assert.equal(E.tipoAviso('gk-toast--error gk-toast'), 'error');
+  assert.equal(E.tipoAviso('gk-toast'), '');
+  assert.equal(E.tipoAviso('xgk-toast--ok'), '');
+  assert.equal(E.tipoAviso(undefined), '');
+});
+
+test('en el buscador: saludo con el buscador vacío y pienso cuando escribís; las poses existen', () => {
+  assert.equal(E.posePortal(''), 'saluda');
+  assert.equal(E.posePortal('   '), 'saluda');
+  assert.equal(E.posePortal(null), 'saluda');
+  assert.equal(E.posePortal('bov'), 'pensando');
+  for (const p of ['saluda', 'pensando']) assert.ok(fs.existsSync(path.join(ROOT, E.CUERPO + p + '.webp')), p);
+  assert.match(regla('body[data-theme="gato"] .gh-portal-fig').body, /display: none;/, 'el retrato de header.js se va solo con Gato Negro');
+  const p = regla('body[data-theme="gato"] .esc-portal-pose').body;
+  assert.match(p, /mix-blend-mode: lighten;/);
+  assert.match(p, /pointer-events: none;/);
+  assert.match(css, /@media \(max-width: 1000px\) \{ body\[data-theme="gato"\] \.esc-portal-pose \{ display: none; \} \}/);
+});
+
+test('estados vacíos: mi pose fundida con el panel y un texto que dice qué hacer', () => {
+  const casos = [
+    ['body[data-theme="gato"] #favoritesGrid:not(:has(.fav-card))::before', 'cuerpo-sentada', /Favorito/],
+    ['body[data-theme="gato"] #categoriesGrid:not(:has(.category-card))::before', 'cuerpo-saluda', /Categoría/],
+    ['body[data-theme="gato"] .launcher-grid:not(:has(.launcher-item))::before', 'cuerpo-pensando', /«\+»/]
+  ];
+  const comun = reglas(css).find(r => r.sel.split(',').map(s => s.trim()).length === 3 && r.sel.includes('#favoritesGrid'));
+  assert.ok(comun, 'regla común de los tres');
+  assert.match(comun.body, /mix-blend-mode: lighten;/);
+  assert.match(comun.body, /grid-column: 1 \/ -1;/);
+  for (const [sel, pose, texto] of casos) {
+    const r = reglas(css).filter(x => x.sel === sel).map(x => x.body).join('\n');
+    const url = /url\("([^"]+)"\)/.exec(r);
+    assert.ok(url, sel);
+    assert.ok(url[1].endsWith(pose + '.webp'), pose);
+    assert.ok(fs.existsSync(path.join(ROOT, 'css', url[1])), url[1] + ' existe');
+    assert.match(/content: "([^"]+)"/.exec(r)[1], texto);
+    // El degradé de abajo es del color del panel sobre el fondo (si no, se nota el corte).
+    const g = /linear-gradient\(to top, (#[0-9A-Fa-f]{6}), transparent\)/.exec(r)[1];
+    const panel = over(hex('#1A1F2B'), 0.9, hex('#0F1117')).map(Math.round);
+    assert.ok(hex(g).every((v, i) => Math.abs(v - panel[i]) <= 3), g + ' ≈ panel ' + panel);
+  }
+  assert.ok(cr(MUTED, over(hex('#1A1F2B'), 0.9, BASE)) >= 4.5, 'el texto se lee');
+});
+
+test('el gato escucha sin tocar a nadie: «Guardar» con el editor cerrado, el backup y la región de avisos', () => {
+  const codigo = js.replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.match(codigo, /if \(t\.closest\('#exportBtn'\)\) \{ reaccionar\('backup'\); return; \}/);
+  assert.match(codigo, /if \(m && m\.hidden\) reaccionar\('guardado'\);/, 'solo si el editor se cerró (se guardó de verdad)');
+  assert.match(codigo, /\}, true\);/, 'en captura: antes de que app.js re-dibuje');
+  assert.match(codigo, /region\.getAttribute\('data-esc'\)\) return;/, 'escucha la región una sola vez');
+  assert.match(codigo, /querySelectorAll\('\.gk-toasts, \.gn-portal'\)/);
+  assert.ok(!/GNKit\.notify\s*=|root\.alert\s*=|root\.confirm\s*=/.test(codigo), 'no pisa nada del kit ni del editor');
 });
 
 test('index.html carga la escena al final y con versión', () => {
