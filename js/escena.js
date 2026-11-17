@@ -1,6 +1,11 @@
 /*!
- * js/escena.js — «GN Escena» en La Guarida (1.4.0, 2026-11-17, BL-091 ESC-5)
+ * js/escena.js — «GN Escena» en La Guarida (1.5.0, 2026-11-17, BL-091 ESC-6)
  *
+ * 1.5.0 (ESC-6): cabecera que se esfuma y un globo que dice algo útil.
+ *  - body.esc-bajo cuando bajás de la página: la cabecera, transparente arriba de todo,
+ *    toma su fondo y lo esfuma hacia abajo (css/universo.css). Sin transform en la cabecera.
+ *  - Sin consejo, el globo ya no repite «Ctrl K» (el buscador está a la vista): dice el
+ *    saludo y cuándo fue tu último backup (el mismo texto de header.js).
  * 1.4.0 (ESC-5, restyle «universo Shiruvana»): mis poses sin fondo y la barra del día.
  *  - Mis poses de cuerpo entero tienen fondo negro. Ahora las recorto en el navegador
  *    (canvas): lo negro que toca el borde y los huecos negros grandes quedan
@@ -39,7 +44,7 @@
 (function (root) {
   'use strict';
 
-  var VERSION = '1.4.0';
+  var VERSION = '1.5.0';
   var CHISPAS = 14;
   var KEY = 'guarida:escena:v1';
   var CARA = 'assets/brand/shiruvana/shiruvana-';
@@ -82,8 +87,11 @@
     return h >= 5 && h < 12 ? 'Buen día' : (h >= 12 && h < 19 ? 'Buenas tardes' : 'Buenas noches');
   }
 
-  // Lo que digo cuando no hay consejo: el saludo de la hora y cómo encontrarme.
-  function lineaDelDia(date) { return saludo(date) + ', Pablo. Ctrl K y te llevo a donde quieras.'; }
+  // Lo que digo cuando no hay consejo: el saludo de la hora y un dato útil (si lo hay).
+  function lineaDelDia(date, dato) { return saludo(date) + ', Pablo.' + (dato ? ' ' + dato : ''); }
+
+  // ¿Ya bajaste de la página? (la cabecera toma su fondo)
+  function bajo(y) { return (+y || 0) > 4; }
 
   // El día local, para la bienvenida (una por día).
   function diaKey(date) { return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(); }
@@ -202,14 +210,15 @@
     lineaDelDia: lineaDelDia, fraseGato: fraseGato, globoHTML: globoHTML,
     saludo: saludo, diaKey: diaKey, tocaBienvenida: tocaBienvenida, bienvenidaHTML: bienvenidaHTML, BIENVENIDA_MS: 3200,
     reaccion: reaccion, tipoAviso: tipoAviso, posePortal: posePortal,
-    POSES: POSES, UMBRAL: UMBRAL, HUECO: HUECO, recorte: recorte, avanceDia: avanceDia
+    POSES: POSES, UMBRAL: UMBRAL, HUECO: HUECO, recorte: recorte, avanceDia: avanceDia, bajo: bajo, META_KEY: 'guarida:shiruvana:v1'
   };
   if (typeof module !== 'undefined' && module.exports) { module.exports = api; }
   if (!root || !root.document) return;
 
   var doc = root.document;
   function $(s) { return doc.querySelector(s); }
-  function load() { try { return JSON.parse(root.localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function leer(k) { try { return JSON.parse(root.localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+  function load() { return leer(KEY); }
   function store(v) { try { root.localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) { /* sin lugar: no es grave */ } }
   // Suma un dato a lo guardado sin pisar lo demás.
   function anotar(parche) {
@@ -258,6 +267,15 @@
       });
     });
   }
+
+  // ESC-6: el dato del globo (el último backup, con el texto de header.js)
+  function datoDelDia() {
+    var H = root.GuaridaHeader && root.GuaridaHeader.api;
+    if (!H || !H.backupText) return '';
+    return H.backupText(leer(api.META_KEY) || {}, Date.now()) + '.';
+  }
+
+  function marcarScroll() { doc.body.classList.toggle('esc-bajo', bajo(root.scrollY != null ? root.scrollY : root.pageYOffset)); }
 
   function marcarDia() {
     if (doc.body.style && doc.body.style.setProperty) doc.body.style.setProperty('--esc-dia', avanceDia(new Date()) + '%');
@@ -312,7 +330,7 @@
     globo = doc.createElement('aside');
     globo.className = 'esc-globo';
     globo.setAttribute('aria-label', 'Shiruvana');
-    globo.innerHTML = globoHTML(lineaDelDia(new Date()));
+    globo.innerHTML = globoHTML(lineaDelDia(new Date(), datoDelDia()));
     // Sin la imagen del gato, el globo queda sin gato (no con un ícono roto).
     globo.querySelector('.esc-gato img').onerror = function () { var b = globo.querySelector('.esc-gato'); if (b) b.hidden = true; };
     globo.querySelector('.esc-plegar').addEventListener('click', function () { plegar(!globo.classList.contains('is-plegado'), true); });
@@ -402,6 +420,9 @@
     setTimeout(function () { doc.body.classList.add('esc-listo'); }, 2000);
     marcarDia();
     if (root.setInterval) root.setInterval(marcarDia, 60000);
+    // ESC-6: la cabecera se esfuma recién cuando bajás
+    marcarScroll();
+    if (root.addEventListener) root.addEventListener('scroll', marcarScroll, { passive: true });
 
     // Guardar en el editor: si después del clic el editor se cerró, se guardó.
     doc.addEventListener('click', function (ev) {
