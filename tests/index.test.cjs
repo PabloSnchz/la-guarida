@@ -47,7 +47,7 @@ test('módulos en orden: los del diseño 3.0 antes que los de siempre; la escena
     'js/data.js', 'js/widgets.js', 'js/drag-drop.js', 'js/modal.js', 'js/app.js', 'js/shiruvana.js', 'js/ui.js', 'js/escena.js'
   ]);
   const css = [...html.matchAll(/<link rel="stylesheet" href="([^"?]+)/g)].map(m => m[1]);
-  assert.deepEqual(css, ['css/styles.css', 'css/themes/gato.css', 'css/kit.css', 'css/header.css', 'css/cards.css', 'css/widgets.css', 'css/editor.css', 'css/escena.css']);
+  assert.deepEqual(css, ['css/styles.css', 'css/themes/gato.css', 'css/kit.css', 'css/header.css', 'css/cards.css', 'css/widgets.css', 'css/editor.css', 'css/escena.css', 'css/universo.css']);
 });
 
 test('cada recurso relativo existe en el repo', () => {
