@@ -1,6 +1,12 @@
 /*!
- * js/widgets-ui.js — Widgets de La Guarida sin ventanitas del navegador (1.1.0, 2026-10-31, RG-4 + RG-8)
+ * js/widgets-ui.js — Widgets de La Guarida sin ventanitas del navegador (1.2.0, 2026-11-17, RG-4 + RG-8 + BL-091 ESC-6)
  *
+ * 1.2.0 (ESC-6): los reinicios de GW2 salen de la cabecera y viven en su widget. El widget
+ * «Resets GW2» de widgets.js tenía el fin de temporada fijo (2026-09-15) y por eso su fila
+ * estaba oculta. Ahora lo dibujo acá con el mismo reloj de la cabecera (js/kit.js: diario,
+ * semanal y «está cerca» en dorado) y la temporada real que header.js guarda de la API
+ * (guarida:temporada:v1); si la temporada terminó o no se sabe, esa fila no aparece.
+ * Sin la clase .reset-value, así el reloj de cada segundo de widgets.js no lo pisa.
  * 1.1.0 (RG-8): quitar widgets. widgets.js nunca tuvo cómo borrarlos. En modo edición
  * cada widget muestra ✕ (igual que favoritos y enlaces); al tocarlo se quita al instante
  * y el aviso ofrece «Deshacer» 10 s. Si después guardás otra cosa, el Deshacer se cancela.
@@ -19,7 +25,7 @@
 (function (root) {
   'use strict';
 
-  var VERSION = '1.1.0';
+  var VERSION = '1.2.0';
   var DESHACER_MS = 10000;
   var DIA = 24 * 60 * 60 * 1000;
 
@@ -29,7 +35,7 @@
     greeting: 'Un saludo según la hora.',
     notes: 'Una libreta que se guarda sola.',
     counter: 'Días que faltan para una fecha.',
-    all_resets: 'Reinicio diario y semanal de GW2.',
+    all_resets: 'Reinicio diario, semanal y fin de temporada de GW2.',
     gw2_news: 'Las últimas noticias de Guild Wars 2.',
     twitch: 'Seguidores y si estás en vivo.',
     youtube: 'Suscriptores y tu último video.'
@@ -127,8 +133,35 @@
     return { days: Math.max(0, Math.ceil((target - now) / DIA)), label: dos(p[2]) + '/' + dos(p[1]) + '/' + p[0] };
   }
 
+  // ---- 1.2.0: reinicios con el reloj de la cabecera ----
+  var SEASON_KEY = 'guarida:temporada:v1';
+
+  // Filas del widget: diario, semanal y (si sigue abierta) la temporada. K es js/kit.js.
+  function resetRows(now, season, K) {
+    if (!K || !K.clocks) return [];
+    var o = season && season > now ? { seasonEnd: season } : {};
+    return K.clocks(now, o).filter(function (c) { return c.key !== 'local'; }).map(function (c) {
+      return { key: c.key, label: c.label, title: c.title, value: c.value, soon: !!c.soon };
+    });
+  }
+
+  function resetsHTML(rows, esc) {
+    return (rows || []).map(function (r) {
+      return '<div class="widget-reset-row gw-reset gw-reset--' + r.key + (r.soon ? ' is-soon' : '') + '" title="' + esc(r.title) + '">' +
+        '<span class="reset-label">' + esc(r.label) + '</span><span class="gw-reset__value">' + esc(r.value) + '</span></div>';
+    }).join('');
+  }
+
+  // El fin de temporada que guardó header.js, o null.
+  function seasonFromCache(raw) {
+    try {
+      var c = JSON.parse(raw || 'null');
+      return c && typeof c.end === 'number' && isFinite(c.end) ? c.end : null;
+    } catch (e) { return null; }
+  }
+
   var api = {
-    VERSION: VERSION, DESC: DESC, defaultConfig: defaultConfig, pickerItems: pickerItems, combined: combined,
+    VERSION: VERSION, DESC: DESC, SEASON_KEY: SEASON_KEY, resetRows: resetRows, resetsHTML: resetsHTML, seasonFromCache: seasonFromCache, defaultConfig: defaultConfig, pickerItems: pickerItems, combined: combined,
     nthOfType: nthOfType, addWidget: addWidget, validCounter: validCounter, counterView: counterView,
     DESHACER_MS: DESHACER_MS, removeAt: removeAt, putBack: putBack
   };
@@ -287,6 +320,18 @@
     });
   }
 
+  // ---- 5. Reinicios con el reloj de la cabecera (1.2.0) ----
+  function pintarResets() {
+    var K = kit();
+    if (!K || !K.api) return;
+    var season = null;
+    try { season = seasonFromCache(root.localStorage.getItem(SEASON_KEY)); } catch (e) { season = null; }
+    var html = resetsHTML(resetRows(Date.now(), season, K.api), K.api.esc);
+    Array.prototype.forEach.call(doc.querySelectorAll('#widgetsLeft .widget--resets .widget-resets-list'), function (list) {
+      if (list.innerHTML !== html) list.innerHTML = html; // sin cambios, no toco nada
+    });
+  }
+
   // Cualquier otro guardado cancela el Deshacer (así nunca pisa algo posterior).
   function vigilarGuardado() {
     var D = root.Data;
@@ -326,6 +371,10 @@
     // ponerBotones solo agrega donde falta, así que no se repite sin fin.
     if (box && root.MutationObserver) new root.MutationObserver(ponerBotones).observe(box, { childList: true, subtree: true });
     ponerBotones();
+    // 1.2.0: los reinicios, cada vez que widgets.js dibuja el panel y cada 30 s (el kit va por minutos)
+    if (box && root.MutationObserver) new root.MutationObserver(pintarResets).observe(box, { childList: true });
+    pintarResets();
+    if (root.setInterval) root.setInterval(pintarResets, 30000);
     // data.js carga después que este archivo: espero a que exista Data.save.
     setTimeout(vigilarGuardado, 0);
   }
