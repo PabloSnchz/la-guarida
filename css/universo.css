@@ -1,4 +1,4 @@
-/* css/universo.css — La Guarida en el universo Shiruvana (1.0.0, 2026-11-17, BL-091 ESC-5)
+/* css/universo.css — La Guarida en el universo Shiruvana (1.1.0, 2026-11-17, BL-091 ESC-6)
    Pablo: «tiene que parecer que son realmente 2 webs del mismo universo». Lo que trae de
    mi sitio (pablosnchz.github.io/shiruvana, css/escenario.css):
    - la paleta: obsidiana #0B0B10, paneles #15151D/#1C1C26, borde #2A2A38, ámbar #E8B34B,
@@ -12,6 +12,10 @@
    - yo, asomada arriba a la derecha de cada panel (saludo en Favoritos, pienso en
      Categorías, sentada en el Lanzador) y el gato en Widgets. Mis poses llegan sin fondo
      (las recorta js/escena.js 1.4.0); mientras no están listas, no se ven.
+   1.1.0 (ESC-6, con Pablo): la cabecera sin corte (transparente arriba de todo; al bajar toma
+   su fondo y lo esfuma hacia abajo, sin línea), el buscador como protagonista de la segunda
+   fila (centrado, más ancho, con lupa y sin mi cara: ya estoy en el globo y en los paneles)
+   y sin la barra de relojes: los reinicios viven en su widget, como cifras.
    SOLO con el theme Gato Negro (body[data-theme="gato"]); los otros 18 themes no cambian.
    Sin transform ni backdrop-filter en la cabecera (los menús son position: fixed en el
    celular). Volver atrás: quitar esta hoja de index.html. */
@@ -43,7 +47,19 @@ body[data-theme="gato"] {
 }
 
 /* ---- 2. Cabecera ---- */
-body[data-theme="gato"] .app-header { background: rgba(11, 11, 16, .92); }
+/* Arriba de todo, sin fondo ni línea: el escenario sigue detrás. Al bajar (escena.js pone
+   esc-bajo) toma su fondo y lo esfuma hacia abajo con una pollera de 36 px. */
+body[data-theme="gato"] .app-header {
+  background: transparent; border-bottom-color: transparent;
+  transition: background .25s ease, border-color .25s ease;
+}
+body[data-theme="gato"].esc-bajo .app-header { background: rgba(11, 11, 16, .94); }
+body[data-theme="gato"] .app-header::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 36px; pointer-events: none;
+  background: linear-gradient(rgba(11, 11, 16, .94), rgba(11, 11, 16, 0));
+  opacity: 0; transition: opacity .25s ease;
+}
+body[data-theme="gato"].esc-bajo .app-header::after { opacity: 1; }
 body[data-theme="gato"] .brand__name { font-weight: 800; letter-spacing: .02em; }
 body[data-theme="gato"] .brand__logo { border-radius: 50%; box-shadow: 0 0 0 2px var(--esc-ambar); }
 body[data-theme="gato"] .app-btn,
@@ -66,15 +82,22 @@ body[data-theme="gato"] .gh-hello::after {
   box-shadow: 0 0 10px rgba(232, 179, 75, .25);
 }
 
-/* El portal cerrado y los relojes */
+/* Segunda fila: el saludo a la izquierda y el buscador al centro, protagonista. Sin relojes:
+   los reinicios están en su widget (js/widgets-ui.js 1.2.0). */
+body[data-theme="gato"] .gh-row { grid-template-columns: minmax(0, 1fr) minmax(320px, 640px) minmax(0, 1fr); }
+body[data-theme="gato"] .gh-clocks { display: none; }
 body[data-theme="gato"] .gn-portal-trigger {
-  background: rgba(21, 21, 29, .8); border-radius: 12px;
+  min-height: 46px; padding: 6px 10px 6px 16px; gap: 12px;
+  background: rgba(21, 21, 29, .8); border-radius: 14px;
   box-shadow: 0 0 0 1px rgba(155, 130, 255, .25), 0 8px 24px rgba(155, 130, 255, .12);
 }
+/* La lupa ámbar en lugar de mi cara */
+body[data-theme="gato"] .gn-portal-trigger::before {
+  content: ""; flex: none; width: 18px; height: 18px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E8B34B' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='M15.5 15.5 21 21'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+body[data-theme="gato"] .gn-portal-trigger__avatar { display: none; }
 body[data-theme="gato"] .gn-portal-trigger:hover { border-color: var(--esc-ambar); box-shadow: var(--esc-brillo); }
-body[data-theme="gato"] .gn-portal-trigger__avatar { box-shadow: 0 0 0 2px var(--esc-ambar); }
-body[data-theme="gato"] .gk-clk { background: rgba(21, 21, 29, .8); border-radius: 10px; }
-body[data-theme="gato"] .gk-clk__value { font-weight: 800; }
 body[data-theme="gato"] .gn-kbd { background: #1C1C26; color: var(--text); border-radius: 6px; }
 
 /* ---- 3. Paneles: tarjeta de mi sitio, antetítulo de color y título en 800 ---- */
@@ -207,7 +230,11 @@ body[data-theme="gato"] #widgetsLeft .widget-counter-days {
   text-shadow: 0 0 18px rgba(232, 179, 75, .35); font-variant-numeric: tabular-nums;
 }
 body[data-theme="gato"] #widgetsLeft .widget-greeting-text { font-size: 1.15rem; font-weight: 800; }
-body[data-theme="gato"] #widgetsLeft .reset-value { color: var(--esc-ambar); font-weight: 800; }
+body[data-theme="gato"] #widgetsLeft .reset-value,
+body[data-theme="gato"] #widgetsLeft .gw-reset__value { color: var(--esc-ambar); font-weight: 800; }
+/* «Está cerca»: la cifra brilla más y el nombre se pone ámbar */
+body[data-theme="gato"] #widgetsLeft .gw-reset.is-soon .gw-reset__value { text-shadow: 0 0 14px rgba(232, 179, 75, .7); }
+body[data-theme="gato"] #widgetsLeft .gw-reset.is-soon .reset-label { color: var(--esc-ambar); }
 body[data-theme="gato"] #widgetsLeft .widget-reset-row { padding: 3px 0; border-bottom: 1px solid rgba(255, 255, 255, .05); }
 body[data-theme="gato"] #widgetsLeft .widget-reset-row:last-child { border-bottom: 0; }
 body[data-theme="gato"] #widgetsLeft .widget-twitch-followers,
@@ -271,8 +298,14 @@ body[data-theme="gato"] :is(.fav-card, .category-card, .launcher-item, .widget):
 @keyframes escAsoma { from { opacity: 0; transform: translate(24px, 18px); } to { opacity: 1; transform: none; } }
 @keyframes escFlota { from { translate: 0 0; } to { translate: 0 -6px; } }
 
+/* ---- Pantallas medianas: una sola columna en la segunda fila (como css/header.css) ---- */
+@media (max-width: 900px) {
+  body[data-theme="gato"] .gh-row { grid-template-columns: minmax(0, 1fr); }
+}
+
 /* ---- Celular ---- */
 @media (max-width: 760px) {
+  body[data-theme="gato"] .app-header::after { display: none; }
   body[data-theme="gato"] .gn-panel { padding: 16px 14px 18px; }
   body[data-theme="gato"] .gn-panel__title,
   body[data-theme="gato"] .gn-count { font-size: 1.3rem; }
@@ -287,6 +320,8 @@ body[data-theme="gato"] :is(.fav-card, .category-card, .launcher-item, .widget):
 /* ---- Movimiento reducido: todo quieto ---- */
 @media (prefers-reduced-motion: reduce) {
   body[data-theme="gato"] .gn-panel::after { animation: none; }
+  body[data-theme="gato"] .app-header,
+  body[data-theme="gato"] .app-header::after { transition: none; }
   body[data-theme="gato"] #seccionFavoritos .fav-card:hover,
   body[data-theme="gato"] #seccionCategorias .category-link:hover { transform: none; }
 }
