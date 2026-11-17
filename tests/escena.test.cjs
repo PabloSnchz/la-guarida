@@ -1,7 +1,7 @@
 // Tests de la escena (BL-091): la estética de mi sitio, solo con el theme Gato Negro.
 // ESC-1 fondo, cápsula y paneles; ESC-2 mi globo con el gato y el consejo adentro;
 // ESC-3 el gato reacciona y yo de cuerpo entero en los estados vacíos y en el buscador;
-// ESC-4 la bienvenida del día.
+// ESC-4 la bienvenida del día; ESC-5 la paleta de mi sitio y mis poses sin fondo (recorte).
 // Correr: node --test tests/*.test.cjs
 'use strict';
 const test = require('node:test');
@@ -30,9 +30,10 @@ const over = (c, a, b) => c.map((v, i) => v * a + b[i] * (1 - a));
 const lum = c => { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
   return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
 const cr = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
-// Peor caso del fondo: el theme + luz violeta + línea de la cuadrícula.
-const BASE = over([255, 255, 255], 0.03, over([168, 150, 255], 0.16, hex('#0F1117')));
-const MUTED = over(hex('#8E96A3'), 0.8, hex('#F4F6FA')); // --gn-muted
+// Peor caso del fondo (ESC-5, paleta de mi sitio): obsidiana + luz violeta + línea de la cuadrícula.
+const BASE = over([255, 255, 255], 0.03, over([155, 130, 255], 0.18, hex('#0B0B10')));
+const TEXTO = hex('#EDEDF2');
+const MUTED = over(hex('#A6A6B8'), 0.8, TEXTO); // --gn-muted con la paleta de css/universo.css
 
 test('chispas: tantas como se piden, con su índice, y con tope', () => {
   assert.equal(E.chispasHTML(3), '<i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i>');
@@ -72,12 +73,12 @@ test('contraste: pestaña activa, paneles y cabecera sobre el punto más claro d
   const tab = regla('body[data-theme="gato"] .app-tab[aria-current="true"]');
   const bg = /background:\s*(#[0-9A-Fa-f]{6})/.exec(tab.body)[1], fg = /color:\s*(#[0-9A-Fa-f]{6})/.exec(tab.body)[1];
   assert.ok(cr(hex(fg), hex(bg)) >= 7, 'pestaña activa ' + cr(hex(fg), hex(bg)).toFixed(2));
-  const panel = over(hex('#1A1F2B'), 0.9, BASE);
-  assert.match(css, /\.gn-panel \{\s*background: rgba\(26, 31, 43, \.9\)/);
-  assert.ok(cr(hex('#F4F6FA'), panel) >= 4.5, 'texto');
+  const panel = over(hex('#15151D'), 0.9, BASE);
+  assert.match(css, /\.gn-panel \{\s*background: rgba\(21, 21, 29, \.9\)/);
+  assert.ok(cr(TEXTO, panel) >= 4.5, 'texto');
   assert.ok(cr(MUTED, panel) >= 4.5, 'texto secundario ' + cr(MUTED, panel).toFixed(2));
-  const header = over(hex('#0F1117'), 0.9, BASE);
-  assert.match(css, /\.app-header \{ background: rgba\(15, 17, 23, \.9\); \}/);
+  const header = over(hex('#0B0B10'), 0.92, BASE);
+  assert.match(css, /\.app-header \{ background: rgba\(11, 11, 16, \.92\); \}/);
   assert.ok(cr(MUTED, header) >= 4.5, 'pestañas sobre la cabecera');
 });
 
@@ -170,9 +171,9 @@ test('el consejo adentro del globo: sin posición propia y con su cara; el globo
 
 test('contraste del globo: texto, mi nombre y lo que dice el gato', () => {
   const g = regla('body[data-theme="gato"] .esc-globo');
-  assert.match(g.body, /background: rgba\(26, 31, 43, \.97\);/);
-  const fondo = over(hex('#1A1F2B'), 0.97, BASE);
-  assert.ok(cr(hex('#F4F6FA'), fondo) >= 4.5, 'texto');
+  assert.match(g.body, /background: rgba\(21, 21, 29, \.97\);/);
+  const fondo = over(hex('#15151D'), 0.97, BASE);
+  assert.ok(cr(TEXTO, fondo) >= 4.5, 'texto');
   const nombre = /color: (#[0-9A-Fa-f]{6})/.exec(regla('body[data-theme="gato"] .esc-nombre').body)[1];
   assert.ok(cr(hex(nombre), fondo) >= 4.5, 'nombre ' + cr(hex(nombre), fondo).toFixed(2));
   const d = regla('body[data-theme="gato"] .esc-gato-dice').body;
@@ -233,12 +234,13 @@ test('en el buscador: saludo con el buscador vacío y pienso cuando escribís; l
   for (const p of ['saluda', 'pensando']) assert.ok(fs.existsSync(path.join(ROOT, E.CUERPO + p + '.webp')), p);
   assert.match(regla('body[data-theme="gato"] .gh-portal-fig').body, /display: none;/, 'el retrato de header.js se va solo con Gato Negro');
   const p = regla('body[data-theme="gato"] .esc-portal-pose').body;
-  assert.match(p, /mix-blend-mode: lighten;/);
+  assert.ok(!/mix-blend|mask-image/.test(p), 'ESC-5: sin blend ni máscara (dejaban un rectángulo negro)');
+  assert.match(p, /drop-shadow/);
   assert.match(p, /pointer-events: none;/);
   assert.match(css, /@media \(max-width: 1000px\) \{ body\[data-theme="gato"\] \.esc-portal-pose \{ display: none; \} \}/);
 });
 
-test('estados vacíos: mi pose fundida con el panel y un texto que dice qué hacer', () => {
+test('estados vacíos: mi pose sin fondo (el recorte) y un texto que dice qué hacer', () => {
   const casos = [
     ['body[data-theme="gato"] #favoritesGrid:not(:has(.fav-card))::before', 'cuerpo-sentada', /Favorito/],
     ['body[data-theme="gato"] #categoriesGrid:not(:has(.category-card))::before', 'cuerpo-saluda', /Categoría/],
@@ -246,21 +248,18 @@ test('estados vacíos: mi pose fundida con el panel y un texto que dice qué hac
   ];
   const comun = reglas(css).find(r => r.sel.split(',').map(s => s.trim()).length === 3 && r.sel.includes('#favoritesGrid'));
   assert.ok(comun, 'regla común de los tres');
-  assert.match(comun.body, /mix-blend-mode: lighten;/);
+  assert.ok(!/mix-blend/.test(comun.body), 'sin blend');
   assert.match(comun.body, /grid-column: 1 \/ -1;/);
   for (const [sel, pose, texto] of casos) {
     const r = reglas(css).filter(x => x.sel === sel).map(x => x.body).join('\n');
-    const url = /url\("([^"]+)"\)/.exec(r);
-    assert.ok(url, sel);
-    assert.ok(url[1].endsWith(pose + '.webp'), pose);
-    assert.ok(fs.existsSync(path.join(ROOT, 'css', url[1])), url[1] + ' existe');
+    // La pose recortada por escena.js; sin recorte, nada (nunca el webp con fondo negro)
+    assert.match(r, new RegExp('background-image: var\\(--esc-p-' + pose.replace('cuerpo-', '') + ', none\\);'), sel);
+    assert.ok(!/url\(/.test(r), 'sin la imagen con fondo');
+    assert.ok(E.POSES.includes(pose.replace('cuerpo-', '')), pose + ' se recorta');
+    assert.ok(fs.existsSync(path.join(ROOT, E.CUERPO + pose.replace('cuerpo-', '') + '.webp')), pose + ' existe');
     assert.match(/content: "([^"]+)"/.exec(r)[1], texto);
-    // El degradé de abajo es del color del panel sobre el fondo (si no, se nota el corte).
-    const g = /linear-gradient\(to top, (#[0-9A-Fa-f]{6}), transparent\)/.exec(r)[1];
-    const panel = over(hex('#1A1F2B'), 0.9, hex('#0F1117')).map(Math.round);
-    assert.ok(hex(g).every((v, i) => Math.abs(v - panel[i]) <= 3), g + ' ≈ panel ' + panel);
   }
-  assert.ok(cr(MUTED, over(hex('#1A1F2B'), 0.9, BASE)) >= 4.5, 'el texto se lee');
+  assert.ok(cr(MUTED, over(hex('#15151D'), 0.9, BASE)) >= 4.5, 'el texto se lee');
 });
 
 test('el gato escucha sin tocar a nadie: «Guardar» con el editor cerrado, el backup y la región de avisos', () => {
@@ -306,11 +305,120 @@ test('la bienvenida: ojos, saludo de la hora y cómo pasarla; encima de todo y c
   assert.match(codigo, /setAttribute\('aria-hidden', 'true'\); \/\/ el saludo ya está en el h1/);
 });
 
-test('index.html carga la escena al final y con versión', () => {
+test('index.html carga la escena al final (y después el universo) y con versión', () => {
   const html = read('index.html');
   const links = [...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map(m => m[1]);
-  assert.equal(links[links.length - 1], 'css/escena.css?v=' + E.VERSION);
+  assert.equal(links[links.length - 2], 'css/escena.css?v=' + E.VERSION);
+  assert.match(links[links.length - 1], /^css\/universo\.css\?v=\d+\.\d+\.\d+$/);
   const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1]);
   assert.equal(scripts[scripts.length - 1], 'js/escena.js?v=' + E.VERSION);
   assert.match(css, new RegExp('\\(' + E.VERSION.replace(/\./g, '\\.') + ', '));
+});
+
+// ---- ESC-5: mis poses sin fondo ----
+// Imagen de prueba: fondo negro, una figura clara con un hueco negro grande (entre brazo y
+// cuerpo), una pupila negra de 1 px y ruido de compresión casi negro en el fondo.
+function lienzo(w, h, pintar) {
+  const d = new Uint8ClampedArray(w * h * 4);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const p = (y * w + x) * 4, c = pintar(x, y);
+    d[p] = c[0]; d[p + 1] = c[1]; d[p + 2] = c[2]; d[p + 3] = 255;
+  }
+  return d;
+}
+const A = (d, w, x, y) => d[(y * w + x) * 4 + 3];
+
+test('recorte: el negro del borde y los huecos grandes se van; la figura, las pupilas y los colores quedan', () => {
+  const w = 60, h = 60;
+  const d = lienzo(w, h, (x, y) => {
+    if (x === 30 && y === 12) return [0, 0, 0];                       // pupila
+    if (x >= 10 && x < 50 && y >= 5 && y < 55) {
+      if (x >= 20 && x < 40 && y >= 25 && y < 45) return [3, 2, 4];   // hueco grande encerrado
+      return [200, 150, 90];
+    }
+    return [(x * 7) % 12, (y * 5) % 12, 6];                            // fondo con ruido < 14
+  });
+  const antes = Array.from(d);
+  const fondo = E.recorte(d, w, h);
+  assert.equal(A(d, w, 0, 0), 0, 'esquina');
+  assert.equal(A(d, w, 5, 30), 0, 'fondo con ruido');
+  assert.equal(A(d, w, 30, 35), 0, 'hueco grande: transparente');
+  assert.equal(A(d, w, 30, 12), 255, 'la pupila sigue');
+  assert.equal(A(d, w, 15, 15), 255, 'figura');
+  assert.ok(A(d, w, 10, 30) < 255, 'el borde se suaviza');
+  for (let i = 0; i < d.length; i++) if (i % 4 !== 3) assert.equal(d[i], antes[i], 'el color no cambia');
+  assert.equal(fondo, w * h - 40 * 50 + 20 * 20, 'cuenta el fondo');
+});
+
+test('recorte: hueco chico encerrado queda; umbral y hueco configurables; alfa previo se respeta', () => {
+  const w = 40, h = 40;
+  const pinta = (x, y) => (x >= 5 && x < 35 && y >= 5 && y < 35 && !(x >= 18 && x < 20 && y >= 18 && y < 20)) ? [180, 180, 180] : [0, 0, 0];
+  const d = lienzo(w, h, pinta);
+  E.recorte(d, w, h);
+  assert.equal(A(d, w, 19, 19), 255, '4 px de 1600 (< 0,4 %): es parte de la figura');
+  const d2 = lienzo(w, h, pinta);
+  E.recorte(d2, w, h, 14, 0.001);
+  assert.ok(A(d2, w, 19, 19) < 128, 'con un hueco mínimo menor, se va (queda casi transparente por el suavizado)');
+  const d3 = lienzo(w, h, (x, y) => (x > 10 && x < 30 && y > 10 && y < 30) ? [20, 20, 20] : [0, 0, 0]);
+  E.recorte(d3, w, h, 30);
+  assert.equal(A(d3, w, 20, 20), 0, 'con umbral 30, un gris 20 es fondo');
+  const d4 = lienzo(w, h, pinta);
+  d4[(20 * w + 8) * 4 + 3] = 40;
+  E.recorte(d4, w, h);
+  assert.equal(A(d4, w, 8, 20), 40, 'nunca sube el alfa que ya tenía');
+  assert.equal(E.UMBRAL, 14);
+  assert.equal(E.HUECO, 0.004);
+  assert.deepEqual(E.POSES, ['sentada', 'saluda', 'pensando']);
+  for (const p of E.POSES) assert.ok(fs.existsSync(path.join(ROOT, E.CUERPO + p + '.webp')), p);
+});
+
+test('recorte: figura que toca el borde y una imagen toda negra', () => {
+  const w = 20, h = 20;
+  const d = lienzo(w, h, (x) => x < 10 ? [0, 0, 0] : [255, 255, 255]);
+  E.recorte(d, w, h);
+  assert.equal(A(d, w, 2, 10), 0);
+  assert.equal(A(d, w, 18, 10), 255, 'lo claro que toca el borde queda');
+  const n = lienzo(8, 8, () => [0, 0, 0]);
+  assert.equal(E.recorte(n, 8, 8), 64);
+  for (let i = 3; i < n.length; i += 4) assert.equal(n[i], 0);
+});
+
+test('la barra del día: cuánto va del día, en %', () => {
+  assert.equal(E.avanceDia(new Date(2026, 10, 17, 0, 0)), 0);
+  assert.equal(E.avanceDia(new Date(2026, 10, 17, 12, 0)), 50);
+  assert.equal(E.avanceDia(new Date(2026, 10, 17, 6, 0)), 25);
+  assert.equal(E.avanceDia(new Date(2026, 10, 17, 23, 59)), 99.9);
+});
+
+test('ESC-5 en escena.js: recorto en canvas, sin red; las poses salen como --esc-p-<pose> y la entrada se marca una vez', () => {
+  const codigo = js.replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.match(codigo, /getImageData\(0, 0, w, h\)/);
+  assert.match(codigo, /recorte\(d\.data, w, h\)/);
+  assert.match(codigo, /URLs\.createObjectURL\(b\)/);
+  assert.match(codigo, /st\.setProperty\('--esc-p-' \+ p, 'url\("' \+ u \+ '"\)'\)/);
+  assert.match(codigo, /classList\.add\('esc-p-' \+ p\)/);
+  assert.match(codigo, /if \(doc\.body\.getAttribute\('data-theme'\) !== 'gato' \|\| !st \|\| !st\.setProperty\) return;/, 'solo con Gato Negro y si hay dónde ponerlas');
+  assert.match(codigo, /if \(recortes\[url\]\) return recortes\[url\];/, 'una vez por imagen');
+  assert.match(codigo, /classList\.add\('esc-listo'\)/);
+  assert.match(codigo, /setProperty\('--esc-dia'/);
+  assert.match(codigo, /fig\.hidden = true; \/\/ aparece cuando la pose ya no tiene fondo/);
+});
+
+test('recorte: el fondo se siembra en los cuatro bordes y se expande en las cuatro direcciones; el borde queda suave', () => {
+  const w = 20, h = 20;
+  // Blanco, con un bolsillo negro abierto solo a la izquierda (filas 5–14, x 0–9) y una
+  // franja negra abierta solo abajo (filas 17–19, x 3–16). Con hueco 1 nada se va «por grande».
+  const d = lienzo(w, h, (x, y) => ((y >= 5 && y < 15 && x < 10) || (y >= 17 && x >= 3 && x < 17)) ? [0, 0, 0] : [230, 230, 230]);
+  E.recorte(d, w, h, 14, 1);
+  assert.equal(A(d, w, 8, 10), 0, 'el bolsillo se vacía desde el borde izquierdo hacia la derecha');
+  assert.equal(A(d, w, 10, 18), 0, 'la franja de abajo es fondo');
+  // Un gris oscuro (25) no es negro: con el umbral de siempre, nada es fondo
+  const g = lienzo(w, h, () => [25, 25, 25]);
+  assert.equal(E.recorte(g, w, h), 0, 'el gris oscuro (pelo, sombras) queda');
+  // Suavizado: entre el borde (0) y la figura (255) hay valores intermedios
+  const e = lienzo(w, h, (x) => x < 6 ? [0, 0, 0] : [230, 230, 230]);
+  E.recorte(e, w, h);
+  const a = A(e, w, 7, 10);
+  assert.ok(a > 0 && a < 255, 'alfa intermedio en el borde: ' + a);
+  assert.equal(A(e, w, 12, 10), 255);
 });
