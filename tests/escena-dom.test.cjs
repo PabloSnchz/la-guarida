@@ -1,7 +1,8 @@
 // Tests del cableado de js/escena.js (BL-091 ESC-2) con un DOM falso mínimo: el consejo
 // pasa a mi globo con Gato Negro y vuelve a la franja con otro theme, el plegado se recuerda
 // y un consejo nuevo abre el globo (ESC-2); el gato reacciona a guardar, al backup y a los
-// avisos, y en el buscador estoy de cuerpo entero (ESC-3); la bienvenida del día (ESC-4).
+// avisos, y en el buscador estoy de cuerpo entero (ESC-3); la bienvenida del día (ESC-4);
+// ESC-5: la pose del buscador aparece recién cuando el recorte (canvas falso) está listo.
 // Sin dependencias: corre con node --test.
 'use strict';
 const test = require('node:test');
@@ -176,13 +177,20 @@ test('ESC-3: el gato reacciona y yo en el buscador', async () => {
   const save = modal.appendChild(new El('button')); save.attrs.id = 'modalSave';
   const exp = body3.appendChild(new El('button')); exp.attrs.id = 'exportBtn';
   const docL = [];
-  const doc3 = { readyState: 'complete', body: body3, createElement: t => new El(t), querySelector: s => html3.querySelector(s), querySelectorAll: s => html3.querySelectorAll(s),
+  // ESC-5: canvas e Image falsos; el recorte devuelve 'blob:<url de la pose>'
+  let dibujos = 0;
+  const canvas = () => { const c = new El('canvas'); c.getContext = () => ({ drawImage: im => { c.u = im.u; dibujos++; },
+    getImageData: (x, y, w, h) => ({ data: new Uint8ClampedArray(w * h * 4) }), putImageData() {} });
+    c.toBlob = cb => cb({ u: c.u }); return c; };
+  class Img { set src(v) { this.u = v; this.naturalWidth = 4; this.naturalHeight = 4; Promise.resolve().then(() => this.onload()); } }
+  const doc3 = { readyState: 'complete', body: body3, createElement: t => (t === 'canvas' ? canvas() : new El(t)), querySelector: s => html3.querySelector(s), querySelectorAll: s => html3.querySelectorAll(s),
     addEventListener: (t, f, cap) => { if (t === 'click') docL.push(f); } };
+  const listo = () => new Promise(r => setImmediate(r));
   const clic = el => docL.forEach(f => f({ target: el }));
   const later = [];
   const st = (f, t) => { if (t === 0) { later.push(f); return 0; } const x = setTimeout(f, t); x.unref(); return x; };
   body3.setAttribute('data-theme', 'gato');
-  vm.runInNewContext(code, { window: { document: doc3, MutationObserver: MO, localStorage: { getItem: () => null, setItem() {} } }, setTimeout: st, clearTimeout, JSON, Date, Math, String, Array, Object });
+  vm.runInNewContext(code, { window: { document: doc3, MutationObserver: MO, localStorage: { getItem: () => null, setItem() {} }, Image: Img, URL: { createObjectURL: b => 'blob:' + b.u } }, setTimeout: st, clearTimeout, JSON, Date, Math, String, Array, Object });
   flush();
   const g = doc3.querySelector('.esc-globo');
   const dice = () => g.querySelector('.esc-gato-dice').textContent;
@@ -225,12 +233,23 @@ test('ESC-3: el gato reacciona y yo en el buscador', async () => {
   const fig = portal.querySelector('.esc-portal-pose');
   assert.ok(fig, 'mi pose está en el buscador');
   assert.equal(portal.children.indexOf(fig), portal.children.indexOf(dialog) - 1, 'al costado, antes del cuadro');
-  assert.match(fig.src, /cuerpo-saluda\.webp$/);
+  assert.equal(fig.hidden, true, 'ESC-5: escondida hasta que la pose no tenga fondo');
+  assert.equal(fig.src, undefined, 'nunca el webp con fondo negro');
+  await listo();
+  assert.equal(fig.src, 'blob:assets/brand/shiruvana/cuerpo-saluda.webp');
+  assert.equal(fig.hidden, false);
   portal.hidden = false; flush();
   input.value = 'bov'; input.dispatch('input');
-  assert.match(fig.src, /cuerpo-pensando\.webp$/);
+  await listo();
+  assert.equal(fig.src, 'blob:assets/brand/shiruvana/cuerpo-pensando.webp');
   input.value = ''; portal.hidden = true; flush(); portal.hidden = false; flush();
-  assert.match(fig.src, /cuerpo-saluda\.webp$/, 'al reabrir vacío, saludo');
+  await listo();
+  assert.equal(fig.src, 'blob:assets/brand/shiruvana/cuerpo-saluda.webp', 'al reabrir vacío, saludo');
+  assert.equal(dibujos, 2, 'cada pose se recorta una sola vez');
+  // Si cambio de pose antes de que termine el recorte, gana la última
+  input.value = 'x'; input.dispatch('input'); input.value = ''; input.dispatch('input');
+  await listo();
+  assert.equal(fig.src, 'blob:assets/brand/shiruvana/cuerpo-saluda.webp');
   // No se duplica si el buscador se vuelve a agregar
   body3.appendChild(portal); flush();
   assert.equal(portal.querySelectorAll('.esc-portal-pose').length, 1);
@@ -287,4 +306,77 @@ test('ESC-4: la bienvenida del día', () => {
   capa2.click();
   assert.equal(c.d.querySelector('.esc-bienvenida'), null, 'un toque la saca');
   assert.equal(c.teclas.length, 0);
+});
+
+test('ESC-5: sin canvas (o si el recorte falla) mi pose del buscador no aparece', async () => {
+  const h = new El('html'); const b = h.appendChild(new El('body'));
+  const d = { readyState: 'complete', body: b, createElement: t => new El(t), querySelector: s => h.querySelector(s), querySelectorAll: s => h.querySelectorAll(s), addEventListener() {} };
+  b.setAttribute('data-theme', 'gato');
+  vm.runInNewContext(code, { window: { document: d, MutationObserver: MO, localStorage: { getItem: () => null, setItem() {} } },
+    setTimeout: (f, t) => { const x = setTimeout(f, t); x.unref(); return x; }, clearTimeout, JSON, Date, Math, String, Array, Object });
+  flush();
+  const portal = new El('div'); portal.className = 'gn-portal';
+  const dialog = portal.appendChild(new El('div')); dialog.className = 'gn-portal__dialog';
+  b.appendChild(portal); flush();
+  await new Promise(r => setImmediate(r));
+  const fig = portal.querySelector('.esc-portal-pose');
+  assert.ok(fig);
+  assert.equal(fig.hidden, true);
+  assert.equal(fig.src, undefined);
+});
+
+test('ESC-5: las poses recortadas quedan en body como --esc-p-<pose> (solo con Gato Negro)', async () => {
+  function abrir(theme) {
+    const h = new El('html'); const b = h.appendChild(new El('body'));
+    const props = {};
+    b.style = { setProperty: (k, v) => { props[k] = v; } };
+    const canvas = () => { const c = new El('canvas'); c.getContext = () => ({ drawImage: im => { c.u = im.u; }, getImageData: (x, y, w, h) => ({ data: new Uint8ClampedArray(w * h * 4) }), putImageData() {} }); c.toBlob = cb => cb({ u: c.u }); return c; };
+    class Img { set src(v) { this.u = v; this.width = 2; this.height = 2; Promise.resolve().then(() => this.onload()); } }
+    const d = { readyState: 'complete', body: b, createElement: t => (t === 'canvas' ? canvas() : new El(t)), querySelector: s => h.querySelector(s), querySelectorAll: s => h.querySelectorAll(s), addEventListener() {}, removeEventListener() {} };
+    b.setAttribute('data-theme', theme);
+    const timers = [];
+    vm.runInNewContext(code, { window: { document: d, MutationObserver: MO, localStorage: { getItem: () => null, setItem() {} }, Image: Img, URL: { createObjectURL: x => 'blob:' + x.u },
+      setInterval: (f, t) => timers.push({ f, t, cada: true }) }, setTimeout: (f, t) => { timers.push({ f, t }); return timers.length; }, clearTimeout() {}, JSON, Date, Math, String, Array, Object });
+    flush();
+    return { b, props, timers };
+  }
+  const a = abrir('gato');
+  assert.match(a.props['--esc-dia'], /^\d+(\.\d)?%$/, 'la barra del día');
+  assert.ok(a.timers.some(t => t.cada && t.t === 60000), 'se actualiza cada minuto');
+  a.timers.filter(t => !t.cada).forEach(t => t.f());
+  await new Promise(r => setImmediate(r));
+  for (const p of ['sentada', 'saluda', 'pensando']) {
+    assert.equal(a.props['--esc-p-' + p], 'url("blob:assets/brand/shiruvana/cuerpo-' + p + '.webp")', p);
+    assert.ok(a.b.classList.contains('esc-p-' + p), p);
+  }
+  assert.ok(a.b.classList.contains('esc-listo'), 'la entrada de las tarjetas se marca');
+  const n = abrir('nord');
+  n.timers.filter(t => !t.cada).forEach(t => t.f());
+  await new Promise(r => setImmediate(r));
+  assert.equal(n.props['--esc-p-saluda'], undefined, 'con otro theme no recorto nada');
+  // Al pasar a Gato Negro, recorto
+  n.b.setAttribute('data-theme', 'gato'); flush();
+  await new Promise(r => setImmediate(r));
+  assert.match(n.props['--esc-p-saluda'], /^url\("blob:/);
+});
+
+test('ESC-5: si una pose tarda más en recortarse, no pisa a la que pediste después', async () => {
+  const h = new El('html'); const b = h.appendChild(new El('body'));
+  const canvas = () => { const c = new El('canvas'); c.getContext = () => ({ drawImage: im => { c.u = im.u; }, getImageData: (x, y, w, hh) => ({ data: new Uint8ClampedArray(w * hh * 4) }), putImageData() {} }); c.toBlob = cb => cb({ u: c.u }); return c; };
+  // La pose de saludo tarda (30 ms); la de pensar, no
+  class Img { set src(v) { this.u = v; this.width = 2; this.height = 2; const go = () => this.onload(); if (/saluda/.test(v)) setTimeout(go, 30); else Promise.resolve().then(go); } }
+  const d = { readyState: 'complete', body: b, createElement: t => (t === 'canvas' ? canvas() : new El(t)), querySelector: s => h.querySelector(s), querySelectorAll: s => h.querySelectorAll(s), addEventListener() {}, removeEventListener() {} };
+  b.setAttribute('data-theme', 'gato');
+  vm.runInNewContext(code, { window: { document: d, MutationObserver: MO, localStorage: { getItem: () => null, setItem() {} }, Image: Img, URL: { createObjectURL: x => 'blob:' + x.u } },
+    setTimeout: (f, t) => { const x = setTimeout(f, t); x.unref && t > 100 && x.unref(); return x; }, clearTimeout, JSON, Date, Math, String, Array, Object });
+  flush();
+  const portal = new El('div'); portal.className = 'gn-portal';
+  const dialog = portal.appendChild(new El('div')); dialog.className = 'gn-portal__dialog';
+  const input = dialog.appendChild(new El('input')); input.attrs.id = 'gnPortalInput';
+  b.appendChild(portal); flush();            // pide «saluda» (lenta)
+  input.value = 'bov'; input.dispatch('input'); // pide «pensando» (rápida)
+  await new Promise(r => setTimeout(r, 60));
+  const fig = portal.querySelector('.esc-portal-pose');
+  assert.equal(fig.getAttribute('data-pose'), 'pensando');
+  assert.equal(fig.src, 'blob:assets/brand/shiruvana/cuerpo-pensando.webp', 'la lenta llegó tarde y no pisó');
 });
