@@ -1,14 +1,17 @@
-/* css/escena.css — «GN Escena» en La Guarida (1.0.0, 2026-11-16, BL-091 ESC-1)
+/* css/escena.css — «GN Escena» en La Guarida (1.1.0, 2026-11-17, BL-091 ESC-2)
    La estética de mi sitio (pablosnchz.github.io/shiruvana) llevada a La Guarida, con
    lo que Pablo eligió en la maqueta ESC-0 (todas las ★):
    - fondo «Taller»: cuadrícula tenue, luz ámbar arriba a la izquierda y violeta abajo
      a la derecha, y chispas que suben (las pone js/escena.js);
    - secciones en una cápsula, con la activa en ámbar;
    - paneles apenas translúcidos, con la línea de color de su sección arriba, que entran
-     de a uno al abrir.
-   SOLO con el theme Gato Negro: cada regla cuelga de body[data-theme="gato"] y los otros
-   18 themes quedan exactamente como estaban. Sin backdrop-filter ni transform en la
-   cabecera: los menús de «⋯» usan position: fixed en el celular y no deben moverse.
+     de a uno al abrir;
+   - 1.1.0 (ESC-2): mi globo abajo a la derecha, con mi cara y el gato robot sentado
+     encima; adentro va el consejo del día. Se pliega a la cara y el gato.
+   SOLO con el theme Gato Negro: cada regla cuelga de body[data-theme="gato"] (lo único
+   suelto es esconder lo nuevo) y los otros 18 themes quedan exactamente como estaban.
+   Sin backdrop-filter ni transform en la cabecera: los menús de «⋯» usan position: fixed
+   en el celular y no deben moverse.
    Volver atrás: quitar esta hoja y js/escena.js de index.html. */
 
 /* ---- Fondo «Taller», fijo detrás de todo ---- */
@@ -58,11 +61,81 @@ body[data-theme="gato"] #seccionFavoritos { --esc-color: #E8B34B; --esc-orden: 2
 body[data-theme="gato"] #seccionCategorias { --esc-color: #9B82FF; --esc-orden: 3; }
 body[data-theme="gato"] #launcherPanel { --esc-color: #2EC4B6; --esc-orden: 4; }
 
+/* ---- ESC-2: mi globo con el gato encima ---- */
+.esc-globo { display: none; }
+/* Debajo del portal (9000), del editor (10000) y de los avisos del kit (10002) */
+body[data-theme="gato"] .esc-globo {
+  position: fixed; right: 20px; bottom: 20px; z-index: 7000; width: min(400px, calc(100vw - 40px));
+  display: flex; align-items: flex-start; gap: 12px; padding: 14px 14px 14px 16px;
+  border: 1px solid var(--border); border-radius: 18px; background: rgba(26, 31, 43, .97);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .5); color: var(--text);
+  animation: escSube .4s ease-out .3s both;
+}
+/* Con un menú abierto (＋ o ⋯) el globo se corre: en el celular el menú llega hasta abajo */
+body[data-theme="gato"]:has(details.gn-menu[open]) .esc-globo { display: none; }
+/* Que el globo no tape lo último de la página */
+body[data-theme="gato"] .app-main { padding-bottom: 150px; }
+body[data-theme="gato"] .esc-cara {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: #000; box-shadow: 0 0 0 2px #F2B94B;
+}
+body[data-theme="gato"] .esc-dice { flex: 1; min-width: 0; }
+/* Ámbar sobre el globo: 9,4:1 */
+body[data-theme="gato"] .esc-nombre { margin: 0; font-size: .7rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: #F2B94B; }
+body[data-theme="gato"] .esc-texto { margin: 2px 0 0; font-size: .9rem; line-height: 1.45; }
+body[data-theme="gato"] .esc-plegar {
+  flex: none; width: 28px; height: 28px; border: 1px solid transparent; border-radius: 8px; background: none;
+  color: var(--gn-muted); font: inherit; font-size: 1rem; line-height: 1; cursor: pointer;
+}
+body[data-theme="gato"] .esc-plegar:hover { color: var(--text); border-color: var(--border); }
+
+/* El gato, sentado sobre el borde del globo */
+body[data-theme="gato"] .esc-gato {
+  position: absolute; right: 44px; bottom: calc(100% - 14px); width: 88px; padding: 0; border: 0; background: none; cursor: pointer;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .5));
+}
+body[data-theme="gato"] .esc-gato[hidden] { display: none; }
+body[data-theme="gato"] .esc-gato img { display: block; width: 100%; height: auto; }
+body[data-theme="gato"] .esc-gato.is-salta img { animation: escSalta .6s ease both; }
+/* #111 sobre el ámbar: 10,4:1 */
+body[data-theme="gato"] .esc-gato-dice {
+  position: absolute; right: 136px; bottom: calc(100% + 30px); padding: 5px 11px; border-radius: 12px;
+  background: #F2B94B; color: #111111; font-size: .8rem; font-weight: 650; white-space: nowrap; pointer-events: none;
+}
+body[data-theme="gato"] .esc-gato-dice:empty { display: none; }
+
+/* Con consejo: habla el consejo, con su propia cara (explica, u ojo si es del backup) */
+body[data-theme="gato"] .esc-globo.con-consejo .esc-cara,
+body[data-theme="gato"] .esc-globo.con-consejo .esc-nombre,
+body[data-theme="gato"] .esc-globo.con-consejo .esc-texto { display: none; }
+body[data-theme="gato"] .esc-slot .gn-toast {
+  position: static; width: auto; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; animation: none;
+}
+body[data-theme="gato"] .esc-slot .gn-toast[hidden] { display: none; }
+body[data-theme="gato"] .esc-slot .gn-toast__avatar { width: 44px; height: 44px; box-shadow: 0 0 0 2px #F2B94B; }
+body[data-theme="gato"] .esc-slot .gn-toast__who { letter-spacing: .04em; color: #F2B94B; }
+
+/* Plegado: solo la cara y el gato */
+body[data-theme="gato"] .esc-globo.is-plegado { width: auto; padding: 8px; border-radius: 999px; align-items: center; }
+body[data-theme="gato"] .esc-globo.is-plegado .esc-dice { display: none; }
+body[data-theme="gato"] .esc-globo.is-plegado .esc-cara { display: block; }
+body[data-theme="gato"] .esc-globo.is-plegado .esc-gato { right: 30px; width: 64px; }
+body[data-theme="gato"] .esc-globo.is-plegado .esc-gato-dice { right: 0; }
+
 @keyframes escChispa { 0% { transform: translateY(0); opacity: 0; } 10% { opacity: .6; } 80% { opacity: .35; } 100% { transform: translateY(-105vh); opacity: 0; } }
 @keyframes escSube { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes escSalta { 0%, 100% { transform: none; } 40% { transform: translateY(-12px) rotate(-4deg); } }
 
-/* Con «reducir movimiento», escenario quieto: sin chispas ni entradas */
+/* Celular: el globo ocupa el ancho de abajo; plegado, se corre a la derecha */
+@media (max-width: 760px) {
+  body[data-theme="gato"] .esc-globo { right: 12px; bottom: 12px; width: calc(100vw - 24px); }
+  body[data-theme="gato"] .esc-globo.is-plegado { width: auto; }
+  body[data-theme="gato"] .esc-gato { width: 72px; }
+}
+
+/* Con «reducir movimiento», escenario quieto: sin chispas, entradas ni saltos */
 @media (prefers-reduced-motion: reduce) {
   body[data-theme="gato"] .esc-chispas { display: none; }
   body[data-theme="gato"] .gn-panel { animation: none; }
+  body[data-theme="gato"] .esc-globo { animation: none; }
+  body[data-theme="gato"] .esc-gato.is-salta img { animation: none; }
 }
