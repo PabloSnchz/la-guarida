@@ -1,7 +1,8 @@
 // Tests de la escena (BL-091): la estética de mi sitio, solo con el theme Gato Negro.
 // ESC-1 fondo, cápsula y paneles; ESC-2 mi globo con el gato y el consejo adentro;
 // ESC-3 el gato reacciona y yo de cuerpo entero en los estados vacíos y en el buscador;
-// ESC-4 la bienvenida del día; ESC-5 la paleta de mi sitio y mis poses sin fondo (recorte).
+// ESC-4 la bienvenida del día; ESC-5 la paleta de mi sitio y mis poses sin fondo (recorte);
+// ESC-6 la cabecera que se esfuma al bajar y un globo que no repite «Ctrl K».
 // Correr: node --test tests/*.test.cjs
 'use strict';
 const test = require('node:test');
@@ -117,9 +118,13 @@ test('plegado: con consejo siempre abierto; sin consejo, como lo dejaste (la pri
   assert.equal(E.plegadoInicial({ plegado: true }, true), false, 'un consejo lo abre');
 });
 
-test('lo que digo sin consejo: el saludo según la hora', () => {
+test('lo que digo sin consejo: el saludo según la hora y un dato útil, sin repetir «Ctrl K»', () => {
   const a = h => E.lineaDelDia(new Date(2026, 10, 17, h, 30));
-  assert.equal(a(4), 'Buenas noches, Pablo. Ctrl K y te llevo a donde quieras.');
+  assert.equal(a(4), 'Buenas noches, Pablo.');
+  assert.equal(E.lineaDelDia(new Date(2026, 10, 17, 21, 0), 'Último backup: ayer.'), 'Buenas noches, Pablo. Último backup: ayer.');
+  assert.equal(E.lineaDelDia(new Date(2026, 10, 17, 21, 0), ''), 'Buenas noches, Pablo.');
+  assert.ok(!/Ctrl K/.test(js.replace(/\/\*[\s\S]*?\*\//g, '')), 'el buscador ya está a la vista');
+  assert.equal(E.META_KEY, 'guarida:shiruvana:v1', 'la misma clave que lee header.js');
   assert.match(a(5), /^Buen día, Pablo\./);
   assert.match(a(11), /^Buen día/);
   assert.match(a(12), /^Buenas tardes/);
@@ -421,4 +426,15 @@ test('recorte: el fondo se siembra en los cuatro bordes y se expande en las cuat
   const a = A(e, w, 7, 10);
   assert.ok(a > 0 && a < 255, 'alfa intermedio en el borde: ' + a);
   assert.equal(A(e, w, 12, 10), 255);
+});
+
+test('ESC-6: la cabecera toma su fondo recién cuando bajás', () => {
+  assert.equal(E.bajo(0), false);
+  assert.equal(E.bajo(4), false);
+  assert.equal(E.bajo(5), true);
+  assert.equal(E.bajo(undefined), false);
+  assert.equal(E.bajo('120'), true);
+  const codigo = js.replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.match(codigo, /root\.addEventListener\('scroll', marcarScroll, \{ passive: true \}\)/);
+  assert.match(codigo, /classList\.toggle\('esc-bajo'/);
 });
