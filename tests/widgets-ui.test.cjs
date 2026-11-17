@@ -108,9 +108,62 @@ test('sin ventanitas del navegador y sin credenciales en el código nuevo', () =
   assert.ok(src.includes("addEventListener('click'") && /}, true\);/.test(src), 'escucha en captura, antes que widgets.js');
 });
 
-test('la fila de temporada del widget queda oculta (la cabecera ya la muestra bien)', () => {
+test('ESC-6: la fila de temporada ya no se esconde; «está cerca» con el dorado del kit', () => {
   const css = fs.readFileSync(path.join(__dirname, '../css/widgets.css'), 'utf8');
-  assert.ok(css.includes('.widget--resets .widget-reset-row:nth-child(3) { display: none; }'));
+  assert.ok(!css.includes('widget-reset-row:nth-child(3)'), 'la temporada vuelve, con la fecha real');
+  assert.ok(css.includes('#widgetsLeft .gw-reset.is-soon .gw-reset__value { color: color-mix(in srgb, #E8B34B 45%, var(--text)); }'));
+  assert.ok(css.includes('#widgetsLeft .gw-reset__value { color: var(--accent-2);'), 'como la .reset-value de siempre');
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
   assert.ok(html.indexOf('css/widgets.css') > html.indexOf('css/styles.css'));
+});
+
+// ---- ESC-6: reinicios con el reloj de la cabecera ----
+const K = require('../js/kit.js');
+const HORA = 60 * 60 * 1000, DIA = 24 * HORA;
+const NOW = Date.UTC(2026, 9, 31, 18, 0); // sábado 31/10/2026 18:00 UTC
+
+test('ESC-6: reinicios diario y semanal con el reloj del kit; la temporada solo si sigue abierta', () => {
+  const sin = W.resetRows(NOW, null, K);
+  assert.deepEqual(sin.map(r => r.key), ['daily', 'weekly'], 'sin «Local»: ya está el reloj de la PC');
+  assert.deepEqual(sin.map(r => r.label), ['Diario', 'Semanal']);
+  assert.equal(sin[0].value, K.dur(K.nextDaily(NOW) - NOW));
+  assert.equal(sin[0].value, '6 h 0 min');
+  assert.equal(sin[1].value, K.dur(K.nextWeekly(NOW) - NOW));
+  assert.ok(sin.every(r => r.soon === false && r.title));
+  const con = W.resetRows(NOW, NOW + 2 * DIA, K);
+  assert.deepEqual(con.map(r => r.key), ['daily', 'weekly', 'season']);
+  assert.equal(con[2].label, 'Temporada');
+  assert.equal(con[2].soon, true, 'menos de 3 días: dorado');
+  assert.equal(W.resetRows(NOW, NOW + 10 * DIA, K)[2].soon, false);
+  assert.deepEqual(W.resetRows(NOW, NOW - 1000, K).map(r => r.key), ['daily', 'weekly'], 'temporada terminada: no se muestra');
+  assert.equal(W.resetRows(Date.UTC(2026, 9, 31, 23, 30), null, K)[0].soon, true, 'diario con menos de 1 h');
+  assert.deepEqual(W.resetRows(NOW, null, null), [], 'sin kit, nada');
+});
+
+test('ESC-6: las filas del widget, escapadas y sin la clase que pisa widgets.js', () => {
+  const html = W.resetsHTML([{ key: 'daily', label: 'Diario', title: 'Reset <diario>', value: '6 h 0 min', soon: true }, { key: 'weekly', label: 'Semanal', title: 'S', value: '1 d 13 h', soon: false }], K.esc);
+  assert.equal(html,
+    '<div class="widget-reset-row gw-reset gw-reset--daily is-soon" title="Reset &lt;diario&gt;"><span class="reset-label">Diario</span><span class="gw-reset__value">6 h 0 min</span></div>' +
+    '<div class="widget-reset-row gw-reset gw-reset--weekly" title="S"><span class="reset-label">Semanal</span><span class="gw-reset__value">1 d 13 h</span></div>');
+  assert.ok(!/class="[^"]*\breset-value\b/.test(html), 'widgets.js actualiza cada segundo las .reset-value con su temporada fija');
+  assert.equal(W.resetsHTML([], K.esc), '');
+  assert.equal(W.resetsHTML(null, K.esc), '');
+});
+
+test('ESC-6: la temporada sale de lo que guardó header.js de la API', () => {
+  assert.equal(W.SEASON_KEY, 'guarida:temporada:v1');
+  assert.equal(W.seasonFromCache(JSON.stringify({ end: 1790000000000, t: 1 })), 1790000000000);
+  assert.equal(W.seasonFromCache(JSON.stringify({ end: null, t: 1 })), null, 'la API no trajo fecha');
+  assert.equal(W.seasonFromCache(JSON.stringify({ end: '2026-12-02' })), null);
+  assert.equal(W.seasonFromCache('{roto'), null);
+  assert.equal(W.seasonFromCache(null), null);
+  assert.match(W.DESC.all_resets, /temporada/);
+});
+
+test('ESC-6: el widget se pinta al dibujarse y cada 30 s, sin tocar lo que no cambió', () => {
+  const src = fs.readFileSync(path.join(__dirname, '../js/widgets-ui.js'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.match(src, /if \(list\.innerHTML !== html\) list\.innerHTML = html;/);
+  assert.match(src, /new root\.MutationObserver\(pintarResets\)\.observe\(box, \{ childList: true \}\)/, 'sin subtree: pintar no se dispara a sí mismo');
+  assert.match(src, /root\.setInterval\(pintarResets, 30000\)/);
+  assert.match(src, /querySelectorAll\('#widgetsLeft \.widget--resets \.widget-resets-list'\)/);
 });
