@@ -1,4 +1,4 @@
-/* css/widgets.css — Widgets de La Guarida (1.1.0, 2026-10-31, RG-4; RG-5: contraste del error; RG-8: ✕ para quitar)
+/* css/widgets.css — Widgets de La Guarida (1.2.0, 2026-11-17, RG-4; RG-5: contraste del error; RG-8: ✕ para quitar; ESC-6: reinicios)
    Panel «Agregar un widget», panel de la cuenta regresiva y retoques del panel Widgets.
    Solo variables del theme activo. */
 
@@ -35,8 +35,11 @@
 .gw-error:empty { display: none; }
 
 /* ---- Panel Widgets ---- */
-/* La temporada ya está en la cabecera, leída de la API; el widget la tenía fija en 2026-09-15 y mostraba «—». */
-#widgetsLeft .widget--resets .widget-reset-row:nth-child(3) { display: none; }
+/* ESC-6: los reinicios los dibuja js/widgets-ui.js con el reloj de la cabecera (js/kit.js) y la
+   temporada real de la API; ya no hace falta esconder la fila de temporada. */
+#widgetsLeft .gw-reset__value { color: var(--accent-2); font-weight: 600; font-variant-numeric: tabular-nums; }
+/* «Está cerca»: el mismo dorado que el reloj del kit (45 % con el texto) */
+#widgetsLeft .gw-reset.is-soon .gw-reset__value { color: color-mix(in srgb, #E8B34B 45%, var(--text)); }
 #widgetsLeft .widget--counter:hover { border-color: var(--border-hover); }
 #widgetsLeft .add-widget-btn { min-height: 40px; }
 
