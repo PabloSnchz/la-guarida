@@ -1,0 +1,292 @@
+/* css/universo.css — La Guarida en el universo Shiruvana (1.0.0, 2026-11-17, BL-091 ESC-5)
+   Pablo: «tiene que parecer que son realmente 2 webs del mismo universo». Lo que trae de
+   mi sitio (pablosnchz.github.io/shiruvana, css/escenario.css):
+   - la paleta: obsidiana #0B0B10, paneles #15151D/#1C1C26, borde #2A2A38, ámbar #E8B34B,
+     violeta #9B82FF y turquesa #2EC4B6; el hover es ámbar con brillo, como allá;
+   - la tipografía: antetítulo en mayúsculas espaciadas y en color, título en 800, números
+     grandes en ámbar con brillo (las «cifras» de mi sitio) para relojes y contadores;
+   - las líneas de tiempo: los enlaces de cada categoría y las noticias cuelgan de una
+     línea con puntos que brillan;
+   - las tarjetas: borde superior de color (como las eras y tarjetas), las del lanzador
+     como las «puertas» del Ecosistema (borde turquesa a la izquierda y «→» al pasar);
+   - yo, asomada arriba a la derecha de cada panel (saludo en Favoritos, pienso en
+     Categorías, sentada en el Lanzador) y el gato en Widgets. Mis poses llegan sin fondo
+     (las recorta js/escena.js 1.4.0); mientras no están listas, no se ven.
+   SOLO con el theme Gato Negro (body[data-theme="gato"]); los otros 18 themes no cambian.
+   Sin transform ni backdrop-filter en la cabecera (los menús son position: fixed en el
+   celular). Volver atrás: quitar esta hoja de index.html. */
+
+/* ---- 1. Paleta de mi sitio (pisa la de css/themes/gato.css solo con este theme) ---- */
+body[data-theme="gato"] {
+  --bg: #0B0B10;
+  --panel: #15151D;
+  --panel-alt: #1C1C26;
+  --border: #2A2A38;
+  --border-hover: #E8B34B;
+  --accent: #E8B34B;
+  --accent-2: #9B82FF;
+  --text: #EDEDF2;
+  --muted: #A6A6B8;
+  --radius: 10px;
+  --gn-card-radius: 14px;
+  --gn-host: #9B82FF;
+  --shadow: none;
+  --shadow-hover: 0 0 22px rgba(232, 179, 75, .25);
+  --glow-color: rgba(232, 179, 75, .35);
+  --scrollbar-color: #2A2A38;
+  --esc-ambar: #E8B34B;
+  --esc-violeta: #9B82FF;
+  --esc-turquesa: #2EC4B6;
+  --esc-tarjeta: rgba(21, 21, 29, .86);
+  --esc-brillo: 0 0 22px rgba(232, 179, 75, .25);
+  --esc-sube: escSube .55s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+/* ---- 2. Cabecera ---- */
+body[data-theme="gato"] .app-header { background: rgba(11, 11, 16, .92); }
+body[data-theme="gato"] .brand__name { font-weight: 800; letter-spacing: .02em; }
+body[data-theme="gato"] .brand__logo { border-radius: 50%; box-shadow: 0 0 0 2px var(--esc-ambar); }
+body[data-theme="gato"] .app-btn,
+body[data-theme="gato"] .theme-select { background: rgba(21, 21, 29, .8); border-radius: 10px; }
+body[data-theme="gato"] .app-btn:hover,
+body[data-theme="gato"] .theme-select:hover,
+body[data-theme="gato"] .gn-menu[open] > summary { border-color: var(--esc-ambar); }
+body[data-theme="gato"] .gn-menu__panel { background: #15151D; border-radius: 14px; box-shadow: 0 18px 50px rgba(0, 0, 0, .55); }
+body[data-theme="gato"] .gn-menu__group { color: var(--esc-ambar); letter-spacing: .2em; font-weight: 700; }
+body[data-theme="gato"] .gn-menu__item:hover,
+body[data-theme="gato"] .gn-menu__item:focus-visible { background: rgba(232, 179, 75, .1); }
+
+/* El saludo: antetítulo ámbar y la barra del día (la barra EVOLVING de mi sitio) */
+body[data-theme="gato"] .gh-hello { gap: 1px; }
+body[data-theme="gato"] .gh-hello__title { font-weight: 800; font-size: 1.15rem; letter-spacing: -.01em; }
+body[data-theme="gato"] .gh-hello__date { color: var(--esc-ambar); font-size: .68rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+body[data-theme="gato"] .gh-hello::after {
+  content: ""; display: block; width: 150px; height: 4px; margin-top: 5px; border-radius: 2px;
+  background: linear-gradient(var(--esc-ambar), var(--esc-ambar)) 0 0 / var(--esc-dia, 0%) 100% no-repeat, rgba(255, 255, 255, .12);
+  box-shadow: 0 0 10px rgba(232, 179, 75, .25);
+}
+
+/* El portal cerrado y los relojes */
+body[data-theme="gato"] .gn-portal-trigger {
+  background: rgba(21, 21, 29, .8); border-radius: 12px;
+  box-shadow: 0 0 0 1px rgba(155, 130, 255, .25), 0 8px 24px rgba(155, 130, 255, .12);
+}
+body[data-theme="gato"] .gn-portal-trigger:hover { border-color: var(--esc-ambar); box-shadow: var(--esc-brillo); }
+body[data-theme="gato"] .gn-portal-trigger__avatar { box-shadow: 0 0 0 2px var(--esc-ambar); }
+body[data-theme="gato"] .gk-clk { background: rgba(21, 21, 29, .8); border-radius: 10px; }
+body[data-theme="gato"] .gk-clk__value { font-weight: 800; }
+body[data-theme="gato"] .gn-kbd { background: #1C1C26; color: var(--text); border-radius: 6px; }
+
+/* ---- 3. Paneles: tarjeta de mi sitio, antetítulo de color y título en 800 ---- */
+body[data-theme="gato"] .gn-panel {
+  position: relative; overflow: hidden; padding: 20px 20px 22px;
+  background: linear-gradient(180deg, rgba(28, 28, 38, .94), rgba(21, 21, 29, .9));
+  border: 1px solid var(--border); border-top: 3px solid var(--esc-color, var(--esc-ambar)); border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .35);
+}
+/* La línea de color de css/cards.css sobra: el borde de arriba ya es la línea */
+body[data-theme="gato"] #seccionFavoritos::before,
+body[data-theme="gato"] #seccionCategorias::before,
+body[data-theme="gato"] #launcherPanel::before,
+body[data-theme="gato"] #seccionWidgets::before {
+  content: ""; display: block; position: absolute; inset: 0; z-index: 0; height: auto; opacity: 1; pointer-events: none;
+  background: radial-gradient(70% 160px at 0 0, var(--esc-luz, rgba(232, 179, 75, .1)), transparent 70%);
+}
+body[data-theme="gato"] .gn-panel > * { position: relative; z-index: 1; }
+
+body[data-theme="gato"] #seccionWidgets { --esc-color: #9B82FF; --esc-luz: rgba(155, 130, 255, .12); --esc-ante: "01 · En vivo"; }
+body[data-theme="gato"] #seccionFavoritos { --esc-color: #E8B34B; --esc-luz: rgba(232, 179, 75, .1); --esc-ante: "02 · A un clic"; }
+body[data-theme="gato"] #seccionCategorias { --esc-color: #9B82FF; --esc-luz: rgba(155, 130, 255, .12); --esc-ante: "03 · Por tema"; }
+body[data-theme="gato"] #launcherPanel { --esc-color: #2EC4B6; --esc-luz: rgba(46, 196, 182, .1); --esc-ante: "04 · En tu PC"; }
+
+body[data-theme="gato"] .gn-panel__head { flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+/* Antetítulo: ámbar 9:1, violeta 6,3:1, turquesa 8,6:1 sobre el panel */
+body[data-theme="gato"] .gn-panel__head::before {
+  content: var(--esc-ante, ""); flex-basis: 100%;
+  font-size: .72rem; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--esc-color, var(--esc-ambar));
+}
+body[data-theme="gato"] .gn-panel__title { font-size: 1.5rem; line-height: 1.15; font-weight: 800; letter-spacing: -.01em; }
+/* El punto de color de css/header.css lo reemplaza el antetítulo */
+body[data-theme="gato"] #seccionFavoritos .gn-panel__title::before,
+body[data-theme="gato"] #seccionCategorias .gn-panel__title::before,
+body[data-theme="gato"] #launcherPanel .gn-panel__title::before { display: none; }
+/* El contador es una «cifra»: grande, ámbar y con brillo, al lado del título */
+body[data-theme="gato"] .gn-count {
+  margin-left: 0; padding: 0; background: none; border-radius: 0;
+  font-size: 1.5rem; line-height: 1.15; font-weight: 800; color: var(--esc-ambar);
+  text-shadow: 0 0 18px rgba(232, 179, 75, .35); font-variant-numeric: tabular-nums;
+}
+body[data-theme="gato"] .gn-panel__desc { margin: 6px 0 16px; font-size: .86rem; max-width: 64ch; }
+
+/* Yo, asomada arriba a la derecha (y el gato en Widgets) */
+body[data-theme="gato"] .gn-panel::after {
+  content: none; position: absolute; z-index: 0; top: 4px; right: 4px; width: 132px; height: 150px; pointer-events: none;
+  background: var(--esc-asoma) right -8px top 0 / 150px auto no-repeat;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent); mask-image: linear-gradient(to bottom, #000 55%, transparent);
+  animation: escAsoma .8s cubic-bezier(.2, .8, .2, 1) .5s both, escFlota 6s 1.3s ease-in-out infinite alternate;
+}
+body[data-theme="gato"] #seccionWidgets::after {
+  content: ""; top: 8px; right: 10px; width: 84px; height: 84px; background-size: 84px auto; background-position: center top;
+  -webkit-mask-image: none; mask-image: none; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .5));
+  --esc-asoma: url("../assets/brand/gato/gato-sentado.webp");
+}
+body[data-theme="gato"].esc-p-saluda #seccionFavoritos::after { content: ""; --esc-asoma: var(--esc-p-saluda); }
+body[data-theme="gato"].esc-p-pensando #seccionCategorias::after { content: ""; --esc-asoma: var(--esc-p-pensando); }
+body[data-theme="gato"].esc-p-sentada #launcherPanel::after { content: ""; --esc-asoma: var(--esc-p-sentada); }
+/* Lugar para que me asome sin tapar el texto */
+body[data-theme="gato"] .gn-panel__head,
+body[data-theme="gato"] .gn-panel__desc { padding-right: 112px; }
+body[data-theme="gato"] #seccionWidgets .gn-panel__head,
+body[data-theme="gato"] #seccionWidgets .gn-panel__desc { padding-right: 84px; }
+
+/* ---- 4. Favoritos: tarjetas de mi sitio, ícono en un aro que se enciende ---- */
+body[data-theme="gato"] #seccionFavoritos .fav-card {
+  padding: 16px 8px 12px; background: var(--esc-tarjeta); border: 1px solid var(--border); border-radius: 14px;
+}
+body[data-theme="gato"] #seccionFavoritos .fav-card .fav-icon,
+body[data-theme="gato"] #seccionFavoritos .fav-card .fav-emoji {
+  border-radius: 50%; background: #1C1C26; box-shadow: 0 0 0 1px var(--border);
+  transition: box-shadow var(--transition-speed) ease;
+}
+body[data-theme="gato"] #seccionFavoritos .fav-card .fav-name { font-weight: 600; }
+body[data-theme="gato"] #seccionFavoritos .fav-card:hover { border-color: var(--esc-ambar); box-shadow: var(--esc-brillo); transform: translateY(-3px); }
+body[data-theme="gato"] #seccionFavoritos .fav-card:hover .fav-icon,
+body[data-theme="gato"] #seccionFavoritos .fav-card:hover .fav-emoji { box-shadow: 0 0 0 2px var(--esc-ambar), 0 0 14px rgba(232, 179, 75, .4); }
+body[data-theme="gato"] .gn-usual__label { color: var(--esc-ambar); font-size: .7rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+body[data-theme="gato"] #seccionFavoritos .gn-usual__chip { background: rgba(21, 21, 29, .8); }
+body[data-theme="gato"] #seccionFavoritos .gn-usual__chip:hover { border-color: var(--esc-ambar); color: var(--esc-ambar); }
+
+/* ---- 5. Categorías: cada una es una línea de tiempo de mi sitio ---- */
+body[data-theme="gato"] #seccionCategorias .category-card {
+  --esc-c: var(--esc-violeta);
+  padding: 14px 14px 12px; background: var(--esc-tarjeta);
+  border: 1px solid var(--border); border-top: 3px solid var(--esc-c); border-radius: 14px;
+}
+body[data-theme="gato"] #seccionCategorias .category-card:nth-child(3n+2) { --esc-c: var(--esc-turquesa); }
+body[data-theme="gato"] #seccionCategorias .category-card:nth-child(3n) { --esc-c: var(--esc-ambar); }
+body[data-theme="gato"] #seccionCategorias .category-card:hover { border-color: var(--esc-ambar); border-top-color: var(--esc-c); border-left-color: var(--esc-ambar); box-shadow: var(--esc-brillo); }
+body[data-theme="gato"] #seccionCategorias .category-header { margin-bottom: 10px; padding-bottom: 0; border-bottom: 0; }
+body[data-theme="gato"] #seccionCategorias .category-title { color: var(--text); font-size: 1rem; font-weight: 800; }
+body[data-theme="gato"] #seccionCategorias .category-links { margin-left: 6px; padding-left: 18px; border-left: 2px solid var(--border); gap: 3px; }
+body[data-theme="gato"] #seccionCategorias .category-link::before {
+  content: ""; position: absolute; left: -24px; top: 50%; width: 10px; height: 10px; margin-top: -5px; border-radius: 50%;
+  background: var(--esc-c); box-shadow: 0 0 0 3px #17171F, 0 0 10px var(--esc-c);
+  transition: background var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+body[data-theme="gato"] #seccionCategorias .category-link:hover { background: rgba(255, 255, 255, .04); border-color: transparent; transform: translateX(3px); }
+body[data-theme="gato"] #seccionCategorias .category-link:hover::before { background: var(--esc-ambar); box-shadow: 0 0 0 3px #17171F, 0 0 14px var(--esc-ambar); }
+body[data-theme="gato"] #seccionCategorias .category-link:hover .link-name { color: var(--esc-ambar); }
+
+/* ---- 6. Lanzador: las «puertas» del Ecosistema ---- */
+body[data-theme="gato"] #launcherPanel .launcher-section-title { color: var(--esc-turquesa); font-size: .72rem; font-weight: 700; letter-spacing: .22em; }
+body[data-theme="gato"] #launcherPanel .launcher-item {
+  min-height: 46px; background: linear-gradient(135deg, rgba(28, 28, 38, .95), rgba(21, 21, 29, .86));
+  border: 1px solid var(--border); border-left: 3px solid var(--esc-turquesa); border-radius: 12px;
+}
+body[data-theme="gato"] #launcherPanel .launcher-icon { border-radius: 50%; background: #1C1C26; }
+body[data-theme="gato"] #launcherPanel .launcher-name { font-weight: 600; }
+body[data-theme="gato"] #launcherPanel .launcher-item::after {
+  content: "→"; margin-left: auto; font-weight: 800; color: var(--esc-ambar); opacity: 0; transform: translateX(-4px);
+  transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+}
+body[data-theme="gato"] #launcherPanel .launcher-item:hover { border-color: var(--esc-ambar); border-left-color: var(--esc-turquesa); box-shadow: var(--esc-brillo); }
+body[data-theme="gato"] #launcherPanel .launcher-item:hover::after { opacity: 1; transform: none; }
+
+/* ---- 7. Widgets: las «cifras» de mi sitio ---- */
+body[data-theme="gato"] #widgetsLeft .widget {
+  --esc-w: var(--esc-ambar);
+  padding: 14px 16px; background: var(--esc-tarjeta); border: 1px solid var(--border); border-top: 3px solid var(--esc-w); border-radius: 14px;
+}
+body[data-theme="gato"] #widgetsLeft .widget:nth-child(3n+2) { --esc-w: var(--esc-violeta); }
+body[data-theme="gato"] #widgetsLeft .widget:nth-child(3n) { --esc-w: var(--esc-turquesa); }
+body[data-theme="gato"] #widgetsLeft .widget:hover { border-color: var(--esc-ambar); border-top-color: var(--esc-w); box-shadow: var(--esc-brillo); }
+body[data-theme="gato"] #widgetsLeft .widget-title { color: var(--esc-w); font-size: .7rem; font-weight: 700; letter-spacing: .2em; }
+body[data-theme="gato"] #widgetsLeft .widget-clock-time,
+body[data-theme="gato"] #widgetsLeft .widget-counter-days {
+  font-size: 2.4rem; line-height: 1.05; font-weight: 800; color: var(--esc-ambar);
+  text-shadow: 0 0 18px rgba(232, 179, 75, .35); font-variant-numeric: tabular-nums;
+}
+body[data-theme="gato"] #widgetsLeft .widget-greeting-text { font-size: 1.15rem; font-weight: 800; }
+body[data-theme="gato"] #widgetsLeft .reset-value { color: var(--esc-ambar); font-weight: 800; }
+body[data-theme="gato"] #widgetsLeft .widget-reset-row { padding: 3px 0; border-bottom: 1px solid rgba(255, 255, 255, .05); }
+body[data-theme="gato"] #widgetsLeft .widget-reset-row:last-child { border-bottom: 0; }
+body[data-theme="gato"] #widgetsLeft .widget-twitch-followers,
+body[data-theme="gato"] #widgetsLeft .widget-youtube-subs { font-size: 1.6rem; font-weight: 800; }
+body[data-theme="gato"] #widgetsLeft .widget-notes-input { background: rgba(11, 11, 16, .6); border-radius: 10px; }
+body[data-theme="gato"] #widgetsLeft .widget-notes-input:focus { border-color: var(--esc-ambar); }
+/* Noticias: una línea de tiempo con puntos violeta */
+body[data-theme="gato"] #widgetsLeft .widget-news-list { margin-left: 5px; padding-left: 16px; border-left: 2px solid var(--border); gap: 4px; }
+body[data-theme="gato"] #widgetsLeft .widget-news-item { position: relative; padding: 4px 6px; background: none; }
+body[data-theme="gato"] #widgetsLeft .widget-news-item::before {
+  content: ""; position: absolute; left: -22px; top: 9px; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--esc-violeta); box-shadow: 0 0 0 3px #17171F, 0 0 10px var(--esc-violeta);
+}
+body[data-theme="gato"] #widgetsLeft .widget-news-item:hover { border-color: transparent; color: var(--esc-ambar); }
+body[data-theme="gato"] #widgetsLeft .widget-news-item:hover::before { background: var(--esc-ambar); box-shadow: 0 0 0 3px #17171F, 0 0 12px var(--esc-ambar); }
+
+/* ---- 8. Botones «+ …» y botones del sitio ---- */
+body[data-theme="gato"] .add-btn,
+body[data-theme="gato"] .add-widget-btn { border-radius: 12px; }
+body[data-theme="gato"] .add-btn:hover,
+body[data-theme="gato"] .add-widget-btn:hover,
+body[data-theme="gato"] #seccionFavoritos .add-btn:hover,
+body[data-theme="gato"] #seccionCategorias .add-btn:hover,
+body[data-theme="gato"] #launcherPanel .add-btn:hover { border-color: var(--esc-ambar); color: var(--esc-ambar); }
+body[data-theme="gato"] .btn,
+body[data-theme="gato"] .gk-btn { border-radius: 10px; }
+body[data-theme="gato"] .btn--gold,
+body[data-theme="gato"] .gk-btn--primary { font-weight: 700; }
+
+/* ---- 9. Editor, paneles del kit, avisos y buscador ---- */
+body[data-theme="gato"] .modal-card,
+body[data-theme="gato"] .gk-sheet__card { background: #15151D; border-top: 3px solid var(--esc-ambar); border-radius: 16px; box-shadow: 0 24px 60px rgba(0, 0, 0, .6); }
+body[data-theme="gato"] .modal-card h3,
+body[data-theme="gato"] .gk-sheet__title { font-weight: 800; letter-spacing: -.01em; }
+body[data-theme="gato"] .field label { letter-spacing: .14em; }
+body[data-theme="gato"] .field input,
+body[data-theme="gato"] .gw-field input { background: #0B0B10; border-radius: 10px; }
+body[data-theme="gato"] .field input:focus,
+body[data-theme="gato"] .gw-field input:focus { border-color: var(--esc-ambar); }
+body[data-theme="gato"] .gk-toast { background: #15151D; border-radius: 14px; }
+body[data-theme="gato"] .gn-portal__dialog { background: #15151D; border-radius: 18px; }
+body[data-theme="gato"] .gn-portal__gl { color: var(--esc-ambar); letter-spacing: .2em; font-weight: 700; }
+body[data-theme="gato"] .gn-portal__res[aria-selected="true"] { background: rgba(232, 179, 75, .12); box-shadow: inset 3px 0 0 var(--esc-ambar); }
+
+/* ---- 10. Entrada: las tarjetas suben de a una, solo al abrir (escena.js pone esc-listo a los 2 s) ---- */
+body[data-theme="gato"]:not(.esc-listo) #seccionFavoritos .fav-card,
+body[data-theme="gato"]:not(.esc-listo) #seccionCategorias .category-card,
+body[data-theme="gato"]:not(.esc-listo) #launcherPanel .launcher-item,
+body[data-theme="gato"]:not(.esc-listo) #widgetsLeft .widget {
+  animation: var(--esc-sube); animation-delay: calc(.3s + var(--esc-i, 8) * 45ms);
+}
+body[data-theme="gato"] :is(.fav-card, .category-card, .launcher-item, .widget):nth-child(1) { --esc-i: 0; }
+body[data-theme="gato"] :is(.fav-card, .category-card, .launcher-item, .widget):nth-child(2) { --esc-i: 1; }
+body[data-theme="gato"] :is(.fav-card, .category-card, .launcher-item, .widget):nth-child(3) { --esc-i: 2; }
+body[data-theme="gato"] :is(.fav-card, .category-card, .launcher-item, .widget):nth-child(4) { --esc-i: 3; }
+body[data-theme="gato"] :is(.fav-card, .category-card, .launcher-item, .widget):nth-child(5) { --esc-i: 4; }
+body[data-theme="gato"] :is(.fav-card, .category-card, .launcher-item, .widget):nth-child(6) { --esc-i: 5; }
+body[data-theme="gato"] :is(.fav-card, .category-card, .launcher-item, .widget):nth-child(7) { --esc-i: 6; }
+body[data-theme="gato"] :is(.fav-card, .category-card, .launcher-item, .widget):nth-child(8) { --esc-i: 7; }
+
+@keyframes escAsoma { from { opacity: 0; transform: translate(24px, 18px); } to { opacity: 1; transform: none; } }
+@keyframes escFlota { from { translate: 0 0; } to { translate: 0 -6px; } }
+
+/* ---- Celular ---- */
+@media (max-width: 760px) {
+  body[data-theme="gato"] .gn-panel { padding: 16px 14px 18px; }
+  body[data-theme="gato"] .gn-panel__title,
+  body[data-theme="gato"] .gn-count { font-size: 1.3rem; }
+  body[data-theme="gato"] .gn-panel::after { width: 96px; height: 116px; background-size: 112px auto; }
+  body[data-theme="gato"] #seccionWidgets::after { width: 64px; height: 64px; background-size: 64px auto; }
+  body[data-theme="gato"] .gn-panel__head,
+  body[data-theme="gato"] .gn-panel__desc { padding-right: 82px; }
+  body[data-theme="gato"] #seccionWidgets .gn-panel__head,
+  body[data-theme="gato"] #seccionWidgets .gn-panel__desc { padding-right: 64px; }
+}
+
+/* ---- Movimiento reducido: todo quieto ---- */
+@media (prefers-reduced-motion: reduce) {
+  body[data-theme="gato"] .gn-panel::after { animation: none; }
+  body[data-theme="gato"] #seccionFavoritos .fav-card:hover,
+  body[data-theme="gato"] #seccionCategorias .category-link:hover { transform: none; }
+}
