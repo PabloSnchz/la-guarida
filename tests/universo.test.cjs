@@ -192,3 +192,33 @@ test('ESC-6: los reinicios del widget son cifras ámbar; «está cerca» brilla 
   assert.match(prop(regla('body[data-theme="gato"] #widgetsLeft .gw-reset.is-soon .gw-reset__value').body, 'text-shadow'), /rgba\(232, 179, 75, \.7\)/);
   assert.equal(prop(regla('body[data-theme="gato"] #widgetsLeft .gw-reset.is-soon .reset-label').body, 'color'), 'var(--esc-ambar)');
 });
+
+// ---- ESC-7 ----
+test('ESC-7: en pantallas anchas la cabecera es una sola línea, con el buscador junto a las pestañas', () => {
+  const m = /@media \(min-width: 1440px\) \{([\s\S]*?\})\s*\}/.exec(css);
+  assert.ok(m, 'hay bloque para pantallas anchas');
+  const R = reglas(m[1]);
+  const r = sel => (R.find(x => x.sel.replace(/\s+/g, ' ') === sel.replace(/\s+/g, ' ')) || {}).body || '';
+  const G = 'body[data-theme="gato"]';
+  const h = r(G + ' .app-header');
+  assert.equal(prop(h, 'display'), 'grid');
+  const areas = prop(h, 'grid-template-areas').match(/"([^"]+)"/g).map(s => s.slice(1, -1).split(/\s+/));
+  const cols = prop(h, 'grid-template-columns').match(/minmax\([^)]*\)|auto/g);
+  assert.equal(areas[0].length, cols.length, 'una columna por área');
+  assert.deepEqual(areas[0].filter(a => a !== '.'), ['brand', 'hello', 'nav', 'portal', 'tools'], 'una sola línea, en este orden');
+  assert.equal(areas[0].indexOf('portal'), areas[0].indexOf('nav') + 1, 'el buscador va pegado a las pestañas');
+  assert.equal(cols[areas[0].indexOf('portal')], 'minmax(260px, 520px)');
+  assert.deepEqual([...new Set(areas[1])], ['tip'], 'la franja del consejo abajo, a todo el ancho');
+  assert.equal(areas[1].length, cols.length);
+  assert.match(prop(h, 'padding'), /var\(--gn-max\)/, 'el mismo ancho que el contenido');
+  assert.equal(prop(r(G + ' .gh-bar,\n' + G + ' .gh-row'), 'display'), 'contents');
+  for (const [sel, a] of [['.app-header .brand', 'brand'], ['.gh-hello', 'hello'], ['.app-nav', 'nav'], ['.gn-portal-trigger', 'portal'], ['.app-tools', 'tools'], ['.gh-tip', 'tip']]) {
+    assert.equal(prop(r(G + ' ' + sel), 'grid-area'), a, sel);
+  }
+  for (const x of R) if (/contents/.test(x.body)) assert.ok(!/brand|nav|tools|portal|menu|btn/.test(x.sel), 'nunca contents en enlaces ni botones: ' + x.sel);
+  assert.equal(prop(r(G + ' .gn-portal-trigger__text span'), 'display'), 'none', 'invitación corta');
+  assert.equal(prop(r(G), '--gn-header-h'), '72px', 'los anclajes de las pestañas no quedan tapados');
+  assert.ok(parseInt(prop(r(G + ' .gn-portal-trigger'), 'min-height'), 10) >= 40, 'blanco táctil');
+  assert.equal(prop(r(G + ' .app-nav'), 'flex-wrap'), 'nowrap');
+  assert.equal(prop(r(G + ' .app-tools'), 'flex-wrap'), 'nowrap');
+});
