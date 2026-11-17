@@ -1,4 +1,4 @@
-/* css/escena.css — «GN Escena» en La Guarida (1.2.0, 2026-11-17, BL-091 ESC-3)
+/* css/escena.css — «GN Escena» en La Guarida (1.3.0, 2026-11-17, BL-091 ESC-4)
    La estética de mi sitio (pablosnchz.github.io/shiruvana) llevada a La Guarida, con
    lo que Pablo eligió en la maqueta ESC-0 (todas las ★):
    - fondo «Taller»: cuadrícula tenue, luz ámbar arriba a la izquierda y violeta abajo
@@ -9,7 +9,8 @@
    - 1.1.0 (ESC-2): mi globo abajo a la derecha, con mi cara y el gato robot sentado
      encima; adentro va el consejo del día. Se pliega a la cara y el gato;
    - 1.2.0 (ESC-3): yo de cuerpo entero cuando una sección está vacía y en el buscador
-     (Ctrl K), fundida con el fondo como en mi sitio.
+     (Ctrl K), fundida con el fondo como en mi sitio;
+   - 1.3.0 (ESC-4): la bienvenida del día, los ojos del gato y el saludo (unos 3 s).
    SOLO con el theme Gato Negro: cada regla cuelga de body[data-theme="gato"] (lo único
    suelto es esconder lo nuevo) y los otros 18 themes quedan exactamente como estaban.
    Sin backdrop-filter ni transform en la cabecera: los menús de «⋯» usan position: fixed
@@ -158,9 +159,28 @@ body[data-theme="gato"] .esc-portal-pose {
 body[data-theme="gato"] .esc-portal-pose[hidden] { display: none; }
 @media (max-width: 1000px) { body[data-theme="gato"] .esc-portal-pose { display: none; } }
 
+/* ---- ESC-4: la bienvenida del día ----
+   Encima de todo (los avisos del kit usan 10002) y solo unos 3 s: se apaga sola a los
+   2,2 s y js/escena.js la saca a los 3,2 s, con un toque o con cualquier tecla. */
+.esc-bienvenida { display: none; }
+body[data-theme="gato"] .esc-bienvenida {
+  position: fixed; inset: 0; z-index: 10005; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  background: #000000; color: #F4F6FA; cursor: pointer; animation: escApaga .9s ease 2.2s both;
+}
+body[data-theme="gato"] .esc-ojos { display: flex; gap: 46px; }
+body[data-theme="gato"] .esc-ojos i {
+  width: 46px; height: 22px; border-radius: 50%; background: #F2B94B;
+  box-shadow: 0 0 26px #F2B94B, 0 0 60px rgba(242, 185, 75, .5); animation: escParpadeo 1.2s ease .2s both;
+}
+body[data-theme="gato"] .esc-bv-saludo { margin: 0; font-size: 1.6rem; font-weight: 800; animation: escSube .6s ease-out 1s both; }
+/* Gris claro sobre negro: 9,9:1 */
+body[data-theme="gato"] .esc-bv-pasar { margin: 0; font-size: .85rem; color: #A9B0BC; animation: escSube .6s ease-out 1.3s both; }
+
 @keyframes escChispa { 0% { transform: translateY(0); opacity: 0; } 10% { opacity: .6; } 80% { opacity: .35; } 100% { transform: translateY(-105vh); opacity: 0; } }
 @keyframes escSube { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @keyframes escSalta { 0%, 100% { transform: none; } 40% { transform: translateY(-12px) rotate(-4deg); } }
+@keyframes escApaga { to { opacity: 0; visibility: hidden; } }
+@keyframes escParpadeo { 0% { transform: scaleY(0); } 40% { transform: scaleY(1); } 55% { transform: scaleY(.1); } 70%, 100% { transform: scaleY(1); } }
 
 /* Celular: el globo ocupa el ancho de abajo; plegado, se corre a la derecha */
 @media (max-width: 760px) {
@@ -176,4 +196,5 @@ body[data-theme="gato"] .esc-portal-pose[hidden] { display: none; }
   body[data-theme="gato"] .esc-globo { animation: none; }
   body[data-theme="gato"] .esc-gato.is-salta img { animation: none; }
   body[data-theme="gato"] .esc-portal-pose { animation: none; }
+  body[data-theme="gato"] .esc-bienvenida { display: none; }
 }
