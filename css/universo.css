@@ -1,4 +1,4 @@
-/* css/universo.css — La Guarida en el universo Shiruvana (1.1.0, 2026-11-17, BL-091 ESC-6)
+/* css/universo.css — La Guarida en el universo Shiruvana (1.2.0, 2026-11-17, BL-091 ESC-7)
    Pablo: «tiene que parecer que son realmente 2 webs del mismo universo». Lo que trae de
    mi sitio (pablosnchz.github.io/shiruvana, css/escenario.css):
    - la paleta: obsidiana #0B0B10, paneles #15151D/#1C1C26, borde #2A2A38, ámbar #E8B34B,
@@ -16,6 +16,10 @@
    su fondo y lo esfuma hacia abajo, sin línea), el buscador como protagonista de la segunda
    fila (centrado, más ancho, con lupa y sin mi cara: ya estoy en el globo y en los paneles)
    y sin la barra de relojes: los reinicios viven en su widget, como cifras.
+   1.2.0 (ESC-7, con Pablo): en pantallas anchas (≥ 1440 px) la cabecera es UNA sola línea:
+   marca | saludo | pestañas + buscador (juntos, al centro) | herramientas. Sin tocar el HTML:
+   las dos filas pasan a display: contents y sus piezas se ubican en la grilla de la cabecera.
+   Más chica, vuelven las dos filas de 1.1.0.
    SOLO con el theme Gato Negro (body[data-theme="gato"]); los otros 18 themes no cambian.
    Sin transform ni backdrop-filter en la cabecera (los menús son position: fixed en el
    celular). Volver atrás: quitar esta hoja de index.html. */
@@ -99,6 +103,31 @@ body[data-theme="gato"] .gn-portal-trigger::before {
 body[data-theme="gato"] .gn-portal-trigger__avatar { display: none; }
 body[data-theme="gato"] .gn-portal-trigger:hover { border-color: var(--esc-ambar); box-shadow: var(--esc-brillo); }
 body[data-theme="gato"] .gn-kbd { background: #1C1C26; color: var(--text); border-radius: 6px; }
+
+/* ESC-7: en pantallas anchas, una sola línea. Las filas .gh-bar y .gh-row se vuelven
+   «transparentes» (display: contents) y la cabecera ubica sus piezas: marca, saludo,
+   pestañas y buscador juntos al centro, herramientas a la derecha. La franja del consejo
+   (#ghTip, vacía casi siempre) queda abajo, a todo el ancho. La marca es un enlace: no
+   la toco (display: contents en un enlace lo saca del árbol de accesibilidad). */
+@media (min-width: 1440px) {
+  body[data-theme="gato"] { --gn-header-h: 72px; }
+  body[data-theme="gato"] .app-header {
+    display: grid; align-items: center; column-gap: 18px; row-gap: 0;
+    grid-template-columns: auto auto minmax(0, 1fr) auto minmax(260px, 520px) minmax(0, 1fr) auto;
+    grid-template-areas: "brand hello . nav portal . tools" "tip tip tip tip tip tip tip";
+    padding: 8px max(24px, calc((100% - var(--gn-max)) / 2 + 24px));
+  }
+  body[data-theme="gato"] .gh-bar,
+  body[data-theme="gato"] .gh-row { display: contents; }
+  body[data-theme="gato"] .app-header .brand { grid-area: brand; }
+  body[data-theme="gato"] .gh-hello { grid-area: hello; padding-left: 18px; border-left: 1px solid var(--border); }
+  body[data-theme="gato"] .app-nav { grid-area: nav; flex-wrap: nowrap; }
+  body[data-theme="gato"] .gn-portal-trigger { grid-area: portal; min-height: 42px; }
+  /* En la línea, la invitación corta: «¿A dónde vamos?» y el atajo */
+  body[data-theme="gato"] .gn-portal-trigger__text span { display: none; }
+  body[data-theme="gato"] .app-tools { grid-area: tools; flex-wrap: nowrap; }
+  body[data-theme="gato"] .gh-tip { grid-area: tip; max-width: none; margin: 0; padding: 0; }
+}
 
 /* ---- 3. Paneles: tarjeta de mi sitio, antetítulo de color y título en 800 ---- */
 body[data-theme="gato"] .gn-panel {
