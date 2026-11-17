@@ -1,4 +1,4 @@
-/* css/escena.css — «GN Escena» en La Guarida (1.1.0, 2026-11-17, BL-091 ESC-2)
+/* css/escena.css — «GN Escena» en La Guarida (1.2.0, 2026-11-17, BL-091 ESC-3)
    La estética de mi sitio (pablosnchz.github.io/shiruvana) llevada a La Guarida, con
    lo que Pablo eligió en la maqueta ESC-0 (todas las ★):
    - fondo «Taller»: cuadrícula tenue, luz ámbar arriba a la izquierda y violeta abajo
@@ -7,7 +7,9 @@
    - paneles apenas translúcidos, con la línea de color de su sección arriba, que entran
      de a uno al abrir;
    - 1.1.0 (ESC-2): mi globo abajo a la derecha, con mi cara y el gato robot sentado
-     encima; adentro va el consejo del día. Se pliega a la cara y el gato.
+     encima; adentro va el consejo del día. Se pliega a la cara y el gato;
+   - 1.2.0 (ESC-3): yo de cuerpo entero cuando una sección está vacía y en el buscador
+     (Ctrl K), fundida con el fondo como en mi sitio.
    SOLO con el theme Gato Negro: cada regla cuelga de body[data-theme="gato"] (lo único
    suelto es esconder lo nuevo) y los otros 18 themes quedan exactamente como estaban.
    Sin backdrop-filter ni transform en la cabecera: los menús de «⋯» usan position: fixed
@@ -121,6 +123,41 @@ body[data-theme="gato"] .esc-globo.is-plegado .esc-cara { display: block; }
 body[data-theme="gato"] .esc-globo.is-plegado .esc-gato { right: 30px; width: 64px; }
 body[data-theme="gato"] .esc-globo.is-plegado .esc-gato-dice { right: 0; }
 
+/* ---- ESC-3: yo de cuerpo entero en los estados vacíos ----
+   La pose va de fondo con mix-blend lighten (su negro se funde con el panel) y un
+   degradé del color del panel abajo, que la apoya sin corte. El texto dice qué hacer. */
+body[data-theme="gato"] #favoritesGrid:not(:has(.fav-card))::before,
+body[data-theme="gato"] #categoriesGrid:not(:has(.category-card))::before,
+body[data-theme="gato"] .launcher-grid:not(:has(.launcher-item))::before {
+  grid-column: 1 / -1; display: flex; align-items: flex-end; min-height: 170px; padding: 0 8px 18px 140px;
+  background-repeat: no-repeat; background-position: left bottom, 8px bottom; background-size: 100% 28px, auto 170px;
+  mix-blend-mode: lighten; color: var(--gn-muted); font-size: .85rem; line-height: 1.45;
+}
+body[data-theme="gato"] #favoritesGrid:not(:has(.fav-card))::before {
+  content: "Todavía no tenés favoritos. Soltá un enlace acá o tocá «+ Favorito» y te lo dejo a un clic.";
+  background-image: linear-gradient(to top, #191D28, transparent), url("../assets/brand/shiruvana/cuerpo-sentada.webp");
+}
+body[data-theme="gato"] #categoriesGrid:not(:has(.category-card))::before {
+  content: "Todavía no armaste categorías. Con «+ Categoría» agrupamos tus enlaces por tema.";
+  background-image: linear-gradient(to top, #191D28, transparent), url("../assets/brand/shiruvana/cuerpo-saluda.webp");
+}
+body[data-theme="gato"] .launcher-grid:not(:has(.launcher-item))::before {
+  min-height: 130px; padding-left: 104px; background-size: 100% 22px, auto 130px;
+  content: "Nada por acá todavía. Tocá «+» y lo dejo a un clic.";
+  background-image: linear-gradient(to top, #191D28, transparent), url("../assets/brand/shiruvana/cuerpo-pensando.webp");
+}
+
+/* ---- ESC-3: yo en el buscador, en lugar del retrato ---- */
+.esc-portal-pose { display: none; }
+body[data-theme="gato"] .gh-portal-fig { display: none; }
+body[data-theme="gato"] .esc-portal-pose {
+  display: block; flex: none; align-self: flex-start; width: auto; height: 300px; margin-right: 8px; pointer-events: none;
+  mix-blend-mode: lighten; -webkit-mask-image: linear-gradient(to top, transparent 0, #000 14%); mask-image: linear-gradient(to top, transparent 0, #000 14%);
+  animation: escSube .3s ease-out both;
+}
+body[data-theme="gato"] .esc-portal-pose[hidden] { display: none; }
+@media (max-width: 1000px) { body[data-theme="gato"] .esc-portal-pose { display: none; } }
+
 @keyframes escChispa { 0% { transform: translateY(0); opacity: 0; } 10% { opacity: .6; } 80% { opacity: .35; } 100% { transform: translateY(-105vh); opacity: 0; } }
 @keyframes escSube { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @keyframes escSalta { 0%, 100% { transform: none; } 40% { transform: translateY(-12px) rotate(-4deg); } }
@@ -138,4 +175,5 @@ body[data-theme="gato"] .esc-globo.is-plegado .esc-gato-dice { right: 0; }
   body[data-theme="gato"] .gn-panel { animation: none; }
   body[data-theme="gato"] .esc-globo { animation: none; }
   body[data-theme="gato"] .esc-gato.is-salta img { animation: none; }
+  body[data-theme="gato"] .esc-portal-pose { animation: none; }
 }
