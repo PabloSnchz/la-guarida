@@ -1,4 +1,4 @@
-/* css/escena.css — «GN Escena» en La Guarida (1.4.0, 2026-11-17, BL-091 ESC-5)
+/* css/escena.css — «GN Escena» en La Guarida (1.5.0, 2026-11-17, BL-091 ESC-6)
    La estética de mi sitio (pablosnchz.github.io/shiruvana) llevada a La Guarida, con
    lo que Pablo eligió en la maqueta ESC-0 (todas las ★):
    - fondo «Taller»: cuadrícula tenue, luz ámbar arriba a la izquierda y violeta abajo
@@ -13,7 +13,9 @@
    - 1.3.0 (ESC-4): la bienvenida del día, los ojos del gato y el saludo (unos 3 s);
    - 1.4.0 (ESC-5): la paleta exacta de mi sitio y mis poses SIN fondo: ya no se funden
      con mix-blend (en el buscador dejaba un rectángulo negro); usan los recortes que hace
-     js/escena.js (--esc-p-<pose>). El resto del restyle vive en css/universo.css.
+     js/escena.js (--esc-p-<pose>). El resto del restyle vive en css/universo.css;
+   - 1.5.0 (ESC-6): sin reglas nuevas acá; la cabecera que se esfuma y el buscador sin mi
+     cara están en css/universo.css 1.1.0 (la versión acompaña a js/escena.js).
    SOLO con el theme Gato Negro: cada regla cuelga de body[data-theme="gato"] (lo único
    suelto es esconder lo nuevo) y los otros 18 themes quedan exactamente como estaban.
    Sin backdrop-filter ni transform en la cabecera: los menús de «⋯» usan position: fixed
