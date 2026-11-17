@@ -52,7 +52,8 @@ test('solo cambia el theme Gato Negro: toda regla cuelga de body[data-theme="gat
 test('la cabecera no gana backdrop-filter, filter, transform ni position (los menús fixed del celular siguen en su lugar)', () => {
   const sin = css.replace(/\/\*[\s\S]*?\*\//g, '');
   assert.ok(!/backdrop-filter/.test(sin));
-  for (const r of RS.filter(x => /\.app-header|\.app-bar|\.gh-row|\.app-tools|\.gn-menu(?!__)/.test(x.sel))) {
+  // La pollera ::after (ESC-6) es un pseudo-elemento: no mueve la cabecera ni sus menús.
+  for (const r of RS.filter(x => /\.app-header|\.app-bar|\.gh-row|\.app-tools|\.gn-menu(?!__)/.test(x.sel) && !/::after/.test(x.sel))) {
     assert.ok(!/(^|[;\s])(filter|transform|will-change|contain|position)\s*:/.test(r.body), r.sel);
   }
 });
@@ -153,6 +154,41 @@ test('«reducir movimiento» y celular', () => {
 test('index.html carga universo.css último, con la versión de su cabecera', () => {
   const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
   const links = [...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map(m => m[1]);
-  const v = /\((\d+\.\d+\.\d+), \d{4}-\d{2}-\d{2}, BL-091 ESC-5\)/.exec(css)[1];
+  const v = /\((\d+\.\d+\.\d+), \d{4}-\d{2}-\d{2}, BL-091 ESC-\d+\)/.exec(css)[1];
   assert.equal(links[links.length - 1], 'css/universo.css?v=' + v);
+});
+
+// ---- ESC-6 ----
+test('ESC-6: arriba de todo la cabecera no tiene fondo ni línea; al bajar se esfuma, sin corte', () => {
+  const h = regla('body[data-theme="gato"] .app-header').body;
+  assert.equal(prop(h, 'background'), 'transparent');
+  assert.equal(prop(h, 'border-bottom-color'), 'transparent');
+  assert.match(prop(regla('body[data-theme="gato"].esc-bajo .app-header').body, 'background'), /^rgba\(11, 11, 16, \.9\d\)$/);
+  const p = regla('body[data-theme="gato"] .app-header::after').body;
+  assert.equal(prop(p, 'top'), '100%');
+  assert.equal(prop(p, 'pointer-events'), 'none');
+  assert.equal(prop(p, 'opacity'), '0');
+  assert.match(prop(p, 'background'), /linear-gradient\(rgba\(11, 11, 16, \.94\), rgba\(11, 11, 16, 0\)\)/, 'del fondo de la cabecera a nada');
+  assert.equal(prop(regla('body[data-theme="gato"].esc-bajo .app-header::after').body, 'opacity'), '1');
+  const m = /@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?\})\s*\}/.exec(css)[1];
+  assert.match(m, /\.app-header::after \{ transition: none; \}/);
+  // Las pestañas se leen sobre el fondo más claro, con cabecera transparente
+  assert.ok(cr(MUTED, BASE) >= 4.5, 'pestañas sobre el escenario ' + cr(MUTED, BASE).toFixed(2));
+});
+
+test('ESC-6: el buscador es el protagonista: centrado, con lupa y sin mi cara; sin barra de relojes', () => {
+  assert.equal(prop(regla('body[data-theme="gato"] .gh-clocks').body, 'display'), 'none');
+  assert.equal(prop(regla('body[data-theme="gato"] .gn-portal-trigger__avatar').body, 'display'), 'none');
+  const fila = RS.filter(x => x.sel === 'body[data-theme="gato"] .gh-row').map(x => prop(x.body, 'grid-template-columns'));
+  assert.deepEqual(fila, ['minmax(0, 1fr) minmax(320px, 640px) minmax(0, 1fr)', 'minmax(0, 1fr)'], 'centrado; en pantallas medianas, una columna');
+  const lupa = regla('body[data-theme="gato"] .gn-portal-trigger::before').body;
+  assert.match(lupa, /data:image\/svg\+xml/);
+  assert.match(lupa, /stroke='%23E8B34B'/, 'lupa ámbar');
+  assert.ok(parseInt(prop(regla('body[data-theme="gato"] .gn-portal-trigger').body, 'min-height'), 10) >= 44, 'blanco táctil');
+});
+
+test('ESC-6: los reinicios del widget son cifras ámbar; «está cerca» brilla más', () => {
+  assert.equal(prop(regla('body[data-theme="gato"] #widgetsLeft .reset-value,\nbody[data-theme="gato"] #widgetsLeft .gw-reset__value').body, 'color'), 'var(--esc-ambar)');
+  assert.match(prop(regla('body[data-theme="gato"] #widgetsLeft .gw-reset.is-soon .gw-reset__value').body, 'text-shadow'), /rgba\(232, 179, 75, \.7\)/);
+  assert.equal(prop(regla('body[data-theme="gato"] #widgetsLeft .gw-reset.is-soon .reset-label').body, 'color'), 'var(--esc-ambar)');
 });
