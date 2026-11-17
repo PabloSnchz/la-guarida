@@ -119,7 +119,7 @@ const globo = doc.querySelector('.esc-globo');
 assert.ok(globo, 'hay globo');
 assert.ok(doc.querySelector('.esc-chispas'), 'hay chispas');
 assert.equal(globo.classList.contains('is-plegado'), false, 'la primera vez, abierto');
-assert.match(globo.querySelector('.esc-texto').textContent, /Pablo\. Ctrl K/);
+assert.match(globo.querySelector('.esc-texto').textContent, /, Pablo\.$/, 'sin header.js: solo el saludo');
 
 // shiruvana.js crea el consejo en <body>; header.js lo pasa a #ghTip
 const toast = new El('div'); toast.className = 'gn-toast'; toast.hidden = true;
@@ -379,4 +379,24 @@ test('ESC-5: si una pose tarda más en recortarse, no pisa a la que pediste desp
   const fig = portal.querySelector('.esc-portal-pose');
   assert.equal(fig.getAttribute('data-pose'), 'pensando');
   assert.equal(fig.src, 'blob:assets/brand/shiruvana/cuerpo-pensando.webp', 'la lenta llegó tarde y no pisó');
+});
+
+test('ESC-6: el globo dice el último backup (texto de header.js) y la cabecera sigue el scroll', () => {
+  const h = new El('html'); const b = h.appendChild(new El('body'));
+  const d = { readyState: 'complete', body: b, createElement: t => new El(t), querySelector: s => h.querySelector(s), querySelectorAll: s => h.querySelectorAll(s), addEventListener() {}, removeEventListener() {} };
+  b.setAttribute('data-theme', 'gato');
+  const ls = { getItem: k => (k === 'guarida:shiruvana:v1' ? JSON.stringify({ lastBackup: 123 }) : null), setItem() {} };
+  const oyentes = {};
+  const w = { document: d, MutationObserver: MO, localStorage: ls, scrollY: 0,
+    addEventListener: (t, f, o) => { oyentes[t] = { f, o }; },
+    GuaridaHeader: { api: { backupText: (meta, now) => (meta.lastBackup === 123 && now > 0 ? 'Último backup: hace 3 días' : '??') } } };
+  vm.runInNewContext(code, { window: w, setTimeout: () => 0, clearTimeout() {}, JSON, Date, Math, String, Array, Object });
+  flush();
+  assert.match(d.querySelector('.esc-texto').textContent, /, Pablo\. Último backup: hace 3 días\.$/);
+  assert.equal(b.classList.contains('esc-bajo'), false, 'arriba de todo: sin fondo');
+  assert.ok(oyentes.scroll && oyentes.scroll.o.passive, 'escucha el scroll sin frenar');
+  w.scrollY = 300; oyentes.scroll.f();
+  assert.equal(b.classList.contains('esc-bajo'), true);
+  w.scrollY = 0; oyentes.scroll.f();
+  assert.equal(b.classList.contains('esc-bajo'), false);
 });
