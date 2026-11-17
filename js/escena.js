@@ -1,6 +1,15 @@
 /*!
- * js/escena.js — «GN Escena» en La Guarida (1.1.0, 2026-11-17, BL-091 ESC-2)
+ * js/escena.js — «GN Escena» en La Guarida (1.2.0, 2026-11-17, BL-091 ESC-3)
  *
+ * 1.2.0 (ESC-3): el gato reacciona y aparezco de cuerpo entero en momentos.
+ *  - El gato festeja cuando guardás algo en el editor, cuando descargás un backup y
+ *    con los avisos que salieron bien; camina inquieto con advertencias y errores.
+ *    Escucho, no toco: el clic en «Guardar» (y que el editor se cierre), el clic en
+ *    «Descargar backup» y los avisos que llegan a la región del kit (.gk-toasts).
+ *  - En el buscador (Ctrl K) estoy de cuerpo entero al costado: saludo mientras está
+ *    vacío y pienso cuando escribís. Reemplaza el retrato de header.js solo con Gato Negro.
+ *  - Los estados vacíos (sin favoritos, sin categorías, lanzador vacío) los dibuja
+ *    css/escena.css con mis poses de cuerpo entero.
  * 1.1.0 (ESC-2): mi globo en la esquina, con el gato robot sentado encima.
  *  - Con el theme Gato Negro, el consejo del día (el .gn-toast de shiruvana.js, que
  *    header.js deja en la franja #ghTip) pasa adentro de mi globo; con cualquier otro
@@ -16,13 +25,23 @@
 (function (root) {
   'use strict';
 
-  var VERSION = '1.1.0';
+  var VERSION = '1.2.0';
   var CHISPAS = 14;
   var KEY = 'guarida:escena:v1';
   var CARA = 'assets/brand/shiruvana/shiruvana-';
+  var CUERPO = 'assets/brand/shiruvana/cuerpo-';
   var GATO = 'assets/brand/gato/gato-';
   var FRASES = ['Prrr… bip.', 'Miau. Compilando.', 'Ojo ámbar: sistema estable.', 'Bip bip. Todo en orden.'];
   var QUEJA = 'Basta, que estoy trabajando.';
+
+  // Cómo reacciona el gato a lo que pasa en La Guarida (null: no reacciona).
+  var REACCIONES = {
+    guardado: { pose: 'festeja', frase: '¡Guardado!' },
+    backup: { pose: 'festeja', frase: 'Backup a salvo.' },
+    ok: { pose: 'festeja', frase: '¡Bip!' },
+    warn: { pose: 'camina', frase: 'Ojo con eso.' },
+    error: { pose: 'camina', frase: 'Algo falló, mirá el aviso.' }
+  };
 
   function chispasHTML(n) {
     var cuantas = Math.max(0, Math.min(40, n | 0));
@@ -55,6 +74,17 @@
     return FRASES[(n > 5 ? n - 2 : n - 1) % FRASES.length];
   }
 
+  function reaccion(evento) { return Object.prototype.hasOwnProperty.call(REACCIONES, evento) ? REACCIONES[evento] : null; }
+
+  // Tipo de un aviso del kit por su clase (gk-toast--ok, --warn, --error, --info).
+  function tipoAviso(className) {
+    var m = /(?:^|\s)gk-toast--(\w+)/.exec(String(className || ''));
+    return m ? m[1] : '';
+  }
+
+  // Mi pose en el buscador: saludo con el buscador vacío, pienso cuando escribís.
+  function posePortal(query) { return String(query == null ? '' : query).trim() ? 'pensando' : 'saluda'; }
+
   function globoHTML(linea) {
     return '<button type="button" class="esc-gato" aria-label="Tocar al gato robot">' +
         '<img src="' + GATO + 'sentado.webp" alt="" width="320" height="320"></button>' +
@@ -69,9 +99,10 @@
   }
 
   var api = {
-    VERSION: VERSION, CHISPAS: CHISPAS, KEY: KEY, FRASES: FRASES, QUEJA: QUEJA,
+    VERSION: VERSION, CHISPAS: CHISPAS, KEY: KEY, FRASES: FRASES, QUEJA: QUEJA, REACCIONES: REACCIONES, CUERPO: CUERPO,
     chispasHTML: chispasHTML, dondeConsejo: dondeConsejo, plegadoInicial: plegadoInicial,
-    lineaDelDia: lineaDelDia, fraseGato: fraseGato, globoHTML: globoHTML
+    lineaDelDia: lineaDelDia, fraseGato: fraseGato, globoHTML: globoHTML,
+    reaccion: reaccion, tipoAviso: tipoAviso, posePortal: posePortal
   };
   if (typeof module !== 'undefined' && module.exports) { module.exports = api; }
   if (!root || !root.document) return;
@@ -110,6 +141,7 @@
   }
 
   function gato(pose, frase) {
+    if (!globo) return;
     var img = globo.querySelector('.esc-gato img');
     var dice = globo.querySelector('.esc-gato-dice');
     var btn = globo.querySelector('.esc-gato');
@@ -120,6 +152,11 @@
     btn.classList.add('is-salta');
     clearTimeout(tGato);
     tGato = setTimeout(function () { img.src = GATO + 'sentado.webp'; dice.textContent = ''; btn.classList.remove('is-salta'); }, 1800);
+  }
+
+  function reaccionar(evento) {
+    var r = reaccion(evento);
+    if (r) gato(r.pose, r.frase);
   }
 
   function crearGlobo() {
@@ -135,6 +172,41 @@
     plegar(plegadoInicial(load(), false), false);
   }
 
+  // ---- ESC-3: el gato escucha ----
+  function escucharAvisos(region) {
+    if (!region || !region.classList || !region.classList.contains('gk-toasts') || region.getAttribute('data-esc')) return;
+    region.setAttribute('data-esc', '1');
+    new root.MutationObserver(function (list) {
+      list.forEach(function (m) {
+        Array.prototype.forEach.call(m.addedNodes || [], function (n) { if (n.className) reaccionar(tipoAviso(n.className)); });
+      });
+    }).observe(region, { childList: true });
+  }
+
+  // ---- ESC-3: yo en el buscador ----
+  function prepararPortal(portal) {
+    if (!portal || !portal.classList || !portal.classList.contains('gn-portal') || portal.querySelector('.esc-portal-pose')) return;
+    var dialog = portal.querySelector('.gn-portal__dialog');
+    if (!dialog) return;
+    var fig = doc.createElement('img');
+    fig.className = 'esc-portal-pose';
+    fig.alt = '';
+    fig.setAttribute('aria-hidden', 'true');
+    fig.width = 201; fig.height = 300;
+    fig.onerror = function () { fig.hidden = true; }; // sin imagen, el buscador queda como antes
+    portal.insertBefore(fig, dialog);
+    var input = portal.querySelector('#gnPortalInput');
+    function pose() {
+      var p = posePortal(input ? input.value : '');
+      if (fig.getAttribute('data-pose') !== p) { fig.setAttribute('data-pose', p); fig.src = CUERPO + p + '.webp'; }
+    }
+    if (input) input.addEventListener('input', pose);
+    new root.MutationObserver(function () { if (!portal.hidden) pose(); }).observe(portal, { attributes: true, attributeFilter: ['hidden'] });
+    pose();
+  }
+
+  function alAgregar(n) { escucharAvisos(n); prepararPortal(n); }
+
   function init() {
     if (!$('.esc-chispas')) {
       var capa = doc.createElement('div');
@@ -146,6 +218,16 @@
     if ($('.esc-globo')) return;
     crearGlobo();
     ubicar();
+
+    // Guardar en el editor: si después del clic el editor se cerró, se guardó.
+    doc.addEventListener('click', function (ev) {
+      var t = ev.target;
+      if (!t || !t.closest) return;
+      if (t.closest('#exportBtn')) { reaccionar('backup'); return; }
+      if (!t.closest('#modalSave')) return;
+      setTimeout(function () { var m = $('#modal'); if (m && m.hidden) reaccionar('guardado'); }, 0);
+    }, true);
+
     if (!root.MutationObserver) return;
     // Cambio de theme: app.js escribe data-theme en <body>.
     new root.MutationObserver(ubicar).observe(doc.body, { attributes: true, attributeFilter: ['data-theme'] });
@@ -154,6 +236,11 @@
     if (tip) new root.MutationObserver(ubicar).observe(tip, { childList: true });
     // «Ahora no», la acción o Esc lo ocultan estando ya en el globo.
     new root.MutationObserver(ubicar).observe(globo.querySelector('.esc-slot'), { attributes: true, attributeFilter: ['hidden'], subtree: true });
+    // La región de avisos del kit y el buscador se crean la primera vez que hacen falta.
+    Array.prototype.forEach.call(doc.querySelectorAll('.gk-toasts, .gn-portal'), alAgregar);
+    new root.MutationObserver(function (list) {
+      list.forEach(function (m) { Array.prototype.forEach.call(m.addedNodes || [], alAgregar); });
+    }).observe(doc.body, { childList: true });
   }
 
   root.GuaridaEscena = { version: VERSION, api: api };
