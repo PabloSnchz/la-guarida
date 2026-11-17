@@ -1,6 +1,10 @@
 /*!
- * js/escena.js — «GN Escena» en La Guarida (1.2.0, 2026-11-17, BL-091 ESC-3)
+ * js/escena.js — «GN Escena» en La Guarida (1.3.0, 2026-11-17, BL-091 ESC-4)
  *
+ * 1.3.0 (ESC-4): la bienvenida del día. La primera vez que abrís La Guarida cada día
+ * (con el theme Gato Negro y sin «reducir movimiento»): pantalla negra, los ojos ámbar
+ * del gato que se abren y el saludo de la hora. Dura unos 3 s y se pasa con un toque o
+ * cualquier tecla. Guardo el día en guarida:escena:v1 ({ plegado, bienvenida }).
  * 1.2.0 (ESC-3): el gato reacciona y aparezco de cuerpo entero en momentos.
  *  - El gato festeja cuando guardás algo en el editor, cuando descargás un backup y
  *    con los avisos que salieron bien; camina inquieto con advertencias y errores.
@@ -25,7 +29,7 @@
 (function (root) {
   'use strict';
 
-  var VERSION = '1.2.0';
+  var VERSION = '1.3.0';
   var CHISPAS = 14;
   var KEY = 'guarida:escena:v1';
   var CARA = 'assets/brand/shiruvana/shiruvana-';
@@ -59,11 +63,28 @@
     return !!(guardado && guardado.plegado === true);
   }
 
-  // Lo que digo cuando no hay consejo: el saludo de la hora y cómo encontrarme.
-  function lineaDelDia(date) {
+  // El saludo de la hora (mañana 05–12, tarde 12–19, noche 19–05).
+  function saludo(date) {
     var h = date.getHours();
-    var saludo = h >= 5 && h < 12 ? 'Buen día' : (h >= 12 && h < 19 ? 'Buenas tardes' : 'Buenas noches');
-    return saludo + ', Pablo. Ctrl K y te llevo a donde quieras.';
+    return h >= 5 && h < 12 ? 'Buen día' : (h >= 12 && h < 19 ? 'Buenas tardes' : 'Buenas noches');
+  }
+
+  // Lo que digo cuando no hay consejo: el saludo de la hora y cómo encontrarme.
+  function lineaDelDia(date) { return saludo(date) + ', Pablo. Ctrl K y te llevo a donde quieras.'; }
+
+  // El día local, para la bienvenida (una por día).
+  function diaKey(date) { return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(); }
+
+  // ¿Toca la bienvenida? Solo con Gato Negro, sin «reducir movimiento» y si hoy no la viste.
+  function tocaBienvenida(guardado, hoy, theme, reducido) {
+    if (theme !== 'gato' || reducido) return false;
+    return !(guardado && guardado.bienvenida === hoy);
+  }
+
+  function bienvenidaHTML(date) {
+    return '<div class="esc-ojos"><i></i><i></i></div>' +
+      '<p class="esc-bv-saludo">' + saludo(date) + ', Pablo</p>' +
+      '<p class="esc-bv-pasar">La Guarida está lista. Tocá para pasar.</p>';
   }
 
   // El gato: cuatro frases que rotan; el quinto toque, la queja.
@@ -102,6 +123,7 @@
     VERSION: VERSION, CHISPAS: CHISPAS, KEY: KEY, FRASES: FRASES, QUEJA: QUEJA, REACCIONES: REACCIONES, CUERPO: CUERPO,
     chispasHTML: chispasHTML, dondeConsejo: dondeConsejo, plegadoInicial: plegadoInicial,
     lineaDelDia: lineaDelDia, fraseGato: fraseGato, globoHTML: globoHTML,
+    saludo: saludo, diaKey: diaKey, tocaBienvenida: tocaBienvenida, bienvenidaHTML: bienvenidaHTML, BIENVENIDA_MS: 3200,
     reaccion: reaccion, tipoAviso: tipoAviso, posePortal: posePortal
   };
   if (typeof module !== 'undefined' && module.exports) { module.exports = api; }
@@ -111,6 +133,13 @@
   function $(s) { return doc.querySelector(s); }
   function load() { try { return JSON.parse(root.localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
   function store(v) { try { root.localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) { /* sin lugar: no es grave */ } }
+  // Suma un dato a lo guardado sin pisar lo demás.
+  function anotar(parche) {
+    var g = load();
+    if (!g || typeof g !== 'object') g = {};
+    for (var k in parche) if (Object.prototype.hasOwnProperty.call(parche, k)) g[k] = parche[k];
+    store(g);
+  }
 
   var globo = null, toques = 0, tGato = null;
 
@@ -122,7 +151,7 @@
     b.setAttribute('aria-label', si ? 'Abrir mi globo' : 'Plegar mi globo');
     b.title = si ? 'Abrir' : 'Plegar';
     b.textContent = si ? '⇱' : '⇲';
-    if (guardar) store({ plegado: si });
+    if (guardar) anotar({ plegado: si });
   }
 
   function consejo() { return $('.gn-toast'); }
@@ -207,6 +236,29 @@
 
   function alAgregar(n) { escucharAvisos(n); prepararPortal(n); }
 
+  // ---- ESC-4: la bienvenida del día ----
+  function bienvenida() {
+    var ahora = new Date();
+    var hoy = diaKey(ahora);
+    var reducido = !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    if (!tocaBienvenida(load(), hoy, doc.body.getAttribute('data-theme'), reducido)) return;
+    anotar({ bienvenida: hoy });
+    var capa = doc.createElement('div');
+    capa.className = 'esc-bienvenida';
+    capa.setAttribute('aria-hidden', 'true'); // el saludo ya está en el h1 de la página
+    capa.innerHTML = bienvenidaHTML(ahora);
+    var t = null;
+    function cerrar() {
+      clearTimeout(t);
+      doc.removeEventListener('keydown', cerrar, true);
+      if (capa.parentNode) capa.parentNode.removeChild(capa);
+    }
+    capa.addEventListener('click', cerrar);
+    doc.addEventListener('keydown', cerrar, true);
+    doc.body.appendChild(capa);
+    t = setTimeout(cerrar, api.BIENVENIDA_MS);
+  }
+
   function init() {
     if (!$('.esc-chispas')) {
       var capa = doc.createElement('div');
@@ -218,6 +270,7 @@
     if ($('.esc-globo')) return;
     crearGlobo();
     ubicar();
+    bienvenida();
 
     // Guardar en el editor: si después del clic el editor se cerró, se guardó.
     doc.addEventListener('click', function (ev) {
