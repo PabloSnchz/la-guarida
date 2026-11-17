@@ -1,6 +1,7 @@
 // Tests del cableado de js/escena.js (BL-091 ESC-2) con un DOM falso mínimo: el consejo
 // pasa a mi globo con Gato Negro y vuelve a la franja con otro theme, el plegado se recuerda
-// y un consejo nuevo abre el globo. Sin dependencias: corre con node --test.
+// y un consejo nuevo abre el globo (ESC-2); el gato reacciona a guardar, al backup y a los
+// avisos, y en el buscador estoy de cuerpo entero (ESC-3). Sin dependencias: corre con node --test.
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -12,7 +13,7 @@ class MO {
   constructor(cb) { this.cb = cb; }
   observe(node, opts) { observers.push({ mo: this, node, opts }); }
 }
-function notify(target, type, attr) {
+function notify(target, type, attr, added) {
   const hits = new Set();
   for (const o of observers) {
     let ok = false;
@@ -23,7 +24,7 @@ function notify(target, type, attr) {
     }
     if (ok) hits.add(o.mo);
   }
-  pending.push(...[...hits].map(m => () => m.cb([{ target, type, attributeName: attr }])));
+  pending.push(...[...hits].map(m => () => m.cb([{ target, type, attributeName: attr, addedNodes: added || [] }])));
 }
 let pending = [];
 function flush() { let n = 0; while (pending.length) { const q = pending; pending = []; q.forEach(f => f()); if (++n > 50) throw new Error('bucle de observers'); } return n; }
@@ -38,7 +39,15 @@ class El {
   set hidden(v) { if (v) this.attrs.hidden = ''; else delete this.attrs.hidden; notify(this, 'attributes', 'hidden'); }
   setAttribute(k, v) { if (k === 'class') this.className = v; else this.attrs[k] = String(v); notify(this, 'attributes', k); }
   getAttribute(k) { return k in this.attrs ? this.attrs[k] : null; }
-  appendChild(c) { if (c.parentNode) { const p = c.parentNode; p.children.splice(p.children.indexOf(c), 1); notify(p, 'childList'); } c.parentNode = this; this.children.push(c); notify(this, 'childList'); return c; }
+  appendChild(c) { if (c.parentNode) { const p = c.parentNode; p.children.splice(p.children.indexOf(c), 1); notify(p, 'childList'); } c.parentNode = this; this.children.push(c); notify(this, 'childList', null, [c]); return c; }
+  insertBefore(c, ref) { this.appendChild(c); const i = this.children.indexOf(ref); this.children.splice(this.children.indexOf(c), 1); this.children.splice(i, 0, c); return c; }
+  closest(sel) { for (let n = this; n && n.matches; n = n.parentNode) if (n.matches(sel)) return n; return null; }
+  get value() { return this.attrs.value || ''; }
+  set value(v) { this.attrs.value = v; }
+  set alt(v) { this.attrs.alt = v; }
+  set width(v) { this.attrs.width = v; }
+  set height(v) { this.attrs.height = v; }
+  dispatch(t) { (this.listeners[t] || []).forEach(f => f({ target: this })); }
   addEventListener(t, f) { (this.listeners[t] = this.listeners[t] || []).push(f); }
   click() { (this.listeners.click || []).forEach(f => f({ target: this })); }
   get textContent() { return this._text + this.children.map(c => c.textContent).join(''); }
@@ -156,4 +165,71 @@ body2.setAttribute('data-theme', 'gato');
 vm.runInNewContext(code, { window: { document: doc2, MutationObserver: MO, localStorage: win.localStorage }, setTimeout: (f, t) => { const x = setTimeout(f, t); x.unref(); return x; }, clearTimeout, JSON, Date, Math, String });
 flush();
 assert.ok(doc2.querySelector('.esc-globo').classList.contains('is-plegado'), 'recuerda el plegado');
+});
+
+test('ESC-3: el gato reacciona y yo en el buscador', async () => {
+  const html3 = new El('html'); const body3 = html3.appendChild(new El('body'));
+  body3.appendChild(new El('div')).attrs.id = 'ghTip';
+  const modal = body3.appendChild(new El('div')); modal.attrs.id = 'modal'; modal.hidden = true;
+  const save = modal.appendChild(new El('button')); save.attrs.id = 'modalSave';
+  const exp = body3.appendChild(new El('button')); exp.attrs.id = 'exportBtn';
+  const docL = [];
+  const doc3 = { readyState: 'complete', body: body3, createElement: t => new El(t), querySelector: s => html3.querySelector(s), querySelectorAll: s => html3.querySelectorAll(s),
+    addEventListener: (t, f, cap) => { if (t === 'click') docL.push(f); } };
+  const clic = el => docL.forEach(f => f({ target: el }));
+  const later = [];
+  const st = (f, t) => { if (t === 0) { later.push(f); return 0; } const x = setTimeout(f, t); x.unref(); return x; };
+  body3.setAttribute('data-theme', 'gato');
+  vm.runInNewContext(code, { window: { document: doc3, MutationObserver: MO, localStorage: { getItem: () => null, setItem() {} } }, setTimeout: st, clearTimeout, JSON, Date, Math, String, Array, Object });
+  flush();
+  const g = doc3.querySelector('.esc-globo');
+  const dice = () => g.querySelector('.esc-gato-dice').textContent;
+  const pose = () => g.querySelector('.esc-gato img').src;
+  const correr = () => { while (later.length) later.shift()(); flush(); };
+
+  // Guardar con un error de validación: el editor sigue abierto, el gato no festeja
+  modal.hidden = false; flush();
+  clic(save); correr();
+  assert.equal(dice(), '', 'no festeja si no se guardó');
+  // Guardar de verdad: app.js cierra el editor
+  clic(save); modal.hidden = true; correr();
+  assert.equal(dice(), '¡Guardado!');
+  assert.match(pose(), /gato-festeja\.webp$/);
+
+  clic(exp); correr();
+  assert.equal(dice(), 'Backup a salvo.');
+
+  // Avisos del kit: la región se crea la primera vez que hace falta
+  const region = body3.appendChild(new El('div')); region.className = 'gk-toasts'; flush();
+  const aviso = k => { const a = new El('div'); a.className = 'gk-toast gk-toast--' + k; region.appendChild(a); flush(); };
+  aviso('warn');
+  assert.equal(dice(), 'Ojo con eso.');
+  assert.match(pose(), /gato-camina\.webp$/);
+  aviso('ok');
+  assert.equal(dice(), '¡Bip!');
+  g.querySelector('.esc-gato-dice').textContent = '';
+  aviso('info');
+  assert.equal(dice(), '', 'los borrados con «Deshacer» no se festejan');
+  // Si la región se vuelve a agregar, la escucho una sola vez
+  body3.appendChild(region); flush();
+  assert.equal(observers.filter(o => o.node === region).length, 1, 'un solo oyente en la región');
+
+  // El buscador lo crea shiruvana.js la primera vez (y header.js le pone su retrato)
+  const portal = new El('div'); portal.className = 'gn-portal'; portal.hidden = true;
+  const ghFig = portal.appendChild(new El('img')); ghFig.className = 'gh-portal-fig';
+  const dialog = portal.appendChild(new El('div')); dialog.className = 'gn-portal__dialog';
+  const input = dialog.appendChild(new El('input')); input.attrs.id = 'gnPortalInput';
+  body3.appendChild(portal); flush();
+  const fig = portal.querySelector('.esc-portal-pose');
+  assert.ok(fig, 'mi pose está en el buscador');
+  assert.equal(portal.children.indexOf(fig), portal.children.indexOf(dialog) - 1, 'al costado, antes del cuadro');
+  assert.match(fig.src, /cuerpo-saluda\.webp$/);
+  portal.hidden = false; flush();
+  input.value = 'bov'; input.dispatch('input');
+  assert.match(fig.src, /cuerpo-pensando\.webp$/);
+  input.value = ''; portal.hidden = true; flush(); portal.hidden = false; flush();
+  assert.match(fig.src, /cuerpo-saluda\.webp$/, 'al reabrir vacío, saludo');
+  // No se duplica si el buscador se vuelve a agregar
+  body3.appendChild(portal); flush();
+  assert.equal(portal.querySelectorAll('.esc-portal-pose').length, 1);
 });
