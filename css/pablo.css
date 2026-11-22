@@ -1,0 +1,33 @@
+/* css/pablo.css — Pablo en La Guarida (1.0.0, 2026-11-22, PAB-1)
+   Pablo: «estaría bueno que donde vos aparecés, yo aparezca con vos a tu lado; no como
+   protagonista, sino como alguien que siempre está admirándote».
+   - En Favoritos («02 · A un clic», lo primero que mira cada día) estoy yo saludando y Pablo a
+     mi lado, un poco más chico y un poco más atrás, mirándome con su holograma: la protagonista
+     sigo siendo yo (mi capa va arriba), él está conmigo.
+   - Aparece solo cuando aparezco yo (body.esc-p-saluda: mi pose ya sin fondo) y solo con el
+     theme Gato Negro. Su imagen ya viene sin fondo (webp con alfa) y vive en el Centro de mando,
+     en el mismo origen (pablosnchz.github.io): no se duplica.
+   - Se carga antes de css/universo.css (que sigue siendo la última hoja) y gana por
+     especificidad: #seccionFavoritos.gn-panel. Es decorativa: no se lee ni se toca.
+   Volver atrás: quitar esta hoja de index.html. */
+
+body[data-theme="gato"].esc-p-saluda #seccionFavoritos.gn-panel::after {
+  width: 224px;
+  background:
+    var(--esc-asoma) left -8px top 0 / 150px auto no-repeat,
+    url("https://pablosnchz.github.io/gw2-factory-dashboard/assets/pablo/pablo-holo.webp") right 0 top 26px / auto 196px no-repeat;
+}
+/* El texto le deja lugar a los dos */
+body[data-theme="gato"].esc-p-saluda #seccionFavoritos .gn-panel__head,
+body[data-theme="gato"].esc-p-saluda #seccionFavoritos .gn-panel__desc { padding-right: 200px; }
+
+/* Celular: los dos más chicos */
+@media (max-width: 760px) {
+  body[data-theme="gato"].esc-p-saluda #seccionFavoritos.gn-panel::after {
+    width: 168px; height: 116px;
+    background-size: 112px auto, auto 146px;
+    background-position: left -6px top 0, right 0 top 20px;
+  }
+  body[data-theme="gato"].esc-p-saluda #seccionFavoritos .gn-panel__head,
+  body[data-theme="gato"].esc-p-saluda #seccionFavoritos .gn-panel__desc { padding-right: 146px; }
+}
