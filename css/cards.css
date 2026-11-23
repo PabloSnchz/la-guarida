@@ -1,4 +1,4 @@
-/* css/cards.css — Tarjetas de La Guarida (1.1.0, 2026-11-23, FAV-1; 1.0.0 RG-3)
+/* css/cards.css — Tarjetas de La Guarida (1.2.0, 2026-11-23, FLU-1; 1.1.0 FAV-1; 1.0.0 RG-3)
    Un color por sección (aprobado por Pablo en RG-0b): ámbar Favoritos, violeta
    Categorías, turquesa Lanzador. Los colores fijos van en bordes, brillos y puntos,
    nunca como color de texto (en los themes claros no llegarían a 4,5:1); el texto
@@ -84,6 +84,18 @@ body[data-theme="gato"] #seccionCategorias .category-title { color: #C9BBFF; }
 .categories-grid:not(:has(.category-card))::after { content: "Todavía no hay categorías. Creá una con «+ Categoría»."; order: -1; }
 .favorites-grid:not(:has(.fav-card))::before,
 .categories-grid:not(:has(.category-card))::before { order: -2; }
+
+/* ---- Fluidez (1.2.0, FLU-1): mientras bajás la página ----
+   js/data.js pone body.gn-scrolleando durante el scroll (y 150 ms después). Mientras tanto:
+   - las tarjetas no reaccionan al mouse que pasa por encima (cada una se levantaba, brillaba
+     y se repintaba al cruzarla: eso eran buena parte de los saltitos);
+   - se pausan las animaciones decorativas que no paran nunca (mi pose que flota en cada panel
+     y las chispas del fondo). Al quedarse quieta la página, todo sigue donde estaba.
+   - el escenario del fondo queda en su propia capa (se pinta una vez). */
+body.gn-scrolleando .app-main { pointer-events: none; }
+body[data-theme].gn-scrolleando .gn-panel::after,
+body[data-theme].gn-scrolleando .esc-chispas i { animation-play-state: paused; }
+body[data-theme="gato"]::before { will-change: transform; }
 
 @media (prefers-reduced-motion: reduce) {
   #seccionFavoritos .fav-card:hover, #launcherPanel .launcher-item:hover { transform: none; }
