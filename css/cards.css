@@ -1,4 +1,4 @@
-/* css/cards.css — Tarjetas de La Guarida (1.0.0, 2026-10-31, RG-3)
+/* css/cards.css — Tarjetas de La Guarida (1.1.0, 2026-11-23, FAV-1; 1.0.0 RG-3)
    Un color por sección (aprobado por Pablo en RG-0b): ámbar Favoritos, violeta
    Categorías, turquesa Lanzador. Los colores fijos van en bordes, brillos y puntos,
    nunca como color de texto (en los themes claros no llegarían a 4,5:1); el texto
@@ -25,6 +25,24 @@
 #seccionFavoritos .fav-card:hover .fav-icon,
 #seccionFavoritos .fav-card:hover .fav-emoji { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gh-fav) 60%, var(--border)); }
 #seccionFavoritos .gn-usual__chip:hover { border-color: var(--gh-fav); }
+
+/* ---- Íconos de Favoritos (1.1.0, FAV-1) ----
+   Todos del mismo tamaño (44 px; el estilo en línea de js/data.js dice 40) y en el mismo aro
+   (círculo con el theme Gato Negro, cuadrado redondeado en los demás). js/data.js pone la clase:
+   - .fi-llena: nuestros sitios (mi DEV, Shiruna, Centro de mando, GitHub) y las imágenes que
+     elegiste a mano: llenan el aro, sin marco doble.
+   - .fi-web: favicons de la web. Están hechos para la pestaña clara del navegador, así que van
+     sobre un disco claro: los cuadrados blancos dejan de flotar y ninguno oscuro se pierde. */
+#seccionFavoritos .fav-card img.fav-icon { width: 44px !important; height: 44px !important; border-radius: 12px !important; }
+#seccionFavoritos .fav-card img.fi-llena { padding: 0; object-fit: cover !important; }
+#seccionFavoritos .fav-card img.fi-web { padding: 9px; object-fit: contain !important; background: #F4F4F7 !important; }
+body[data-theme="gato"] #seccionFavoritos .fav-card img.fav-icon { border-radius: 50% !important; }
+
+/* «Lo de siempre»: el mismo ícono, chico, en vez del emoji */
+.gn-usual__ico { display: inline-grid; place-items: center; flex: none; width: 18px; height: 18px; }
+.gn-usual__ico img { width: 18px !important; height: 18px !important; border-radius: 50% !important; }
+.gn-usual__ico img.fi-llena { padding: 0; object-fit: cover !important; }
+.gn-usual__ico img.fi-web { padding: 2px; object-fit: contain !important; background: #F4F4F7; }
 
 /* ---- Categorías (violeta) ---- */
 #seccionCategorias .category-card { border-left: 3px solid color-mix(in srgb, var(--gh-cat) 70%, var(--border)); }
