@@ -4,6 +4,8 @@
  * v9 — FAV-1 (2026-11-23, íconos 1.0.0): nuestros sitios con su propio ícono (mi DEV, Shiruna,
  *      Centro de mando) y GitHub visible; clases fi-llena / fi-web para que css/cards.css
  *      les dé a todos el mismo aro; «Lo de siempre» con el ícono real en vez del emoji.
+ * v10 — FLU-1 (2026-11-23, fluidez 1.0.0): un solo reloj de widgets.js y body.gn-scrolleando
+ *      mientras bajás la página (css/cards.css apaga el hover y pausa lo decorativo).
  */
 (function (root) {
   'use strict';
@@ -184,7 +186,7 @@
   // Ganan sobre icon_url y emoji (son nuestros); solo un ícono subido a mano (icon_data) los pisa.
   var ICONOS_VERSION = '1.0.0';
   var GATO_PATH = 'M8 25V12l3-5 3 4h4l3-4 3 5v13c0 1-1 2-2 2H10c-1 0-2-1-2-2z';
-  var GITHUB_PATH = 'M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z';
+  var GITHUB_PATH = 'M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.950-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z';
 
   function svgURI(svg) { return 'data:image/svg+xml,' + encodeURIComponent(svg); }
 
@@ -304,6 +306,52 @@
     return n;
   }
 
+  // ====== Fluidez (FLU-1, 1.0.0, 2026-11-23) ======
+  // Pablo: al bajar la página se sentía pesada y con saltitos. Dos causas de este lado:
+  // 1) widgets.js arranca un reloj de 1 s (function tick) cada vez que dibuja los widgets y nunca
+  //    para el anterior: con el uso se juntaban decenas de relojes tocando la página cada segundo.
+  //    Dejo pasar uno solo: el primero sigue andando (busca los widgets en cada vuelta, así que
+  //    sirve igual después de redibujar) y los nuevos se descartan. widgets.js no cambia.
+  //    Lo reconozco por su nombre, su segundo y porque trabaja con .widget--clock: nada más se toca.
+  // 2) body.gn-scrolleando mientras bajás (hasta 150 ms después del último paso): css/cards.css
+  //    apaga el efecto de pasar el mouse por las tarjetas (cada una se levantaba y brillaba al
+  //    cruzarla) y pausa las animaciones decorativas.
+  var FLUIDEZ_VERSION = '1.0.0';
+  var QUIETO_MS = 150;
+
+  function esRelojWidgets(fn, ms) {
+    return typeof fn === 'function' && fn.name === 'tick' && ms === 1000 && String(fn).indexOf('.widget--clock') !== -1;
+  }
+
+  function unSoloReloj(win) {
+    var nativo = win && win.setTimeout;
+    if (typeof nativo !== 'function' || nativo.__gnUnReloj) return false;
+    var vivo = null;
+    var envuelto = function (fn, ms) {
+      if (esRelojWidgets(fn, ms)) {
+        if (vivo && fn !== vivo) return 0; // ya hay uno andando
+        vivo = fn;
+      }
+      return nativo.apply(win, arguments);
+    };
+    envuelto.__gnUnReloj = true;
+    win.setTimeout = envuelto;
+    return true;
+  }
+
+  function marcarScrolleo(win) {
+    var doc = win && win.document;
+    if (!doc || !win.addEventListener) return false;
+    var t = null;
+    win.addEventListener('scroll', function () {
+      if (!doc.body) return;
+      if (!t) doc.body.classList.add('gn-scrolleando');
+      win.clearTimeout(t);
+      t = win.setTimeout(function () { t = null; doc.body.classList.remove('gn-scrolleando'); }, QUIETO_MS);
+    }, { passive: true });
+    return true;
+  }
+
   root.Data = {
     state: state,
     load: load,
@@ -320,8 +368,16 @@
     sitioPropio: sitioPropio,
     iconoSitio: iconoSitio,
     esFaviconWeb: esFaviconWeb,
-    decorarChips: decorarChips
+    decorarChips: decorarChips,
+    FLUIDEZ_VERSION: FLUIDEZ_VERSION,
+    QUIETO_MS: QUIETO_MS,
+    esRelojWidgets: esRelojWidgets,
+    unSoloReloj: unSoloReloj,
+    marcarScrolleo: marcarScrolleo
   };
+
+  // En el navegador, enseguida: data.js carga antes que widgets.js y app.js.
+  if (root.document) { unSoloReloj(root); marcarScrolleo(root); }
 
   // En el navegador: cada vez que shiruvana.js repinta «Lo de siempre», le pongo los íconos.
   if (root.document && root.MutationObserver) {
