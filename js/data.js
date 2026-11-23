@@ -1,6 +1,9 @@
 /*!
  * js/data.js — Estado y persistencia
  * v8 — Theme oficial Gato Negro por defecto (migración de una sola vez desde Bóveda)
+ * v9 — FAV-1 (2026-11-23, íconos 1.0.0): nuestros sitios con su propio ícono (mi DEV, Shiruna,
+ *      Centro de mando) y GitHub visible; clases fi-llena / fi-web para que css/cards.css
+ *      les dé a todos el mismo aro; «Lo de siempre» con el ícono real en vez del emoji.
  */
 (function (root) {
   'use strict';
@@ -170,6 +173,66 @@
   function esc(s) { return String(s || '').replace(/[&<>]/g, function(m) { return ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]); }); }
   function getDomain(url) { try { return new URL(url).hostname; } catch(e) { return ''; } }
 
+  // ====== Íconos (FAV-1, 1.0.0, 2026-11-23) ======
+  // Pablo: los favoritos de Shiruvana-dev y Shiruna-dev se veían iguales, el de GitHub no se
+  // veía y el Centro de mando quedaba sin marco. Nuestros sitios llevan su ícono acá mismo
+  // (SVG en línea, sin red); mismo gato de la marca, distinto color por dueño:
+  //   dev     → mi DEV (La Bóveda que evoluciono): marco violeta, ojos ámbar (la marca tal cual)
+  //   shiruna → el DEV de Shiruna: marco rosa, ojos turquesa y un moñito
+  //   centro  → el Centro de mando: disco violeta, ojos ámbar
+  //   github  → GitHub: la marca clara sobre disco oscuro (la oscura se perdía en el panel)
+  // Ganan sobre icon_url y emoji (son nuestros); solo un ícono subido a mano (icon_data) los pisa.
+  var ICONOS_VERSION = '1.0.0';
+  var GATO_PATH = 'M8 25V12l3-5 3 4h4l3-4 3 5v13c0 1-1 2-2 2H10c-1 0-2-1-2-2z';
+  var GITHUB_PATH = 'M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z';
+
+  function svgURI(svg) { return 'data:image/svg+xml,' + encodeURIComponent(svg); }
+
+  function svgGato(fondo, aro, ojos, extra) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">' +
+      '<circle cx="16" cy="16" r="15.25" fill="' + fondo + '" stroke="' + aro + '" stroke-width="1.5"/>' +
+      '<path d="' + GATO_PATH + '" fill="#0F1117"/>' +
+      '<ellipse cx="13" cy="17" rx="1.6" ry="2.2" fill="' + ojos + '"/>' +
+      '<ellipse cx="19" cy="17" rx="1.6" ry="2.2" fill="' + ojos + '"/>' + (extra || '') + '</svg>';
+  }
+
+  var ICONOS_SVG = {
+    dev: svgGato('#232A3A', '#7B5CFF', '#F2B94B'),
+    shiruna: svgGato('#3A2036', '#FF6FAE', '#2EC4B6',
+      '<path d="M20.6 8.6l2.3-1.7v3.4zM25.4 8.6l-2.3-1.7v3.4z" fill="#FF6FAE"/><circle cx="23" cy="8.6" r=".9" fill="#FF6FAE"/>'),
+    centro: svgGato('#5A3DDB', '#C9BBFF', '#F2B94B'),
+    github: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#24292F"/>' +
+      '<path transform="translate(6 6) scale(1.25)" fill="#F0F3F6" d="' + GITHUB_PATH + '"/></svg>'
+  };
+
+  // Dirección sin protocolo ni www, en minúsculas → ícono. El orden importa: lo más largo primero.
+  var SITIOS = [
+    ['pablosnchz.github.io/gw2-factory-dashboard', 'centro'],
+    ['pablosnchz.github.io/gw2-factory-dev', 'dev'],
+    ['gw2-factory-dev.vercel.app', 'dev'],
+    ['shiruna-gato-negro.github.io', 'shiruna'],
+    ['github.com', 'github']
+  ];
+
+  function sitioPropio(url) {
+    var k = String(url || '').trim().toLowerCase()
+      .replace(/^[a-z][a-z0-9+.-]*:\/\//, '').replace(/^www\./, '').replace(/[?#].*$/, '');
+    for (var i = 0; i < SITIOS.length; i++) {
+      var p = SITIOS[i][0];
+      if (k === p || k.indexOf(p + '/') === 0) return SITIOS[i][1];
+    }
+    return '';
+  }
+
+  function iconoSitio(clave) { return ICONOS_SVG[clave] ? svgURI(ICONOS_SVG[clave]) : ''; }
+
+  // Un icon_url que en realidad es un favicon (servicios de favicons o .ico) va como favicon.
+  function esFaviconWeb(u) {
+    return /icon\.horse\/|google\.com\/s2\/favicons|duckduckgo\.com\/ip3\/|favicon|\.ico(?:[?#]|$)/i.test(String(u || ''));
+  }
+
+  function clase(base, extra) { return ((base || '') + ' ' + extra).trim(); }
+
   function getFaviconHTML(item, size, cssClass) {
     var s = size || 32;
     var emojiClass = cssClass === 'fav-icon' ? 'fav-emoji' : 'link-emoji';
@@ -177,15 +240,20 @@
     var emoji = item.emoji || '';
     var icon_url = item.icon_url || '';
     var icon_data = item.icon_data || '';
+
+    var sitio = icon_data ? '' : sitioPropio(url);
+    if (sitio) {
+      return '<img class="' + clase(cssClass, 'fi-llena') + '" src="' + iconoSitio(sitio) + '" alt="" data-sitio="' + sitio + '" style="width:' + s + 'px;height:' + s + 'px;border-radius:50%;object-fit:cover;">';
+    }
     
     if (icon_url && icon_url.trim()) {
-      return '<img class="' + (cssClass || '') + '" src="' + esc(icon_url) + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
+      return '<img class="' + clase(cssClass, esFaviconWeb(icon_url) ? 'fi-web' : 'fi-llena') + '" src="' + esc(icon_url) + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
              'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';">' +
              '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">' + (emoji || '🔗') + '</span>';
     }
     
     if (icon_data) {
-      return '<img class="' + (cssClass || '') + '" src="' + icon_data + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;">';
+      return '<img class="' + clase(cssClass, 'fi-llena') + '" src="' + icon_data + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;">';
     }
     
     if (emoji && emoji.trim()) {
@@ -198,12 +266,42 @@
       var googleFavicon = 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=256';
       var duckduckgoFavicon = 'https://icons.duckduckgo.com/ip3/' + domain + '.ico';
       
-      return '<img class="' + (cssClass || '') + '" src="' + iconHorseFavicon + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
+      return '<img class="' + clase(cssClass, 'fi-web') + '" src="' + iconHorseFavicon + '" alt="" style="width:' + s + 'px;height:' + s + 'px;border-radius:8px;object-fit:contain;" ' +
              'onerror="if(!this.dataset.fallback1){this.dataset.fallback1=1;this.src=\'' + googleFavicon + '\';}else if(!this.dataset.fallback2){this.dataset.fallback2=1;this.src=\'' + duckduckgoFavicon + '\';}else{this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';}">' +
              '<span class="' + emojiClass + '" style="display:none;width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">🔗</span>';
     }
     
     return '<span class="' + emojiClass + '" style="width:' + s + 'px;height:' + s + 'px;font-size:' + (s * 0.7) + 'px;line-height:' + s + 'px;">🔗</span>';
+  }
+
+  // ====== «Lo de siempre» con el ícono real (FAV-1) ======
+  // js/shiruvana.js pinta cada chip con un emoji (⭐ para todo favorito). Acá cambio ese emoji
+  // por el mismo ícono de la tarjeta. El chip trae el nombre en title: busco primero en
+  // Favoritos, después en los enlaces de Categorías y al final en el Lanzador.
+  function itemPorNombre(nombre) {
+    if (!nombre) return null;
+    var i, j, cs = state.categories || [];
+    for (i = 0; i < (state.favorites || []).length; i++) if (state.favorites[i].name === nombre) return state.favorites[i];
+    for (i = 0; i < cs.length; i++) for (j = 0; j < (cs[i].links || []).length; j++) if (cs[i].links[j].name === nombre) return cs[i].links[j];
+    var lz = (state.games || []).concat(state.apps || []);
+    for (i = 0; i < lz.length; i++) if (lz[i].name === nombre) return lz[i];
+    return null;
+  }
+
+  function decorarChips(box) {
+    if (!box || !box.querySelectorAll) return 0;
+    var n = 0;
+    Array.prototype.forEach.call(box.querySelectorAll('.gn-usual__chip'), function (chip) {
+      if (chip.getAttribute('data-ico')) return;
+      var span = chip.querySelector('span[aria-hidden]');
+      var it = itemPorNombre(chip.getAttribute('title'));
+      if (!span || !it) return;
+      chip.setAttribute('data-ico', '1');
+      span.className = 'gn-usual__ico';
+      span.innerHTML = getFaviconHTML(it, 18, 'gn-usual__img');
+      n++;
+    });
+    return n;
   }
 
   root.Data = {
@@ -217,7 +315,24 @@
     getDomain: getDomain,
     getFaviconHTML: getFaviconHTML,
     DEFAULT_STATE: DEFAULT_STATE,
-    DEFAULT_THEME: DEFAULT_THEME
+    DEFAULT_THEME: DEFAULT_THEME,
+    ICONOS_VERSION: ICONOS_VERSION,
+    sitioPropio: sitioPropio,
+    iconoSitio: iconoSitio,
+    esFaviconWeb: esFaviconWeb,
+    decorarChips: decorarChips
   };
+
+  // En el navegador: cada vez que shiruvana.js repinta «Lo de siempre», le pongo los íconos.
+  if (root.document && root.MutationObserver) {
+    var conectar = function () {
+      var box = root.document.getElementById('usualChips');
+      if (!box) return;
+      decorarChips(box);
+      new root.MutationObserver(function () { decorarChips(box); }).observe(box, { childList: true });
+    };
+    if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', conectar);
+    else conectar();
+  }
 
 })(typeof window !== 'undefined' ? window : this);
